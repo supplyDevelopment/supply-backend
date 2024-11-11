@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 5432
+      POSTGRES_DB: supplydb
+    volumes:
+      - ./src/main/resources/db/ainitscript.sql:/docker-entrypoint-initdb.d/ainitscript.sql
+      - ./src/main/resources/db/company.sql:/docker-entrypoint-initdb.d/company.sql
+      - ./src/main/resources/db/user.sql:/docker-entrypoint-initdb.d/user.sql
+    ports:
+      - "4000:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/supplydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
