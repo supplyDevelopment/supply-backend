@@ -1,4 +1,4 @@
-package ru.supply.data.utils;
+package ru.supply.data.utils.user;
 
 import lombok.Getter;
 

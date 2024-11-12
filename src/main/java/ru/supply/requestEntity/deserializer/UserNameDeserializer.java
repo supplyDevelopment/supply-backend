@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import ru.supply.configuration.exception.IncorrectInputException;
-import ru.supply.data.utils.UserName;
+import ru.supply.data.utils.user.UserName;
 
 import java.io.IOException;
 

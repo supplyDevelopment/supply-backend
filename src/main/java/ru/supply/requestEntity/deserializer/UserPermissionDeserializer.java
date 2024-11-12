@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import ru.supply.data.utils.UserPermission;
+import ru.supply.data.utils.user.UserPermission;
 
 import java.io.IOException;
 import java.util.List;
