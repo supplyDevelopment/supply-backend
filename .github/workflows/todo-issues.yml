@@ -3,7 +3,7 @@ name: Create Issues for TODOs
 on:
   push:
     branches:
-      - '*'  # Укажите нужную ветку, если хотите отслеживать другую
+      - '*'  # Отслеживает все ветки
 
 jobs:
   find-todos:
@@ -11,26 +11,38 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3  # Обновили до v3
 
       - name: Find TODOs in code
         id: find_todos
         run: |
-          # Находим все комментарии с TODO
+          # Находим все комментарии с TODO и выводим результат для проверки
           grep -rnw '.' -e '@TODO' > todos.txt || true
+          cat todos.txt  # Выводим содержимое todos.txt для отладки
 
       - name: Create GitHub Issues
-        if: success() && steps.find_todos.outputs.todo_count != '0'
+        if: success()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          while IFS= read -r line; do
-            # Извлекаем информацию о файле, строке и тексте TODO
-            file=$(echo "$line" | cut -d':' -f1)
-            line_number=$(echo "$line" | cut -d':' -f2)
-            todo_text=$(echo "$line" | cut -d':' -f3-)
-            # Создаем issue с информацией о TODO
-            curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-              -d "{\"title\": \"TODO: $todo_text\", \"body\": \"Найдено в $file на строке $line_number.\"}" \
-              https://api.github.com/repos/$GITHUB_REPOSITORY/issues
-          done < todos.txt
+          if [ -s todos.txt ]; then
+            echo "TODO найден. Создаем задачи."
+            while IFS= read -r line; do
+              file=$(echo "$line" | cut -d':' -f1)
+              line_number=$(echo "$line" | cut -d':' -f2)
+              todo_text=$(echo "$line" | cut -d':' -f3-)
+
+              # Логируем данные для отладки
+              echo "Файл: $file"
+              echo "Строка: $line_number"
+              echo "TODO: $todo_text"
+
+              # Создаем issue с использованием GitHub API
+              curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                -d "{\"title\": \"TODO: $todo_text\", \"body\": \"Найдено в $file на строке $line_number.\"}" \
+                https://api.github.com/repos/$GITHUB_REPOSITORY/issues
+            done < todos.txt
+          else
+            echo "Нет TODO комментариев для создания задач."
+          fi
