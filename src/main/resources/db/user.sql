@@ -9,14 +9,14 @@ CREATE TABLE company_user(
     updated_at  TIMESTAMPTZ
 );
 
-CREATE TABLE company_user_connection(
+CREATE TABLE company_user(
     userId      UUID NOT NULL REFERENCES company_user(id),
     companyId   UUID NOT NULL REFERENCES company(id)
 );
 
-CREATE TABLE company_user_warehouse(
+CREATE TABLE warehouse_user(
     userId      UUID NOT NULL REFERENCES company_user(id),
-    warehouse   UUID NOT NULL
+    warehouse   UUID NOT NULL REFERENCES warehouse(id)
 );
 
 
