@@ -1,0 +1,36 @@
+name: Create Issues for TODOs
+
+on:
+  push:
+    branches:
+      - '*'  # Укажите нужную ветку, если хотите отслеживать другую
+
+jobs:
+  find-todos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Find TODOs in code
+        id: find_todos
+        run: |
+          # Находим все комментарии с TODO
+          grep -rnw '.' -e '@TODO' > todos.txt || true
+
+      - name: Create GitHub Issues
+        if: success() && steps.find_todos.outputs.todo_count != '0'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          while IFS= read -r line; do
+            # Извлекаем информацию о файле, строке и тексте TODO
+            file=$(echo "$line" | cut -d':' -f1)
+            line_number=$(echo "$line" | cut -d':' -f2)
+            todo_text=$(echo "$line" | cut -d':' -f3-)
+            # Создаем issue с информацией о TODO
+            curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+              -d "{\"title\": \"TODO: $todo_text\", \"body\": \"Найдено в $file на строке $line_number.\"}" \
+              https://api.github.com/repos/$GITHUB_REPOSITORY/issues
+          done < todos.txt

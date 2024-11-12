@@ -22,7 +22,7 @@ import java.util.*;
 public class RpUser {
 
     public final DataSource dataSource;
-
+    // @TODO create connection pool
     public Optional<User> add(UserRequestEntity user) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
