@@ -7,4 +7,5 @@ public interface Users {
     UUID id();
     String password();
     String email();
+
 }

@@ -1,9 +1,9 @@
 package ru.supply.data.user;
 
 import ru.supply.data.utils.Email;
-import ru.supply.data.utils.UserName;
+import ru.supply.data.utils.user.UserName;
 import ru.supply.data.utils.Phone;
-import ru.supply.data.utils.UserPermission;
+import ru.supply.data.utils.user.UserPermission;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,5 +21,6 @@ public record User (
         LocalDate createdAt,
         LocalDate updatedAt,
         List<UUID> warehouses
-        ) {
+        )
+{
 }
