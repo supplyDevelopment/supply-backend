@@ -17,7 +17,7 @@ jobs:
         id: find_todos
         run: |
           # Находим все комментарии с TODO и выводим результат для проверки
-          grep -rnw '.' -e '@TODO' --exclude='./.github/workflows/todo-issues.yml' > todos.txt || true
+          grep -rnw '.' -e '@TODO' --exclude-dir='.github/workflows' > todos.txt || true
           cat todos.txt  # Выводим содержимое todos.txt для отладки
 
       - name: Create GitHub Issues
