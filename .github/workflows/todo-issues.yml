@@ -11,17 +11,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Обновили до v3
+        uses: actions/checkout@v3
 
       - name: Find TODOs in code
         id: find_todos
         run: |
-          # Находим все комментарии с TODO и выводим результат для проверки
-          grep -rnw '.' -e '@TODO' > todos.txt || true
+          # Находим все строки с @TODO, исключая сам workflow-файл
+          grep -rnw '.' -e '@TODO' --exclude='.github/workflows/todo-issues.yml' > todos.txt || true
           cat todos.txt  # Выводим содержимое todos.txt для отладки
 
       - name: Create GitHub Issues
-        if: success()
+        if: success() && steps.find_todos.outputs.todos != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
