@@ -1,4 +1,4 @@
-package com.example.supply;
+package ru.supply;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
