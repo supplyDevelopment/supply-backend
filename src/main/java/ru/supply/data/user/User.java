@@ -19,8 +19,6 @@ public record User (
         UUID companyId,
         List<UserPermission> permissions,
         LocalDate createdAt,
-        LocalDate updatedAt,
-        List<UUID> warehouses
-        )
-{
+        LocalDate updatedAt
+) {
 }

@@ -20,5 +20,5 @@ public record Company (
         Tax tax_id,
         List<Address> addresses,
         CompanyStatus status
-) {
+) { // @TODO: create interface for Company
 }
