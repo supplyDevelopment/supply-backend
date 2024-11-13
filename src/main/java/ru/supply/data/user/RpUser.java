@@ -57,7 +57,7 @@ public class RpUser {
                 )
         );
     }
-
+    // @TODO create connection pool10
     public Optional<User> getByEmail(String email) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession

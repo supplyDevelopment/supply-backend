@@ -32,16 +32,22 @@ jobs:
               line_number=$(echo "$line" | cut -d':' -f2)
               todo_text=$(echo "$line" | cut -d':' -f3-)
 
-              # Логируем данные для отладки
-              echo "Файл: $file"
-              echo "Строка: $line_number"
-              echo "TODO: $todo_text"
+              issue_title="TODO: $todo_text"
 
-              # Создаем issue с использованием GitHub API
-              curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-                -H "Accept: application/vnd.github.v3+json" \
-                -d "{\"title\": \"TODO: $todo_text\", \"body\": \"Найдено в $file на строке $line_number.\"}" \
-                https://api.github.com/repos/$GITHUB_REPOSITORY/issues
+              # Проверяем, существует ли уже задача с таким заголовком
+              existing_issue=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                "https://api.github.com/repos/$GITHUB_REPOSITORY/issues?state=open" \
+                | jq -r ".[] | select(.title == \"$issue_title\") | .id")
+
+              if [ -z "$existing_issue" ]; then
+                echo "Задача не найдена. Создаем новую."
+                curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  -d "{\"title\": \"$issue_title\", \"body\": \"Найдено в $file на строке $line_number.\"}" \
+                  https://api.github.com/repos/$GITHUB_REPOSITORY/issues
+              else
+                echo "Задача с заголовком '$issue_title' уже существует. Пропускаем создание."
+              fi
             done < todos.txt
           else
             echo "Нет TODO комментариев для создания задач."
