@@ -9,8 +9,10 @@ services:
       POSTGRES_DB: supplydb
     volumes:
       - ./src/main/resources/db/ainitscript.sql:/docker-entrypoint-initdb.d/ainitscript.sql
+      - ./src/main/resources/db/warehouse.sql:/docker-entrypoint-initdb.d/warehouse.sql
       - ./src/main/resources/db/company.sql:/docker-entrypoint-initdb.d/company.sql
       - ./src/main/resources/db/user.sql:/docker-entrypoint-initdb.d/user.sql
+      - ./src/main/resources/db/zpost.sql:/docker-entrypoint-initdb.d/zpost.sql
     ports:
       - "4000:5432"
     networks:
