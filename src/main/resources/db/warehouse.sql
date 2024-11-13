@@ -8,5 +8,3 @@ CREATE TABLE warehouse (
    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
    updated_at    TIMESTAMPTZ
 );
-
--- @TODO create connection between warehouse and products

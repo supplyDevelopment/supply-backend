@@ -8,15 +8,3 @@ CREATE TABLE company_user(
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ
 );
-
-CREATE TABLE company_user(
-    userId      UUID NOT NULL REFERENCES company_user(id),
-    companyId   UUID NOT NULL REFERENCES company(id)
-);
-
-CREATE TABLE warehouse_user(
-    userId      UUID NOT NULL REFERENCES company_user(id),
-    warehouse   UUID NOT NULL REFERENCES warehouse(id)
-);
-
-
