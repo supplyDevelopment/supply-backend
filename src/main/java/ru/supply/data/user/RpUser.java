@@ -22,7 +22,7 @@ import java.util.*;
 public class RpUser {
 
     public final DataSource dataSource;
-    // @TODO create connection pool9
+
     public Optional<User> add(UserRequestEntity user) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
@@ -53,8 +53,7 @@ public class RpUser {
                         user.companyId(),
                         user.permissions(),
                         LocalDate.now(),
-                        LocalDate.now(),
-                        List.of()
+                        LocalDate.now()
                 )
         );
     }
@@ -73,11 +72,9 @@ public class RpUser {
                            u.phone,
                            u.created_at,
                            u.updated_at,
-                           c.companyId,
-                           array_agg(w.warehouse) AS warehouses
+                           c.companyId
                     FROM company_user u
                     LEFT JOIN company_user_connection c ON u.id = c.userId
-                    LEFT JOIN company_user_warehouse w ON u.id = w.userId
                     WHERE u.email = ?
                     GROUP BY u.id, c.companyId
                     """)
@@ -105,10 +102,6 @@ public class RpUser {
 
         UUID companyId = rset.getObject("companyId", UUID.class);
 
-        List<UUID> warehouses = Arrays.stream(
-                (UUID[]) rset.getArray("warehouses").getArray()
-        ).filter(Objects::nonNull).toList();
-
         return Optional.of(new User(
                 UUID.fromString(rset.getString("id")),
                 userName,
@@ -118,8 +111,7 @@ public class RpUser {
                 companyId,
                 userPermissions,
                 rset.getDate("created_at").toLocalDate(),
-                rset.getDate("updated_at").toLocalDate(),
-                warehouses
+                rset.getDate("updated_at").toLocalDate()
         ));
     }
 

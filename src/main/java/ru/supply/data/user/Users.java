@@ -7,5 +7,5 @@ public interface Users {
     UUID id();
     String password();
     String email();
-
+    // @TODO: add getters for all fields
 }
