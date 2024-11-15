@@ -21,6 +21,7 @@ CREATE TABLE product(
     status INVENTORY_ITEM_STATUS NOT NULL,
     expiration_date DATE
 )
+-- @TODO: create a filed to store url to the photo
 
 -- @TODO: create connection to operations
 -- @TODO: create connection to warehouse
