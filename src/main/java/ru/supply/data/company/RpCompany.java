@@ -41,7 +41,7 @@ public class RpCompany {
         UUID companyId = jdbcSession
                 .sql("""
                         INSERT INTO company (name, admin_id, contact_emails, contact_phones, bil_address, tax_id, addresses, status, updated_at)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?::STATUS, ?)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?::COMPANY_STATUS, ?)
                         """)
                 .set(company.name())
                 .set(company.admin_id())
