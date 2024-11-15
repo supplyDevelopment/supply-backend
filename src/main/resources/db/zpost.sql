@@ -13,4 +13,9 @@ CREATE TABLE warehouse_user_connection(
                                warehouse   UUID NOT NULL REFERENCES warehouse(id)
 );
 
+CREATE TABLE tool_warehouse_connection(
+                               toolId      UUID NOT NULL REFERENCES tool(id),
+                               warehouse   UUID NOT NULL REFERENCES warehouse(id)
+);
+
 -- @TODO create connection between warehouse and products
