@@ -14,6 +14,7 @@ services:
       - ./src/main/resources/db/user.sql:/docker-entrypoint-initdb.d/user.sql
       - ./src/main/resources/db/zpost.sql:/docker-entrypoint-initdb.d/zpost.sql
       - ./src/main/resources/db/inventory-items.sql:/docker-entrypoint-initdb.d/inventory-items.sql
+      - ./src/main/resources/db/supplier.sql:/docker-entrypoint-initdb.d/supplier.sql
     ports:
       - "4000:5432"
     networks:
