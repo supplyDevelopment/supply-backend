@@ -8,12 +8,15 @@ import ru.supply.data.item.product.Product;
 import ru.supply.data.item.product.RpProduct;
 import ru.supply.data.item.tool.RpTool;
 import ru.supply.data.item.tool.Tool;
+import ru.supply.data.supplier.RpSupplier;
+import ru.supply.data.supplier.Supplier;
 import ru.supply.data.utils.item.ItemStatus;
 import ru.supply.requestEntity.user.UserRequestEntity;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -68,8 +71,10 @@ public class endPoint {
 //        RpTool rpTool = new RpTool(dataSource);
 //        Optional<Tool> addtool = rpTool.add(tool);
 //        Optional<Tool> gettool = rpTool.get(addtool.orElseThrow().id());
-        Optional<Product> product = new RpProduct(dataSource).add(new Product(UUID.randomUUID(), "test", "test", 1, ItemStatus.ACTIVE, LocalDate.now()));
-        Optional<Product> getProduct = new RpProduct(dataSource).get(product.orElseThrow().id());
+//        Optional<Product> product = new RpProduct(dataSource).add(new Product(UUID.randomUUID(), "test", "test", 1, ItemStatus.ACTIVE, LocalDate.now()));
+//        Optional<Product> getProduct = new RpProduct(dataSource).get(product.orElseThrow().id());
+        Optional<Supplier> supplier = new RpSupplier(dataSource).add(new Supplier(UUID.randomUUID(), "test", List.of(), List.of(), "test", LocalDate.now(), null));
+        Optional<Supplier> getSupplier = new RpSupplier(dataSource).getById(supplier.orElseThrow().id());
         return "";
     }
 
