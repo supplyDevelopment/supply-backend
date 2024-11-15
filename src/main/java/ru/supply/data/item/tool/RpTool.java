@@ -1,9 +1,9 @@
-package ru.supply.data.item;
+package ru.supply.data.item.tool;
 
 import com.jcabi.jdbc.JdbcSession;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
-import ru.supply.data.utils.item.ToolStatus;
+import ru.supply.data.utils.item.ItemStatus;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -59,7 +59,7 @@ public class RpTool {
                 UUID.fromString(rset.getString("id")),
                 rset.getString("name"),
                 rset.getString("description"),
-                ToolStatus.valueOf(rset.getString("status")),
+                ItemStatus.valueOf(rset.getString("status")),
                 rset.getString("serial_number")
         ));
     }

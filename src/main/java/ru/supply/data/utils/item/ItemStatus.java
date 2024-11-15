@@ -1,6 +1,6 @@
 package ru.supply.data.utils.item;
 
-public enum ToolStatus {
+public enum ItemStatus {
     ACTIVE,
     INACTIVE,
     REPAIR,

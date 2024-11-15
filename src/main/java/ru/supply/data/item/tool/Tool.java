@@ -1,6 +1,6 @@
-package ru.supply.data.item;
+package ru.supply.data.item.tool;
 
-import ru.supply.data.utils.item.ToolStatus;
+import ru.supply.data.utils.item.ItemStatus;
 
 import java.util.UUID;
 
@@ -8,7 +8,7 @@ public record Tool(
     UUID id,
     String name,
     String description,
-    ToolStatus status,
+    ItemStatus status,
     String serialNumber
 ) {
 }
