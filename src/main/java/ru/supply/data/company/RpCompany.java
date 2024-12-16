@@ -3,14 +3,13 @@ package ru.supply.data.company;
 import com.jcabi.jdbc.JdbcSession;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.mapper.Mapper;
 import ru.supply.data.utils.Address;
 import ru.supply.data.utils.Email;
 import ru.supply.data.utils.Phone;
 import ru.supply.data.utils.company.Bil;
 import ru.supply.data.utils.company.CompanyStatus;
 import ru.supply.data.utils.company.Tax;
-import ru.supply.data.utils.user.UserPermission;
+import ru.supply.requestEntity.company.CompanyRequestEntity;
 
 import javax.sql.DataSource;
 import java.sql.Array;
@@ -28,7 +27,7 @@ public class RpCompany {
 
     public final DataSource dataSource;
 
-    public Company add(Company company) throws SQLException {
+    public Company add(CompanyRequestEntity company) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
 
@@ -40,11 +39,10 @@ public class RpCompany {
                 company.addresses().stream().map(Address::getAddress).toArray());
         UUID companyId = jdbcSession
                 .sql("""
-                        INSERT INTO company (name, admin_id, contact_emails, contact_phones, bil_address, tax_id, addresses, status, updated_at)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?::COMPANY_STATUS, ?)
+                        INSERT INTO company (name, contact_emails, contact_phones, bil_address, tax_id, addresses, status, updated_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?::COMPANY_STATUS, ?)
                         """)
                 .set(company.name())
-                .set(company.admin_id())
                 .set(emailsArray)
                 .set(phonesArray)
                 .set(company.bil_address().getBil())
@@ -57,7 +55,6 @@ public class RpCompany {
         return new Company(
                 companyId,
                 company.name(),
-                company.admin_id(),
                 company.contactEmails(),
                 company.contactPhones(),
                 company.bil_address(),
@@ -65,22 +62,6 @@ public class RpCompany {
                 company.addresses(),
                 company.status()
         );
-    }
-
-    public Optional<Company> getByAdminId(UUID adminId) throws SQLException {
-        JdbcSession jdbcSession = new JdbcSession(dataSource);
-        return jdbcSession
-                .sql("""
-                        SELECT * FROM company
-                        WHERE admin_id = ?
-                        """)
-                .set(adminId)
-                .select((rset, stmt) -> {
-                    if (rset.next()) {
-                        return compactCompanyFromResultSet(rset);
-                    }
-                    return Optional.empty();
-                });
     }
 
     public Optional<Company> getByName(String name) throws SQLException {
@@ -99,7 +80,7 @@ public class RpCompany {
                 });
     }
 
-    private static Optional<Company> compactCompanyFromResultSet(ResultSet rset) throws SQLException {
+    static Optional<Company> compactCompanyFromResultSet(ResultSet rset) throws SQLException {
         String emails = rset.getString("contact_emails");
         emails = emails.substring(1, emails.length() - 1);
         List<Email> companyEmails = Arrays.stream(
@@ -121,7 +102,6 @@ public class RpCompany {
         return Optional.of(new Company(
                 UUID.fromString(rset.getString("id")),
                 rset.getString("name"),
-                UUID.fromString(rset.getString("admin_id")),
                 companyEmails,
                 companyPhones,
                 new Bil(rset.getString("bil_address")),
