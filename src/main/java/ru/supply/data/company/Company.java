@@ -13,12 +13,11 @@ import java.util.UUID;
 public record Company (
         UUID id,
         String name,
-        UUID admin_id,
         List<Email> contactEmails,
         List<Phone> contactPhones,
         Bil bil_address,
         Tax tax_id,
         List<Address> addresses,
         CompanyStatus status
-) { // @TODO: create interface for Company
+) {
 }

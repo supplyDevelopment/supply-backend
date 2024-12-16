@@ -5,8 +5,7 @@ CREATE TYPE COMPANY_STATUS AS ENUM (
 
 CREATE TABLE company(
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name        VARCHAR(1024) NOT NULL,
-    admin_id    UUID NOT NULL,
+    name        VARCHAR(1024) NOT NULL UNIQUE,
     contact_emails EMAIL[] NOT NULL,
     contact_phones PHONE[] NOT NULL,
     bil_address VARCHAR(128) NOT NULL UNIQUE,
