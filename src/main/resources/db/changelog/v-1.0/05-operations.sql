@@ -2,7 +2,7 @@ CREATE TYPE OPERATION_TYPE AS ENUM (
     'ADD',
     'REMOVE',
     'REPLACE'
-)
+);
 
 CREATE TABLE operation(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -17,6 +17,4 @@ CREATE TABLE comment(
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- TODO: create connection to warehouse
--- TODO: create connection to user
--- TODO: create connection to comment
+-- TODO: implement all possible operations

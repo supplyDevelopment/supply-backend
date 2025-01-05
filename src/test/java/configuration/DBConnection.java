@@ -14,13 +14,14 @@ public class DBConnection {
                     .withDatabaseName("testdb")
                     .withUsername("testuser")
                     .withPassword("testpass")
-                    .withClasspathResourceMapping("db/ainitscript.sql", "/docker-entrypoint-initdb.d/ainitscript.sql", BindMode.READ_ONLY)
-                    .withClasspathResourceMapping("db/warehouse.sql", "/docker-entrypoint-initdb.d/warehouse.sql", BindMode.READ_ONLY)
-                    .withClasspathResourceMapping("db/company.sql", "/docker-entrypoint-initdb.d/company.sql", BindMode.READ_ONLY)
-                    .withClasspathResourceMapping("db/user.sql", "/docker-entrypoint-initdb.d/user.sql", BindMode.READ_ONLY)
-                    .withClasspathResourceMapping("db/zpost.sql", "/docker-entrypoint-initdb.d/zpost.sql", BindMode.READ_ONLY)
-                    .withClasspathResourceMapping("db/inventory-items.sql", "/docker-entrypoint-initdb.d/inventory-items.sql", BindMode.READ_ONLY)
-                    .withClasspathResourceMapping("db/supplier.sql", "/docker-entrypoint-initdb.d/supplier.sql", BindMode.READ_ONLY);
+                    .withClasspathResourceMapping("db/changelog/v-1.0/01-types.sql", "/docker-entrypoint-initdb.d/01-types.sql", BindMode.READ_ONLY)
+                    .withClasspathResourceMapping("db/changelog/v-1.0/02-users.sql", "/docker-entrypoint-initdb.d/02-users.sql", BindMode.READ_ONLY)
+                    .withClasspathResourceMapping("db/changelog/v-1.0/03-resources.sql", "/docker-entrypoint-initdb.d/03-resources.sql", BindMode.READ_ONLY)
+                    .withClasspathResourceMapping("db/changelog/v-1.0/04-warehouses.sql", "/docker-entrypoint-initdb.d/04-warehouses.sql", BindMode.READ_ONLY)
+                    .withClasspathResourceMapping("db/changelog/v-1.0/05-operations.sql", "/docker-entrypoint-initdb.d/05-operations.sql", BindMode.READ_ONLY)
+                    .withClasspathResourceMapping("db/changelog/v-1.0/06-company.sql", "/docker-entrypoint-initdb.d/06-company.sql", BindMode.READ_ONLY);
+
+
 
     static {
         POSTGRESQL_CONTAINER.start();

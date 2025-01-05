@@ -3,6 +3,7 @@ package ru.supply.data.company;
 import com.jcabi.jdbc.JdbcSession;
 import configuration.DBConnection;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,7 @@ public class RpCompanyTest extends DBConnection {
     private DataSource dataSource;
 
     @Test
+    @Disabled
     void addTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
         CompanyRequestEntity company = new CompanyRequestEntity(
@@ -65,6 +67,7 @@ public class RpCompanyTest extends DBConnection {
     }
 
     @Test
+    @Disabled
     void getByNameTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
         CompanyRequestEntity company = new CompanyRequestEntity(

@@ -4,13 +4,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.supply.data.company.RpCompany;
 import ru.supply.data.item.product.Product;
 import ru.supply.data.item.product.RpProduct;
 import ru.supply.data.item.tool.RpTool;
 import ru.supply.data.item.tool.Tool;
 import ru.supply.data.supplier.RpSupplier;
 import ru.supply.data.supplier.Supplier;
+import ru.supply.data.utils.Email;
+import ru.supply.data.utils.Phone;
+import ru.supply.data.utils.company.Bil;
+import ru.supply.data.utils.company.CompanyStatus;
+import ru.supply.data.utils.company.Tax;
 import ru.supply.data.utils.item.ItemStatus;
+import ru.supply.requestEntity.company.CompanyRequestEntity;
 import ru.supply.requestEntity.user.UserRequestEntity;
 
 import javax.sql.DataSource;
@@ -83,7 +90,9 @@ public class endPoint {
         return m;
     }
     @GetMapping("/")
-    public String init() {
+    public String init() throws SQLException {
+        RpCompany rpCompany = new RpCompany(dataSource);
+        rpCompany.add(new CompanyRequestEntity("test", List.of(new Email("gd.host@yandex.ru")), List.of(new Phone("+79033073746")), new Bil("test"), new Tax("test"), List.of(), CompanyStatus.ACTIVE));
         return "Hi";
     }
 }

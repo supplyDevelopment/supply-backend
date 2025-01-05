@@ -8,13 +8,7 @@ services:
       POSTGRES_PASSWORD: 5432
       POSTGRES_DB: supplydb
     volumes:
-      - ./src/main/resources/db/ainitscript.sql:/docker-entrypoint-initdb.d/ainitscript.sql
-      - ./src/main/resources/db/warehouse.sql:/docker-entrypoint-initdb.d/warehouse.sql
-      - ./src/main/resources/db/company.sql:/docker-entrypoint-initdb.d/company.sql
-      - ./src/main/resources/db/user.sql:/docker-entrypoint-initdb.d/user.sql
-      - ./src/main/resources/db/zpost.sql:/docker-entrypoint-initdb.d/zpost.sql
-      - ./src/main/resources/db/inventory-items.sql:/docker-entrypoint-initdb.d/inventory-items.sql
-      - ./src/main/resources/db/supplier.sql:/docker-entrypoint-initdb.d/supplier.sql
+      - supplydb_data:/var/lib/postgresql/data
     ports:
       - "4000:5432"
     networks:
@@ -33,7 +27,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/supplydb
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATASOURCE_PASSWORD: 5432
     ports:
       - "8080:8080"
     networks:
@@ -42,3 +36,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  supplydb_data:
