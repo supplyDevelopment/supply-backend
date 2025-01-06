@@ -13,7 +13,9 @@ CREATE TYPE RESOURCE_TYPE AS ENUM (
 CREATE TABLE project (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name        VARCHAR(1024) NOT NULL,
-    description VARCHAR(1024)
+    description VARCHAR(1024),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE resource (
