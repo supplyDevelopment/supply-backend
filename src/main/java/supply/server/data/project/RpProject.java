@@ -18,7 +18,7 @@ public class RpProject {
 
     private final DataSource dataSource;
 
-    public Project add(String name, String description, UUID companyId) throws SQLException {
+    public Optional<Project> add(String name, String description, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         UUID projectId = jdbcSession
                 .sql("""
@@ -32,14 +32,14 @@ public class RpProject {
 
         // TODO: implement connection with company
 
-        return new Project(
+        return Optional.of(new Project(
                 projectId,
                 name,
                 description,
                 companyId,
                 LocalDate.now(),
                 LocalDate.now()
-        );
+        ));
     }
 
     public Optional<Project> get(UUID projectId) throws SQLException {

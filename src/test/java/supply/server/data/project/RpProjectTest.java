@@ -27,7 +27,7 @@ public class RpProjectTest extends DBConnection {
         String description = "description";
         UUID companyId = UUID.randomUUID();
 
-        Project insertedProject = rpProject.add(name, description, companyId);
+        Project insertedProject = rpProject.add(name, description, companyId).orElseThrow();
 
         assertEquals(name, insertedProject.name());
         assertEquals(description, insertedProject.description());
@@ -64,7 +64,7 @@ public class RpProjectTest extends DBConnection {
         String description = "getTestDescription";
         UUID companyId = UUID.randomUUID();
 
-        Project expected = rpProject.add(name, description, companyId);
+        Project expected = rpProject.add(name, description, companyId).orElseThrow();
         Project actual = rpProject.get(expected.id()).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
