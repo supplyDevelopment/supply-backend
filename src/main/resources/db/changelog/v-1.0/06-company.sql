@@ -16,6 +16,11 @@ CREATE TABLE company(
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE company_projects(
+    project     UUID NOT NULL REFERENCES project(id),
+    company     UUID NOT NULL REFERENCES company(id)
+);
+
 CREATE TABLE company_warehouses(
     warehouse   UUID NOT NULL REFERENCES warehouse(id),
     company     UUID NOT NULL REFERENCES company(id)

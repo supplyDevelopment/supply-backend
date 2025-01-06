@@ -22,7 +22,12 @@ CREATE DOMAIN EMAIL AS VARCHAR
     CHECK (
         VALUE ~ '^[\w\-\.]+@([\w-]+\.)+[\w-]{2,4}$'
     );
+
 CREATE DOMAIN PHONE AS VARCHAR
     CHECK (
         VALUE ~ '^\+7\d{10}$'
     );
+
+CREATE TYPE UNIT AS ENUM (
+    'KG'
+);
