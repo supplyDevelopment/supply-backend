@@ -33,7 +33,7 @@ public class RpResourceTest extends DBConnection {
     @Test
     void addTest() throws SQLException, MalformedURLException {
         RpProject rpProject = new RpProject(dataSource);
-        Project project = rpProject.add("testName", "testDescription", UUID.randomUUID());
+        Project project = rpProject.add("testName", "testDescription", UUID.randomUUID()).orElseThrow();
 
         RpResource rpResource = new RpResource(dataSource);
         CreateResource createResource = new CreateResource(
@@ -112,7 +112,7 @@ public class RpResourceTest extends DBConnection {
     @Test
     void getTest() throws SQLException, MalformedURLException {
         RpProject rpProject = new RpProject(dataSource);
-        Project project = rpProject.add("testName", "testDescription", UUID.randomUUID());
+        Project project = rpProject.add("testName", "testDescription", UUID.randomUUID()).orElseThrow();
 
         RpResource rpResource = new RpResource(dataSource);
         CreateResource createResource = new CreateResource(
