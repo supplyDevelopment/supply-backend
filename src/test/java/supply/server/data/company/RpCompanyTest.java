@@ -1,7 +1,7 @@
 package supply.server.data.company;
 
 import com.jcabi.jdbc.JdbcSession;
-import configuration.DBConnection;
+import supply.server.configuration.DBConnection;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -58,11 +58,11 @@ public class RpCompanyTest extends DBConnection {
         Company result = resultOpt.get();
 
         Assertions.assertEquals(company.name(), result.name());
-        Assertions.assertEquals(company.contactEmails().getFirst().getEmail(), result.contactEmails().getFirst().getEmail());
-        Assertions.assertEquals(company.contactPhones().getFirst().getPhone(), result.contactPhones().getFirst().getPhone());
+        Assertions.assertEquals(company.contactEmails().get(0).getEmail(), result.contactEmails().get(0).getEmail());
+        Assertions.assertEquals(company.contactPhones().get(0).getPhone(), result.contactPhones().get(0).getPhone());
         Assertions.assertEquals(company.bil_address().getBil(), result.bil_address().getBil());
         Assertions.assertEquals(company.tax_id().getTax(), result.tax_id().getTax());
-        Assertions.assertEquals(company.addresses().getFirst().getAddress(), result.addresses().getFirst().getAddress());
+        Assertions.assertEquals(company.addresses().get(0).getAddress(), result.addresses().get(0).getAddress());
         Assertions.assertEquals(company.status(), result.status());
     }
 
@@ -86,11 +86,11 @@ public class RpCompanyTest extends DBConnection {
         Company result = resultOpt.get();
 
         Assertions.assertEquals(company.name(), result.name());
-        Assertions.assertEquals(company.contactEmails().getFirst().getEmail(), result.contactEmails().getFirst().getEmail());
-        Assertions.assertEquals(company.contactPhones().getFirst().getPhone(), result.contactPhones().getFirst().getPhone());
+        Assertions.assertEquals(company.contactEmails().get(0).getEmail(), result.contactEmails().get(0).getEmail());
+        Assertions.assertEquals(company.contactPhones().get(0).getPhone(), result.contactPhones().get(0).getPhone());
         Assertions.assertEquals(company.bil_address().getBil(), result.bil_address().getBil());
         Assertions.assertEquals(company.tax_id().getTax(), result.tax_id().getTax());
-        Assertions.assertEquals(company.addresses().getFirst().getAddress(), result.addresses().getFirst().getAddress());
+        Assertions.assertEquals(company.addresses().get(0).getAddress(), result.addresses().get(0).getAddress());
         Assertions.assertEquals(company.status(), result.status());
 
     }
