@@ -4,7 +4,6 @@ import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
 import supply.server.data.utils.Unit;
 
-import javax.sql.DataSource;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
@@ -24,7 +23,6 @@ public record Resource(
         UUID warehouseId,
         UUID userId,
         LocalDate createdAt,
-        LocalDate updatedAt,
-        DataSource dataSource
+        LocalDate updatedAt
 ) {
 }
