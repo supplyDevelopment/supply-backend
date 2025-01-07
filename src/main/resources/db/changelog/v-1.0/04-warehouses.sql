@@ -4,7 +4,7 @@ CREATE TABLE warehouse (
     location      VARCHAR(1024) NOT NULL,
     stock_level   INTEGER NOT NULL DEFAULT 0,
     capacity      INTEGER NOT NULL,
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at    TIMESTAMPTZ NOT NULL,
     updated_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
