@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static supply.server.data.user.RpUser.compactUserFromResultSet;
 
 public class RpUserTest extends DBConnection {
 
@@ -30,7 +29,7 @@ public class RpUserTest extends DBConnection {
                 new Email("example@example.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                UUID.randomUUID(),
+                getCompanyId(),
                 List.of(UserPermission.DELETE)
         );
 
@@ -46,8 +45,9 @@ public class RpUserTest extends DBConnection {
 
 
         JdbcSession jdbcSession = new JdbcSession(dataSource);
-        User userFromDB = jdbcSession.sql("""
-                SELECT u.id,
+        User userFromDB = jdbcSession
+                .sql("""
+                    SELECT u.id,
                            (u.name).first_name as firstName,
                            (u.name).second_name as secondName,
                            (u.name).last_name as lastName,
@@ -56,10 +56,12 @@ public class RpUserTest extends DBConnection {
                            u.email,
                            u.phone,
                            u.created_at,
-                           u.updated_at
+                           u.updated_at,
+                           cu.company_id
                     FROM company_user u
+                    LEFT JOIN company_users cu ON u.id = cu.user_id
                     WHERE u.id = ?
-                """)
+                    """)
                 .set(user.id())
                 .select((rset, stmt) -> {
                     if (rset.next()) {
@@ -80,7 +82,7 @@ public class RpUserTest extends DBConnection {
                                 userEmail,
                                 userPhone,
                                 rset.getString("password"),
-                                null, // TODO: implement connection with company
+                                rset.getObject("company_id", UUID.class),
                                 userPermissions,
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate()
@@ -113,7 +115,7 @@ public class RpUserTest extends DBConnection {
                 new Email("example1@example1.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                UUID.randomUUID(),
+                getCompanyId(),
                 List.of(UserPermission.DELETE)
         );
 
@@ -131,7 +133,6 @@ public class RpUserTest extends DBConnection {
         assertEquals(expected.permissions().get(0), user.permissions().get(0));
         assertEquals(expected.createdAt(), user.createdAt());
         assertEquals(expected.updatedAt(), user.updatedAt());
-
     }
 
 }
