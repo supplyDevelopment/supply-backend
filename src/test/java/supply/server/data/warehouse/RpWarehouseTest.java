@@ -158,34 +158,4 @@ public class RpWarehouseTest extends DBConnection {
         assertEquals(expected.updatedAt(), actual.updatedAt());
     }
 
-    private UUID getCompanyId() throws SQLException {
-        JdbcSession jdbcSession = new JdbcSession(dataSource);
-        Optional<UUID> companyId = jdbcSession
-                .sql("""
-                        SELECT id FROM company
-                        """)
-                .select((rset, stmt) -> {
-                    if (rset.next()) {
-                        return Optional.of(UUID.fromString(rset.getString("id")));
-                    }
-                    return Optional.<UUID>empty();
-                });
-        if (companyId.isEmpty()) {
-            RpCompany rpCompany = new RpCompany(dataSource);
-            CreateCompany createCompany = new CreateCompany(
-                    "addTestCompany",
-                    List.of(new Email("example@example.com")),
-                    List.of(new Phone("+71234567890")),
-                    new Bil("1234567890"),
-                    new Tax("1234567890"),
-                    List.of(new Address("test")),
-                    CompanyStatus.ACTIVE
-            );
-            Company company = rpCompany.add(createCompany).orElseThrow();
-            return company.id();
-        } else {
-            return companyId.get();
-        }
-    }
-
 }
