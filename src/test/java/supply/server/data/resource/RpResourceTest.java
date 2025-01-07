@@ -24,12 +24,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@Testcontainers
 public class RpResourceTest extends DBConnection {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource = dataSource();
 
     @Test
     void addTest() throws SQLException, MalformedURLException {
