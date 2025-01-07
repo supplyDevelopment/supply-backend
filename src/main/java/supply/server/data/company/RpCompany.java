@@ -23,55 +23,64 @@ import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class RpCompany {
+public class RpCompany implements Companies {
 
     public final DataSource dataSource;
 
-    public Company add(CompanyRequestEntity company) throws SQLException {
+    @Override
+    public Optional<Company> add(CreateCompany createCompany) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
 
         Array emailsArray = connection.createArrayOf("EMAIL",
-                company.contactEmails().stream().map(Email::getEmail).toArray());
+                createCompany.contactEmails().stream().map(Email::getEmail).toArray());
         Array phonesArray = connection.createArrayOf("PHONE",
-                company.contactPhones().stream().map(Phone::getPhone).toArray());
+                createCompany.contactPhones().stream().map(Phone::getPhone).toArray());
         Array addressesArray = connection.createArrayOf("VARCHAR",
-                company.addresses().stream().map(Address::getAddress).toArray());
+                createCompany.addresses().stream().map(Address::getAddress).toArray());
         UUID companyId = jdbcSession
                 .sql("""
-                        INSERT INTO company (name, contact_emails, contact_phones, bil_address, tax_id, addresses, status, updated_at)
+                        INSERT INTO company (name, contact_emails, contact_phones,
+                         bil_address, tax, addresses, status, created_at)
                          VALUES (?, ?, ?, ?, ?, ?, ?::COMPANY_STATUS, ?)
                         """)
-                .set(company.name())
+                .set(createCompany.name())
                 .set(emailsArray)
                 .set(phonesArray)
-                .set(company.bil_address().getBil())
-                .set(company.tax_id().getTax())
+                .set(createCompany.bil_address().getBil())
+                .set(createCompany.tax().getTax())
                 .set(addressesArray)
-                .set(company.status().toString())
+                .set(createCompany.status().toString())
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
-        return new Company(
+        return Optional.of(new Company(
                 companyId,
-                company.name(),
-                company.contactEmails(),
-                company.contactPhones(),
-                company.bil_address(),
-                company.tax_id(),
-                company.addresses(),
-                company.status()
-        );
+                createCompany.name(),
+                createCompany.contactEmails(),
+                createCompany.contactPhones(),
+                createCompany.bil_address(),
+                createCompany.tax(),
+                createCompany.addresses(),
+                createCompany.status(),
+                LocalDate.now(),
+                LocalDate.now(),
+                dataSource
+        ));
     }
 
-    public Optional<Company> getByName(String name) throws SQLException {
+    @Override
+    public Optional<Company> get(UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                        SELECT * FROM company
-                        WHERE name = ?
+                        SELECT id, name, contact_emails, contact_phones,
+                         bil_address, tax, addresses, status,
+                         created_at, updated_at
+                        FROM company
+                        WHERE id = ?
                         """)
-                .set(name)
+                .set(companyId)
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         return compactCompanyFromResultSet(rset);
@@ -80,7 +89,7 @@ public class RpCompany {
                 });
     }
 
-    static Optional<Company> compactCompanyFromResultSet(ResultSet rset) throws SQLException {
+    private Optional<Company> compactCompanyFromResultSet(ResultSet rset) throws SQLException {
         String emails = rset.getString("contact_emails");
         emails = emails.substring(1, emails.length() - 1);
         List<Email> companyEmails = Arrays.stream(
@@ -105,10 +114,12 @@ public class RpCompany {
                 companyEmails,
                 companyPhones,
                 new Bil(rset.getString("bil_address")),
-                new Tax(rset.getString("tax_id")),
+                new Tax(rset.getString("tax")),
                 companyAddresses,
-                CompanyStatus.valueOf(rset.getString("status"))
+                CompanyStatus.valueOf(rset.getString("status")),
+                rset.getDate("created_at").toLocalDate(),
+                rset.getDate("updated_at").toLocalDate(),
+                dataSource
         ));
     }
-
 }
