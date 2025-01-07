@@ -23,11 +23,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class RpCompany implements Companies {
+public class RpCompany {
 
     public final DataSource dataSource;
 
-    @Override
     public Optional<Company> add(CreateCompany createCompany) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
@@ -69,7 +68,6 @@ public class RpCompany implements Companies {
         ));
     }
 
-    @Override
     public Optional<Company> get(UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
