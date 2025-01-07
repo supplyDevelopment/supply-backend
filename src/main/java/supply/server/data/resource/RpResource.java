@@ -46,8 +46,10 @@ public class RpResource {
                         type,
                         projectId,
                         status,
-                        description)
-                        VALUES (?, ?, ?, ?::UNIT, ?::RESOURCE_TYPE, ?, ?::INVENTORY_ITEM_STATUS, ?)
+                        description,
+                        created_at
+                        )
+                        VALUES (?, ?, ?, ?::UNIT, ?::RESOURCE_TYPE, ?, ?::INVENTORY_ITEM_STATUS, ?, ?)
                         """)
                 .set(sqlUrls)
                 .set(createResource.name())
@@ -57,6 +59,7 @@ public class RpResource {
                 .set(createResource.projectId())
                 .set(createResource.status().toString())
                 .set(createResource.description())
+                .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
         return Optional.of(new Resource(

@@ -22,12 +22,13 @@ public class RpProject {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         UUID projectId = jdbcSession
                 .sql("""
-                        INSERT INTO project (name, description)
-                        VALUES (?, ?)
+                        INSERT INTO project (name, description, created_at)
+                        VALUES (?, ?, ?)
                         RETURNING id
                         """)
                 .set(name)
                 .set(description)
+                .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
         // TODO: implement connection with company

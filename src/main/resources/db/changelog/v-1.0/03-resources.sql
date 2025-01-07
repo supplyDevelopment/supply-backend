@@ -14,7 +14,7 @@ CREATE TABLE project (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name        VARCHAR(1024) NOT NULL,
     description VARCHAR(1024),
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at  TIMESTAMPTZ NOT NULL,
     updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE resource (
     projectId   UUID NOT NULL REFERENCES project(id),
     status      INVENTORY_ITEM_STATUS NOT NULL,
     description VARCHAR(1024),
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at  TIMESTAMPTZ NOT NULL,
     updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
