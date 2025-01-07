@@ -3,13 +3,19 @@ package supply.server.data.warehouse;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DBConnection;
+import supply.server.data.user.CreateUser;
+import supply.server.data.user.RpUser;
+import supply.server.data.user.User;
 import supply.server.data.utils.Address;
+import supply.server.data.utils.Email;
+import supply.server.data.utils.Phone;
+import supply.server.data.utils.user.UserName;
+import supply.server.data.utils.user.UserPermission;
 
 import javax.sql.DataSource;
+import java.sql.Array;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,6 +25,25 @@ public class RpWarehouseTest extends DBConnection {
 
     @Test
     void addTest() throws SQLException {
+        RpUser rpUser = new RpUser(dataSource);
+        User user1 = rpUser.add(new CreateUser(
+                new UserName("testFirstName", "testSecondName", "testLastName"),
+                new Email("example@example.com"),
+                new Phone("+71234567890"),
+                "testPassword",
+                UUID.randomUUID(),
+                List.of(UserPermission.DELETE)
+        )).orElseThrow();
+
+        User user2 = rpUser.add(new CreateUser(
+                new UserName("testFirstName", "testSecondName", "testLastName"),
+                new Email("example0@example0.com"),
+                new Phone("+71234567890"),
+                "testPassword",
+                UUID.randomUUID(),
+                List.of(UserPermission.DELETE)
+        )).orElseThrow();
+
         RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
 
         CreateWarehouse createWarehouse = new CreateWarehouse(
@@ -26,7 +51,7 @@ public class RpWarehouseTest extends DBConnection {
                 new Address("test"),
                 0L,
                 0L,
-                List.of(UUID.randomUUID()),
+                List.of(user1.id(), user2.id()),
                 UUID.randomUUID()
         );
 
@@ -40,21 +65,31 @@ public class RpWarehouseTest extends DBConnection {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Warehouse result = jdbcSession
                 .sql("""
-                        SELECT id, name, location, stock_level,
-                         capacity, created_at, updated_at
-                        FROM warehouse
-                        WHERE id = ?
-                        """)
+                    SELECT w.id, w.name, w.location, w.stock_level,
+                           w.capacity, w.created_at, w.updated_at,
+                           ARRAY_AGG(wa.user_id) AS admins
+                    FROM warehouse w
+                    LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
+                    WHERE w.id = ?
+                    GROUP BY w.id
+                    """)
                 .set(warehouse.id())
                 .select((rset, stmt) -> {
                     if (rset.next()) {
+                        Array adminsArray = rset.getArray("admins");
+                        List<UUID> admins = new ArrayList<>();
+                        if (adminsArray != null) {
+                            UUID[] adminIds = (UUID[]) adminsArray.getArray();
+                            admins.addAll(Arrays.asList(adminIds));
+                        }
+
                         return Optional.of(new Warehouse(
                                 UUID.fromString(rset.getString("id")),
                                 rset.getString("name"),
                                 new Address(rset.getString("location")),
                                 rset.getLong("stock_level"),
                                 rset.getLong("capacity"),
-                                List.of(),
+                                admins,
                                 null,
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate(),
@@ -73,6 +108,45 @@ public class RpWarehouseTest extends DBConnection {
         assertEquals(warehouse.companyId(), result.companyId());
         assertEquals(warehouse.createdAt(), result.createdAt());
         assertEquals(warehouse.updatedAt(), result.updatedAt());
+    }
+
+    @Test
+    void getTest() throws SQLException {
+        RpUser rpUser = new RpUser(dataSource);
+        User user = rpUser.add(new CreateUser(
+                new UserName("testFirstName", "testSecondName", "testLastName"),
+                new Email("example1@example1.com"),
+                new Phone("+71234567890"),
+                "testPassword",
+                UUID.randomUUID(),
+                List.of(UserPermission.DELETE)
+        )).orElseThrow();
+
+
+        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+
+        CreateWarehouse createWarehouse = new CreateWarehouse(
+                "test",
+                new Address("test"),
+                0L,
+                0L,
+                List.of(user.id()),
+                UUID.randomUUID()
+        );
+
+        Warehouse expected = rpWarehouse.add(createWarehouse).orElseThrow();
+        Warehouse actual = rpWarehouse.getById(expected.id()).orElseThrow();
+
+        assertEquals(expected.id(), actual.id());
+        assertEquals(expected.name(), actual.name());
+        assertEquals(expected.location().getAddress(), actual.location().getAddress());
+        assertEquals(expected.stockLevel(), actual.stockLevel());
+        assertEquals(expected.capacity(), actual.capacity());
+        assertEquals(expected.admins(), actual.admins());
+        assertEquals(expected.admins().get(0), actual.admins().get(0));
+        assertEquals(expected.companyId(), actual.companyId());
+        assertEquals(expected.createdAt(), actual.createdAt());
+        assertEquals(expected.updatedAt(), actual.updatedAt());
     }
 
 }
