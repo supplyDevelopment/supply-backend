@@ -79,15 +79,15 @@ public class endPoint {
         Optional<Supplier> getSupplier = new RpSupplier(dataSource).getById(supplier.orElseThrow().id());
         return "";
     }
-
-    @PostMapping("/r")
-    public String r(@RequestBody String m) {
-        return m;
-    }
-    @GetMapping("/")
-    public String init() throws SQLException {
-        RpCompany rpCompany = new RpCompany(dataSource);
-        rpCompany.add(new CompanyRequestEntity("test", List.of(new Email("gd.host@yandex.ru")), List.of(new Phone("+79033073746")), new Bil("test"), new Tax("test"), List.of(), CompanyStatus.ACTIVE));
-        return "Hi";
-    }
+//
+//    @PostMapping("/r")
+//    public String r(@RequestBody String m) {
+//        return m;
+//    }
+//    @GetMapping("/")
+//    public String init() throws SQLException {
+//        RpCompany rpCompany = new RpCompany(dataSource);
+//        rpCompany.add(new CompanyRequestEntity("test", List.of(new Email("gd.host@yandex.ru")), List.of(new Phone("+79033073746")), new Bil("test"), new Tax("test"), List.of(), CompanyStatus.ACTIVE));
+//        return "Hi";
+//    }
 }
