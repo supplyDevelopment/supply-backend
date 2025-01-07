@@ -9,10 +9,10 @@ CREATE TABLE company(
     contact_emails  EMAIL[] NOT NULL,
     contact_phones  PHONE[] NOT NULL,
     bil_address     VARCHAR(128) NOT NULL UNIQUE,
-    tax_id          VARCHAR(128) NOT NULL UNIQUE,
+    tax             VARCHAR(128) NOT NULL UNIQUE,
     addresses       VARCHAR(1024)[] NOT NULL,
     status          COMPANY_STATUS NOT NULL,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_at      TIMESTAMPTZ NOT NULL,
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
