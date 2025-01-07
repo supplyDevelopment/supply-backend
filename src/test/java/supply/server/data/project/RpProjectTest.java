@@ -2,9 +2,6 @@ package supply.server.data.project;
 
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import supply.server.configuration.DBConnection;
 
 import javax.sql.DataSource;
@@ -13,12 +10,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
-@Testcontainers
 public class RpProjectTest extends DBConnection {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource = dataSource();
 
     @Test
     void addTest() throws SQLException {

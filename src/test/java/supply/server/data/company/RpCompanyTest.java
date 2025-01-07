@@ -20,12 +20,9 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest
-@Testcontainers
 public class RpCompanyTest extends DBConnection {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource = dataSource();
 
     @Test
     @Disabled
