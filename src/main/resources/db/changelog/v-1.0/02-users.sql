@@ -5,7 +5,7 @@ CREATE TABLE company_user (
      privileges  user_privilege[],
      email       EMAIL NOT NULL UNIQUE,
      phone       PHONE NOT NULL,
-     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+     created_at  TIMESTAMPTZ NOT NULL,
      updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
