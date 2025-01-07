@@ -31,13 +31,13 @@ public class RpProject {
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
-        // TODO: implement connection with company
+
 
         return Optional.of(new Project(
                 projectId,
                 name,
                 description,
-                companyId,
+                null, // TODO: implement connection with company
                 LocalDate.now(),
                 LocalDate.now()
         ));
@@ -66,7 +66,7 @@ public class RpProject {
                 });
     }
 
-    public List<Project> getAll(String prefix, Pagination pagination) {
+    public List<Project> getAll(String prefix, UUID companyId, Pagination pagination) {
         throw new NotImplementedException();
     }
 

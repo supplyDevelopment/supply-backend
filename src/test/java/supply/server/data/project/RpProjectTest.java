@@ -25,7 +25,6 @@ public class RpProjectTest extends DBConnection {
 
         assertEquals(name, insertedProject.name());
         assertEquals(description, insertedProject.description());
-        assertEquals(companyId, insertedProject.companyId());
 
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Project project = jdbcSession.sql("SELECT * FROM project WHERE id = ?")
@@ -47,6 +46,7 @@ public class RpProjectTest extends DBConnection {
         assertEquals(insertedProject.id(), project.id());
         assertEquals(insertedProject.name(), project.name());
         assertEquals(insertedProject.description(), project.description());
+        assertEquals(insertedProject.companyId(), project.companyId());
         assertEquals(insertedProject.createdAt(), project.createdAt());
         assertEquals(insertedProject.updatedAt(), project.updatedAt());
     }
@@ -64,6 +64,7 @@ public class RpProjectTest extends DBConnection {
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.name(), actual.name());
         assertEquals(expected.description(), actual.description());
+        assertEquals(expected.companyId(), actual.companyId());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
     }

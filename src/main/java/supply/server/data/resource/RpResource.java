@@ -124,7 +124,7 @@ public class RpResource {
                 });
     }
 
-    public List<Resource> getAllByName(String prefix, ResourceFilters filters,  Pagination pagination) {
+    public List<Resource> getAllByName(String prefix, ResourceFilters filters, UUID companyId, Pagination pagination) {
         throw new NotImplementedException();
     }
 

@@ -103,8 +103,12 @@ public class RpResourceTest extends DBConnection {
         assertEquals(insertedResource.unit(), resource.unit());
         assertEquals(insertedResource.type(), resource.type());
         assertEquals(insertedResource.projectId(), resource.projectId());
+        assertEquals(insertedResource.warehouseId(), resource.warehouseId());
+        assertEquals(insertedResource.userId(), resource.userId());
         assertEquals(insertedResource.status(), resource.status());
         assertEquals(insertedResource.description(), resource.description());
+        assertEquals(insertedResource.createdAt(), resource.createdAt());
+        assertEquals(insertedResource.updatedAt(), resource.updatedAt());
     }
 
     @Test
@@ -136,8 +140,12 @@ public class RpResourceTest extends DBConnection {
         assertEquals(expected.unit(), actual.unit());
         assertEquals(expected.type(), actual.type());
         assertEquals(expected.projectId(), actual.projectId());
+        assertEquals(expected.warehouseId(), actual.warehouseId());
+        assertEquals(expected.userId(), actual.userId());
         assertEquals(expected.status(), actual.status());
         assertEquals(expected.description(), actual.description());
+        assertEquals(expected.createdAt(), actual.createdAt());
+        assertEquals(expected.updatedAt(), actual.updatedAt());
     }
 
     @Test
