@@ -22,35 +22,35 @@ public class RpUser {
 
     public final DataSource dataSource;
 
-    public Optional<User> add(UserRequestEntity user) throws SQLException {
+    public Optional<User> add(CreateUser createUser) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
-        Array privilegesArray = connection.createArrayOf("user_privilege", user.permissions().stream().map(UserPermission::name).toArray());
+        Array privilegesArray = connection.createArrayOf("user_privilege", createUser.permissions().stream().map(UserPermission::name).toArray());
 
         UUID userId = jdbcSession
                 .sql("""
-                        INSERT INTO company_user (name, email, phone, password, privileges, created_at, updated_at)
-                        VALUES ((?, ?, ?)::USER_NAME, ?::EMAIL, ?::PHONE, ?, ?::user_privilege[], ?, ?)
+                        INSERT INTO company_user (name, email, phone, password, privileges, created_at)
+                        VALUES ((?, ?, ?)::USER_NAME, ?::EMAIL, ?::PHONE, ?, ?::user_privilege[], ?)
                         """)
-                .set(user.name().getFirstName())
-                .set(user.name().getSecondName())
-                .set(user.name().getLastName().orElse(null))
-                .set(user.email().getEmail())
-                .set(user.phone().getPhone())
-                .set(user.password())
+                .set(createUser.name().getFirstName())
+                .set(createUser.name().getSecondName())
+                .set(createUser.name().getLastName().orElse(null))
+                .set(createUser.email().getEmail())
+                .set(createUser.phone().getPhone())
+                .set(createUser.password())
                 .set(privilegesArray)
                 .set(LocalDate.now())
-                .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
+
         return Optional.of(
                 new User(
                         userId,
-                        user.name(),
-                        user.email(),
-                        user.phone(),
-                        user.password(),
-                        user.companyId(),
-                        user.permissions(),
+                        createUser.name(),
+                        createUser.email(),
+                        createUser.phone(),
+                        createUser.password(),
+                        null, // TODO: implement connection with company
+                        createUser.permissions(),
                         LocalDate.now(),
                         LocalDate.now()
                 )
@@ -69,12 +69,9 @@ public class RpUser {
                            u.email,
                            u.phone,
                            u.created_at,
-                           u.updated_at,
-                           c.companyId
+                           u.updated_at
                     FROM company_user u
-                    LEFT JOIN company_user_connection c ON u.id = c.userId
                     WHERE u.email = ?
-                    GROUP BY u.id, c.companyId
                     """)
                 .set(email)
                 .select((rset, stmt) -> {
@@ -86,7 +83,9 @@ public class RpUser {
                 });
     }
 
-    private static Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
+
+
+    static Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
         Email userEmail = new Email(rset.getString("email"));
         UserName userName = new UserName(
                 rset.getString("firstName"),
@@ -98,7 +97,7 @@ public class RpUser {
                 (String[]) rset.getArray("privileges").getArray()
         ).map(UserPermission::valueOf).toList();
 
-        UUID companyId = rset.getObject("companyId", UUID.class);
+//        UUID companyId = rset.getObject("companyId", UUID.class);
 
         return Optional.of(new User(
                 UUID.fromString(rset.getString("id")),
@@ -106,7 +105,7 @@ public class RpUser {
                 userEmail,
                 userPhone,
                 rset.getString("password"),
-                companyId,
+                null, // TODO: implement connection with company
                 userPermissions,
                 rset.getDate("created_at").toLocalDate(),
                 rset.getDate("updated_at").toLocalDate()
