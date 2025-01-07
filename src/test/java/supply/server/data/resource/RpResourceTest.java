@@ -19,6 +19,7 @@ import java.sql.Array;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -140,6 +141,86 @@ public class RpResourceTest extends DBConnection {
         assertEquals(expected.projectId(), actual.projectId());
         assertEquals(expected.status(), actual.status());
         assertEquals(expected.description(), actual.description());
+    }
+
+    @Test
+    void editNoParametersTest() throws SQLException, MalformedURLException {
+        RpProject rpProject = new RpProject(dataSource);
+        Project project = rpProject.add("testName", "testDescription", UUID.randomUUID()).orElseThrow();
+
+        RpResource rpResource = new RpResource(dataSource);
+        CreateResource createResource = new CreateResource(
+                List.of(new URL("http://test.com")),
+                "testName",
+                1,
+                Unit.KG,
+                ResourceType.PRODUCT,
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                project.id(),
+                ResourceStatus.ACTIVE,
+                "testDescription"
+        );
+
+        Resource resource = rpResource.add(createResource).orElseThrow();
+
+        Resource editedResource = rpResource.edit(
+                resource.id(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty());
+
+        assertEquals(resource.id(), editedResource.id());
+        assertEquals(resource.images().get(0), editedResource.images().get(0));
+        assertEquals(resource.name(), editedResource.name());
+        assertEquals(resource.count(), editedResource.count());
+        assertEquals(resource.unit(), editedResource.unit());
+        assertEquals(resource.type(), editedResource.type());
+        assertEquals(resource.projectId(), editedResource.projectId());
+        assertEquals(resource.status(), editedResource.status());
+        assertEquals(resource.description(), editedResource.description());
+    }
+
+    @Test
+    void editTest() throws SQLException, MalformedURLException {
+        RpProject rpProject = new RpProject(dataSource);
+        Project project = rpProject.add("testName", "testDescription", UUID.randomUUID()).orElseThrow();
+
+        RpResource rpResource = new RpResource(dataSource);
+        CreateResource createResource = new CreateResource(
+                List.of(new URL("http://test.com")),
+                "testName",
+                1,
+                Unit.KG,
+                ResourceType.PRODUCT,
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                project.id(),
+                ResourceStatus.ACTIVE,
+                "testDescription"
+        );
+
+        Resource resource = rpResource.add(createResource).orElseThrow();
+
+        Resource editedResource = rpResource.edit(
+                resource.id(),
+                Optional.of("editedName"),
+                Optional.of(2),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.of("editedDescription"));
+
+        assertEquals(resource.id(), editedResource.id());
+        assertEquals(resource.images().get(0), editedResource.images().get(0));
+        assertEquals("editedName", editedResource.name());
+        assertEquals(2, editedResource.count());
+        assertEquals(resource.unit(), editedResource.unit());
+        assertEquals(resource.type(), editedResource.type());
+        assertEquals(resource.projectId(), editedResource.projectId());
+        assertEquals(resource.status(), editedResource.status());
+        assertEquals("editedDescription", editedResource.description());
     }
 
 }

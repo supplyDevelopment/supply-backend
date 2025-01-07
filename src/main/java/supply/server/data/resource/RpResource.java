@@ -1,6 +1,7 @@
 package supply.server.data.resource;
 
 import com.jcabi.jdbc.JdbcSession;
+import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -151,8 +152,29 @@ public class RpResource {
             Optional<UUID> projectId,
             Optional<ResourceStatus> status,
             Optional<String> description
-    ) {
-        throw new NotImplementedException();
+    ) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+
+        jdbcSession
+                .sql("""
+                        UPDATE resource SET
+                        name = coalesce(?, name),
+                        count = coalesce(?, count),
+                        projectId = coalesce(?, projectId),
+                        status = coalesce(?::INVENTORY_ITEM_STATUS, status),
+                        description = coalesce(?, description)
+                        WHERE id = ?
+                        """)
+                .set(name.orElse(null))
+                .set(count.orElse(null))
+                .set(projectId.orElse(null))
+                .set(status.map(ResourceStatus::toString).orElse(null))
+                .set(description.orElse(null))
+                .set(resourceId)
+                .update(Outcome.VOID);
+
+        // TODO: create change log
+        return get(resourceId).orElseThrow();
     }
 
 }
