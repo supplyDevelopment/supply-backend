@@ -46,6 +46,16 @@ public class RpWarehouse {
                     .insert(Outcome.VOID);
         }
 
+        jdbcSession
+                .sql("""
+                        INSERT INTO company_warehouses
+                        (warehouse, company)
+                        VALUES (?, ?)
+                        """)
+                .set(warehouseId)
+                .set(createWarehouse.companyId())
+                .insert(Outcome.VOID);
+
         return Optional.of(new Warehouse(
                 warehouseId,
                 createWarehouse.name(),
@@ -53,7 +63,7 @@ public class RpWarehouse {
                 createWarehouse.stockLevel(),
                 createWarehouse.capacity(),
                 createWarehouse.admins(),
-                null, // TODO: implement connection with company
+                createWarehouse.companyId(),
                 LocalDate.now(),
                 LocalDate.now(),
                 dataSource
@@ -65,14 +75,16 @@ public class RpWarehouse {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                    SELECT w.id, w.name, w.location, w.stock_level,
-                           w.capacity, w.created_at, w.updated_at,
-                           ARRAY_AGG(wa.user_id) AS admins
-                    FROM warehouse w
-                    LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
-                    WHERE w.id = ?
-                    GROUP BY w.id
-                    """)
+                        SELECT w.id, w.name, w.location, w.stock_level,
+                               w.capacity, w.created_at, w.updated_at,
+                               ARRAY_AGG(DISTINCT wa.user_id) AS admins,
+                               cw.company AS company_id
+                        FROM warehouse w
+                        LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
+                        LEFT JOIN company_warehouses cw ON w.id = cw.warehouse
+                        WHERE w.id = ?
+                        GROUP BY w.id, cw.company
+                        """)
                 .set(id)
                 .select((rset, stmt) -> {
                     if (rset.next()) {
@@ -98,7 +110,7 @@ public class RpWarehouse {
                 rset.getLong("stock_level"),
                 rset.getLong("capacity"),
                 admins,
-                null, // TODO: implement connection with company
+                UUID.fromString(rset.getString("company_id")),
                 rset.getDate("created_at").toLocalDate(),
                 rset.getDate("updated_at").toLocalDate(),
                 dataSource

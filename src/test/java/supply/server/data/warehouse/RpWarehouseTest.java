@@ -3,16 +3,23 @@ package supply.server.data.warehouse;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DBConnection;
+import supply.server.data.company.Company;
+import supply.server.data.company.CreateCompany;
+import supply.server.data.company.RpCompany;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
+import supply.server.data.utils.company.Bil;
+import supply.server.data.utils.company.CompanyStatus;
+import supply.server.data.utils.company.Tax;
 import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.user.UserPermission;
 
 import javax.sql.DataSource;
+import java.security.SecureRandom;
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
@@ -52,7 +59,7 @@ public class RpWarehouseTest extends DBConnection {
                 0L,
                 0L,
                 List.of(user1.id(), user2.id()),
-                UUID.randomUUID()
+                getCompanyId()
         );
 
         Warehouse warehouse = rpWarehouse.add(createWarehouse).orElseThrow();
@@ -65,14 +72,16 @@ public class RpWarehouseTest extends DBConnection {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Warehouse result = jdbcSession
                 .sql("""
-                    SELECT w.id, w.name, w.location, w.stock_level,
-                           w.capacity, w.created_at, w.updated_at,
-                           ARRAY_AGG(wa.user_id) AS admins
-                    FROM warehouse w
-                    LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
-                    WHERE w.id = ?
-                    GROUP BY w.id
-                    """)
+                        SELECT w.id, w.name, w.location, w.stock_level,
+                               w.capacity, w.created_at, w.updated_at,
+                               ARRAY_AGG(DISTINCT wa.user_id) AS admins,
+                               cw.company AS company_id
+                        FROM warehouse w
+                        LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
+                        LEFT JOIN company_warehouses cw ON w.id = cw.warehouse
+                        WHERE w.id = ?
+                        GROUP BY w.id, cw.company
+                        """)
                 .set(warehouse.id())
                 .select((rset, stmt) -> {
                     if (rset.next()) {
@@ -90,7 +99,7 @@ public class RpWarehouseTest extends DBConnection {
                                 rset.getLong("stock_level"),
                                 rset.getLong("capacity"),
                                 admins,
-                                null,
+                                UUID.fromString(rset.getString("company_id")),
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate(),
                                 dataSource
@@ -131,7 +140,7 @@ public class RpWarehouseTest extends DBConnection {
                 0L,
                 0L,
                 List.of(user.id()),
-                UUID.randomUUID()
+                getCompanyId()
         );
 
         Warehouse expected = rpWarehouse.add(createWarehouse).orElseThrow();
@@ -147,6 +156,36 @@ public class RpWarehouseTest extends DBConnection {
         assertEquals(expected.companyId(), actual.companyId());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
+    }
+
+    private UUID getCompanyId() throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Optional<UUID> companyId = jdbcSession
+                .sql("""
+                        SELECT id FROM company
+                        """)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(UUID.fromString(rset.getString("id")));
+                    }
+                    return Optional.<UUID>empty();
+                });
+        if (companyId.isEmpty()) {
+            RpCompany rpCompany = new RpCompany(dataSource);
+            CreateCompany createCompany = new CreateCompany(
+                    "addTestCompany",
+                    List.of(new Email("example@example.com")),
+                    List.of(new Phone("+71234567890")),
+                    new Bil("1234567890"),
+                    new Tax("1234567890"),
+                    List.of(new Address("test")),
+                    CompanyStatus.ACTIVE
+            );
+            Company company = rpCompany.add(createCompany).orElseThrow();
+            return company.id();
+        } else {
+            return companyId.get();
+        }
     }
 
 }
