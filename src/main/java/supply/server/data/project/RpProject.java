@@ -1,6 +1,7 @@
 package supply.server.data.project;
 
 import com.jcabi.jdbc.JdbcSession;
+import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
@@ -31,13 +32,21 @@ public class RpProject {
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
-
+        jdbcSession
+                .sql("""
+                        INSERT INTO company_projects
+                        (project, company)
+                        VALUES (?, ?)
+                        """)
+                .set(projectId)
+                .set(companyId)
+                .insert(Outcome.VOID);
 
         return Optional.of(new Project(
                 projectId,
                 name,
                 description,
-                null, // TODO: implement connection with company
+                companyId,
                 LocalDate.now(),
                 LocalDate.now()
         ));
@@ -47,8 +56,11 @@ public class RpProject {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                        SELECT id, name, description, created_at, updated_at FROM project
-                        WHERE id = ?
+                        SELECT p.id, p.name, p.description, p.created_at, p.updated_at,
+                               cp.company AS company_id
+                        FROM project p
+                        LEFT JOIN company_projects cp ON p.id = cp.project
+                        WHERE p.id = ?
                         """)
                 .set(projectId)
                 .select((rset, stmt) -> {
@@ -57,7 +69,7 @@ public class RpProject {
                                 rset.getObject("id", UUID.class),
                                 rset.getString("name"),
                                 rset.getString("description"),
-                                null, // TODO: find company id from connection
+                                rset.getObject("company_id", UUID.class),
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate()
                         ));
