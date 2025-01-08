@@ -3,7 +3,7 @@ package supply.server.data;
 import java.util.List;
 
 public record PaginatedList<T>(
-        int total,
+        long total,
         List<T> items
 ) {
 }
