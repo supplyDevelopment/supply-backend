@@ -12,6 +12,8 @@ import supply.server.configuration.liquibase.LiquibaseRunner;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
 import supply.server.data.company.RpCompany;
+import supply.server.data.project.Project;
+import supply.server.data.project.RpProject;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
@@ -160,6 +162,27 @@ public class DBConnection {
             return warehouse.id();
         } else {
             return warehouseId.get();
+        }
+    }
+
+    protected UUID getProjectId() throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Optional<UUID> projectId = jdbcSession
+                .sql("""
+                        SELECT id FROM project
+                        """)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(UUID.fromString(rset.getString("id")));
+                    }
+                    return Optional.<UUID>empty();
+                });
+        if (projectId.isEmpty()) {
+            RpProject rpProject = new RpProject(dataSource);
+            Project project = rpProject.add("test", "test", getCompanyId()).orElseThrow();
+            return project.id();
+        } else {
+            return projectId.get();
         }
     }
 
