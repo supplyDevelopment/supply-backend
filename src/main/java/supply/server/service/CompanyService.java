@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
-import supply.server.data.Repository;
+import supply.server.data.PgRepository;
 import supply.server.data.company.Company;
 import supply.server.data.project.Project;
 import supply.server.data.resource.Resource;
@@ -22,14 +22,14 @@ import java.util.UUID;
 public class CompanyService {
 
     private final Company company;
-    private final Repository repository;
+    private final PgRepository pgRepository;
 
     public PaginatedList<Project> projects(Pagination pagination) throws SQLException {
         PaginatedList<UUID> projectIds = company.projectIds(pagination);
 
         List<Project> projects = new ArrayList<>();
         for (UUID id: projectIds.items()) {
-            Optional<Project> project = repository.rpProject().get(id);
+            Optional<Project> project = pgRepository.rpProject().get(id);
             project.ifPresent(projects::add);
         }
 
@@ -41,7 +41,7 @@ public class CompanyService {
 
         List<Warehouse> warehouses = new ArrayList<>();
         for (UUID id: warehouseIds.items()) {
-            Optional<Warehouse> warehouse = repository.rpWarehouse().getById(id);
+            Optional<Warehouse> warehouse = pgRepository.rpWarehouse().getById(id);
             warehouse.ifPresent(warehouses::add);
         }
 
@@ -53,7 +53,7 @@ public class CompanyService {
 
         List<User> users = new ArrayList<>();
         for (UUID id: userIds.items()) {
-            Optional<User> user = repository.rpUser().get(id);
+            Optional<User> user = pgRepository.rpUser().get(id);
             user.ifPresent(users::add);
         }
 
@@ -65,7 +65,7 @@ public class CompanyService {
 
         List<Resource> resources = new ArrayList<>();
         for (UUID id: resourceIds.items()) {
-            Optional<Resource> resource = repository.rpResource().get(id);
+            Optional<Resource> resource = pgRepository.rpResource().get(id);
             resource.ifPresent(resources::add);
         }
 
