@@ -113,7 +113,7 @@ public class RpWarehouseTest extends DBConnection {
         assertEquals(warehouse.location().getAddress(), result.location().getAddress());
         assertEquals(warehouse.stockLevel(), result.stockLevel());
         assertEquals(warehouse.capacity(), result.capacity());
-        assertEquals(warehouse.admins(), result.admins());
+        assertEquals(warehouse.admins().stream().sorted().toList(), result.admins().stream().sorted().toList());
         assertEquals(warehouse.companyId(), result.companyId());
         assertEquals(warehouse.createdAt(), result.createdAt());
         assertEquals(warehouse.updatedAt(), result.updatedAt());
@@ -127,7 +127,7 @@ public class RpWarehouseTest extends DBConnection {
                 new Email("example1@example1.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                UUID.randomUUID(),
+                getCompanyId(),
                 List.of(UserPermission.DELETE)
         )).orElseThrow();
 
