@@ -8,14 +8,24 @@ import supply.server.data.warehouse.RpWarehouse;
 
 import javax.sql.DataSource;
 
-public record Repository(
+public record PgRepository(
         RpCompany rpCompany,
         RpUser rpUser,
         RpWarehouse rpWarehouse,
         RpProject rpProject,
         RpResource rpResource
 ) {
-    public Repository(DataSource dataSource) {
+
+    private static PgRepository INSTANCE;
+
+    public static PgRepository instance(DataSource dataSource) {
+        if (INSTANCE == null) {
+            INSTANCE = new PgRepository(dataSource);
+        }
+        return INSTANCE;
+    }
+
+    private PgRepository(DataSource dataSource) {
         this(
                 new RpCompany(dataSource),
                 new RpUser(dataSource),

@@ -22,9 +22,4 @@ public record Warehouse (
     LocalDate updatedAt,
     DataSource dataSource
 ) {
-
-    public List<Resource> resources() {
-        throw new NotImplementedException();
-    }
-
 }
