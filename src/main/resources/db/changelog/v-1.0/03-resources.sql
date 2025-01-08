@@ -33,8 +33,8 @@ CREATE TABLE resource (
 );
 
 CREATE TABLE resource_users (
-    resourceId UUID PRIMARY KEY REFERENCES resource(id),
-    userId UUID NOT NULL REFERENCES company_user(id)
+    resource_id  UUID PRIMARY KEY REFERENCES resource(id),
+    user_id      UUID NOT NULL REFERENCES company_user(id)
 );
 
 CREATE TABLE resource_operations (

@@ -12,12 +12,20 @@ import supply.server.configuration.liquibase.LiquibaseRunner;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
 import supply.server.data.company.RpCompany;
+import supply.server.data.user.CreateUser;
+import supply.server.data.user.RpUser;
+import supply.server.data.user.User;
 import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
 import supply.server.data.utils.company.Bil;
 import supply.server.data.utils.company.CompanyStatus;
 import supply.server.data.utils.company.Tax;
+import supply.server.data.utils.user.UserName;
+import supply.server.data.utils.user.UserPermission;
+import supply.server.data.warehouse.CreateWarehouse;
+import supply.server.data.warehouse.RpWarehouse;
+import supply.server.data.warehouse.Warehouse;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -91,6 +99,67 @@ public class DBConnection {
             return company.id();
         } else {
             return companyId.get();
+        }
+    }
+
+    protected UUID getUserId() throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Optional<UUID> userId = jdbcSession
+                .sql("""
+                        SELECT id FROM company_user
+                        """)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(UUID.fromString(rset.getString("id")));
+                    }
+                    return Optional.<UUID>empty();
+                });
+        if (userId.isEmpty()) {
+            RpUser rpUser = new RpUser(dataSource);
+            CreateUser createUser = new CreateUser(
+                    new UserName("testFirstName", "testSecondName", "testLastName"),
+                    new Email("example@example.com"),
+                    new Phone("+71234567890"),
+                    "testPassword",
+                    getCompanyId(),
+                    List.of(UserPermission.DELETE)
+            );
+
+            User user = rpUser.add(createUser).orElseThrow();
+            return user.id();
+        } else {
+            return userId.get();
+        }
+    }
+
+    protected UUID getWarehouseId() throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Optional<UUID> warehouseId = jdbcSession
+                .sql("""
+                        SELECT id FROM warehouse
+                        """)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(UUID.fromString(rset.getString("id")));
+                    }
+                    return Optional.<UUID>empty();
+                });
+        if (warehouseId.isEmpty()) {
+            RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+
+            CreateWarehouse createWarehouse = new CreateWarehouse(
+                    "test",
+                    new Address("test"),
+                    0L,
+                    0L,
+                    List.of(getUserId()),
+                    getCompanyId()
+            );
+
+            Warehouse warehouse = rpWarehouse.add(createWarehouse).orElseThrow();
+            return warehouse.id();
+        } else {
+            return warehouseId.get();
         }
     }
 

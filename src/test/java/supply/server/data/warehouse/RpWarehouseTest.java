@@ -38,7 +38,7 @@ public class RpWarehouseTest extends DBConnection {
                 new Email("example@example.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                UUID.randomUUID(),
+                getCompanyId(),
                 List.of(UserPermission.DELETE)
         )).orElseThrow();
 
@@ -47,7 +47,7 @@ public class RpWarehouseTest extends DBConnection {
                 new Email("example0@example0.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                UUID.randomUUID(),
+                getCompanyId(),
                 List.of(UserPermission.DELETE)
         )).orElseThrow();
 
