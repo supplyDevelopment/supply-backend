@@ -68,6 +68,35 @@ public class RpUser {
         );
     }
 
+    public Optional<User> get(UUID id) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        return jdbcSession
+                .sql("""
+                    SELECT u.id,
+                           (u.name).first_name as firstName,
+                           (u.name).second_name as secondName,
+                           (u.name).last_name as lastName,
+                           u.password,
+                           u.privileges,
+                           u.email,
+                           u.phone,
+                           u.created_at,
+                           u.updated_at,
+                           cu.company_id
+                    FROM company_user u
+                    LEFT JOIN company_users cu ON u.id = cu.user_id
+                    WHERE u.id = ?
+                    """)
+                .set(id)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return compactUserFromResultSet(rset);
+                    } else {
+                        return Optional.empty();
+                    }
+                });
+    }
+
     public Optional<User> getByEmail(String email) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession

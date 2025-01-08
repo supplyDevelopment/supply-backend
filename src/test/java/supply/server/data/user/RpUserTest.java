@@ -107,13 +107,13 @@ public class RpUserTest extends DBConnection {
     }
 
     @Test
-    void getTest() throws SQLException {
+    void getByEmailTest() throws SQLException {
         RpUser rpUser = new RpUser(dataSource);
 
         CreateUser createUser = new CreateUser(
                 new UserName("testFirstName", "testSecondName", "testLastName"),
                 new Email("example1@example1.com"),
-                new Phone("+71234567890"),
+                new Phone("+71234567891"),
                 "testPassword",
                 getCompanyId(),
                 List.of(UserPermission.DELETE)
@@ -134,5 +134,35 @@ public class RpUserTest extends DBConnection {
         assertEquals(expected.createdAt(), user.createdAt());
         assertEquals(expected.updatedAt(), user.updatedAt());
     }
+
+    @Test
+    void getByIdTest() throws SQLException {
+        RpUser rpUser = new RpUser(dataSource);
+
+        CreateUser createUser = new CreateUser(
+                new UserName("testFirstName", "testSecondName", "testLastName"),
+                new Email("example2@example2.com"),
+                new Phone("+71234567892"),
+                "testPassword",
+                getCompanyId(),
+                List.of(UserPermission.DELETE)
+        );
+
+        User expected = rpUser.add(createUser).orElseThrow();
+        User user = rpUser.get(expected.id()).orElseThrow();
+
+        assertEquals(expected.id(), user.id());
+        assertEquals(expected.name().getFirstName(), user.name().getFirstName());
+        assertEquals(expected.name().getSecondName(), user.name().getSecondName());
+        assertEquals(expected.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+        assertEquals(expected.email().getEmail(), user.email().getEmail());
+        assertEquals(expected.phone().getPhone(), user.phone().getPhone());
+        assertEquals(expected.password(), user.password());
+        assertEquals(expected.companyId(), user.companyId());
+        assertEquals(expected.permissions().get(0), user.permissions().get(0));
+        assertEquals(expected.createdAt(), user.createdAt());
+        assertEquals(expected.updatedAt(), user.updatedAt());
+    }
+
 
 }
