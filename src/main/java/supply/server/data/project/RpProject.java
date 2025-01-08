@@ -5,6 +5,7 @@ import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.stereotype.Component;
 import supply.server.data.Pagination;
 
 import javax.sql.DataSource;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
+@Component
 public class RpProject {
 
     private final DataSource dataSource;

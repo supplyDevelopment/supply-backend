@@ -5,6 +5,7 @@ import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
+import supply.server.configuration.exception.InconsistentDatabaseException;
 import supply.server.data.Pagination;
 import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
@@ -47,9 +48,10 @@ public class RpResource {
                         projectId,
                         status,
                         description,
+                        warehouseId,
                         created_at
                         )
-                        VALUES (?, ?, ?, ?::UNIT, ?::RESOURCE_TYPE, ?, ?::INVENTORY_ITEM_STATUS, ?, ?)
+                        VALUES (?, ?, ?, ?::UNIT, ?::RESOURCE_TYPE, ?, ?::INVENTORY_ITEM_STATUS, ?, ?, ?)
                         """)
                 .set(sqlUrls)
                 .set(createResource.name())
@@ -59,18 +61,9 @@ public class RpResource {
                 .set(createResource.projectId())
                 .set(createResource.status().toString())
                 .set(createResource.description())
+                .set(createResource.warehouseId())
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
-
-        jdbcSession
-                .sql("""
-                        INSERT INTO warehouse_resources
-                        (resource_id, warehouse_id)
-                        VALUES (?, ?)
-                        """)
-                .set(resourceId)
-                .set(createResource.warehouseId())
-                .insert(Outcome.VOID);
 
         jdbcSession
                 .sql("""
@@ -80,6 +73,33 @@ public class RpResource {
                         """)
                 .set(resourceId)
                 .set(createResource.userId())
+                .insert(Outcome.VOID);
+
+        Optional<UUID> companyId = jdbcSession
+                .sql("""
+                        SELECT company FROM company_warehouses
+                        WHERE warehouse = ?
+                        """)
+                .set(createResource.warehouseId())
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(rset.getObject("company", UUID.class));
+                    }
+                    return Optional.empty();
+                });
+
+        if (companyId.isEmpty()) {
+            throw new InconsistentDatabaseException("Unable to find company for warehouse");
+        }
+
+        jdbcSession
+                .sql("""
+                        INSERT INTO company_resources
+                        (resource, company)
+                        VALUES (?, ?)
+                        """)
+                .set(resourceId)
+                .set(companyId.get())
                 .insert(Outcome.VOID);
 
         return Optional.of(new Resource(
@@ -104,12 +124,10 @@ public class RpResource {
         return jdbcSession
                 .sql("""
                         SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
-                               r.status, r.description, r.created_at, r.updated_at,
-                               ru.user_id AS user_id,
-                               wr.warehouse_id AS warehouse_id
+                               r.status, r.description, r.warehouseId, r.created_at, r.updated_at,
+                               ru.user_id AS user_id
                         FROM resource r
                         LEFT JOIN resource_users ru ON r.id = ru.resource_id
-                        LEFT JOIN warehouse_resources wr ON r.id = wr.resource_id
                         WHERE r.id = ?
                         """)
                 .set(resourceId)
@@ -140,7 +158,7 @@ public class RpResource {
                                 rset.getObject("projectId", UUID.class),
                                 ResourceStatus.valueOf(rset.getString("status")),
                                 rset.getString("description"),
-                                rset.getObject("warehouse_id", UUID.class),
+                                rset.getObject("warehouseId", UUID.class),
                                 rset.getObject("user_id", UUID.class),
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate()

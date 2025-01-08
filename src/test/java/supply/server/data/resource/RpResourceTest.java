@@ -58,15 +58,41 @@ public class RpResourceTest extends DBConnection {
         assertEquals(createResource.description(), resource.description());
 
         JdbcSession jdbcSession = new JdbcSession(dataSource);
+
+        UUID companyFromWarehouse = jdbcSession
+                .sql("""
+                        SELECT company
+                        FROM company_warehouses
+                        WHERE warehouse = ?
+                        """)
+                .set(resource.warehouseId())
+                .select((rset, stmt) -> {
+                    if (rset.next()) return rset.getObject("company", UUID.class);
+                    return null;
+                });
+
+        UUID companyFromResource = jdbcSession
+                .sql("""
+                        SELECT company
+                        FROM company_resources
+                        WHERE resource = ?
+                        """)
+                .set(resource.id())
+                .select((rset, stmt) -> {
+                    if (rset.next()) return rset.getObject("company", UUID.class);
+                    return null;
+                });
+
+        assertEquals(companyFromWarehouse, companyFromResource);
+
+
         Resource insertedResource = jdbcSession
                 .sql("""
                         SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
-                               r.status, r.description, r.created_at, r.updated_at,
-                               ru.user_id AS user_id,
-                               wr.warehouse_id AS warehouse_id
+                               r.status, r.description, r.warehouseId, r.created_at, r.updated_at,
+                               ru.user_id AS user_id
                         FROM resource r
                         LEFT JOIN resource_users ru ON r.id = ru.resource_id
-                        LEFT JOIN warehouse_resources wr ON r.id = wr.resource_id
                         WHERE r.id = ?
                         """)
                 .set(resource.id())
@@ -97,7 +123,7 @@ public class RpResourceTest extends DBConnection {
                                 rset.getObject("projectId", UUID.class),
                                 ResourceStatus.valueOf(rset.getString("status")),
                                 rset.getString("description"),
-                                rset.getObject("warehouse_id", UUID.class),
+                                rset.getObject("warehouseId", UUID.class),
                                 rset.getObject("user_id", UUID.class),
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate()

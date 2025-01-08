@@ -28,6 +28,7 @@ CREATE TABLE resource (
     projectId   UUID NOT NULL REFERENCES project(id),
     status      INVENTORY_ITEM_STATUS NOT NULL,
     description VARCHAR(1024),
+    warehouseId UUID NOT NULL REFERENCES warehouse(id),
     created_at  TIMESTAMPTZ NOT NULL,
     updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
