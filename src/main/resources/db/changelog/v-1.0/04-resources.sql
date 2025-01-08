@@ -3,12 +3,12 @@ CREATE TYPE INVENTORY_ITEM_STATUS AS ENUM (
     'INACTIVE',
     'REPAIR',
     'DELIVER'
-);
+); -- отсутствует
 
 CREATE TYPE RESOURCE_TYPE AS ENUM (
     'TOOL',
     'PRODUCT'
-);
+); -- можно добавлять
 
 CREATE TABLE project (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -16,7 +16,7 @@ CREATE TABLE project (
     description VARCHAR(1024),
     created_at  TIMESTAMPTZ NOT NULL,
     updated_at  TIMESTAMPTZ DEFAULT NOW()
-);
+); -- можно удалять
 
 CREATE TABLE resource (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -42,3 +42,4 @@ CREATE TABLE resource_operations (
 
 );
 
+-- изменять можно несколько параметров

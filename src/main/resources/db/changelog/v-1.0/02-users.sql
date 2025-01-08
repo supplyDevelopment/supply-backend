@@ -7,7 +7,7 @@ CREATE TABLE company_user (
      phone       PHONE NOT NULL,
      created_at  TIMESTAMPTZ NOT NULL,
      updated_at  TIMESTAMPTZ DEFAULT NOW()
-);
+); -- можно удалять
 
 CREATE TABLE supplier (
      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

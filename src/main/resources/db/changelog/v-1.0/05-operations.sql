@@ -2,7 +2,7 @@ CREATE TYPE OPERATION_TYPE AS ENUM (
     'ADD',
     'REMOVE',
     'REPLACE'
-);
+); -- изменение
 
 CREATE TABLE operation(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -11,10 +11,6 @@ CREATE TABLE operation(
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE comment(
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    text VARCHAR(1024) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
 -- TODO: implement all possible operations
+
+-- перемещение: какой сколько откуда куда

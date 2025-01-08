@@ -30,4 +30,4 @@ CREATE DOMAIN PHONE AS VARCHAR
 
 CREATE TYPE UNIT AS ENUM (
     'KG'
-);
+); -- грамы литры милилитры штуки куб см
