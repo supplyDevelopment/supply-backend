@@ -62,6 +62,26 @@ public class RpResource {
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
+        jdbcSession
+                .sql("""
+                        INSERT INTO warehouse_resources
+                        (resource_id, warehouse_id)
+                        VALUES (?, ?)
+                        """)
+                .set(resourceId)
+                .set(createResource.warehouseId())
+                .insert(Outcome.VOID);
+
+        jdbcSession
+                .sql("""
+                        INSERT INTO resource_users
+                        (resource_id, user_id)
+                        VALUES (?, ?)
+                        """)
+                .set(resourceId)
+                .set(createResource.userId())
+                .insert(Outcome.VOID);
+
         return Optional.of(new Resource(
                 resourceId,
                 createResource.images(),
@@ -72,8 +92,8 @@ public class RpResource {
                 createResource.projectId(),
                 createResource.status(),
                 createResource.description(),
-                null, // TODO: implement connection with warehouse
-                null,
+                createResource.warehouseId(),
+                createResource.userId(),
                 LocalDate.now(),
                 LocalDate.now()
         ));
@@ -83,8 +103,14 @@ public class RpResource {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                        SELECT id, images, name, count, unit, type, projectId, status, description, created_at, updated_at FROM resource
-                        WHERE id = ?
+                        SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
+                               r.status, r.description, r.created_at, r.updated_at,
+                               ru.user_id AS user_id,
+                               wr.warehouse_id AS warehouse_id
+                        FROM resource r
+                        LEFT JOIN resource_users ru ON r.id = ru.resource_id
+                        LEFT JOIN warehouse_resources wr ON r.id = wr.resource_id
+                        WHERE r.id = ?
                         """)
                 .set(resourceId)
                 .select((rset, stmt) -> {
@@ -114,8 +140,8 @@ public class RpResource {
                                 rset.getObject("projectId", UUID.class),
                                 ResourceStatus.valueOf(rset.getString("status")),
                                 rset.getString("description"),
-                                null, // TODO: implement connection with warehouse
-                                null,
+                                rset.getObject("warehouse_id", UUID.class),
+                                rset.getObject("user_id", UUID.class),
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate()
                         ));

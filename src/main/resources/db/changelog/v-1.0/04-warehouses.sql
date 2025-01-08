@@ -14,6 +14,6 @@ CREATE TABLE warehouse_admins (
 );
 
 CREATE TABLE warehouse_resources (
-    tool_id         UUID NOT NULL REFERENCES resource(id),
+    resource_id         UUID NOT NULL REFERENCES resource(id),
     warehouse_id    UUID NOT NULL REFERENCES warehouse(id)
 );
