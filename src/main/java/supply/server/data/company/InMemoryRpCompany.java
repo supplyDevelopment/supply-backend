@@ -1,16 +1,21 @@
 package supply.server.data.company;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class InMemoryRpCompany {
 
-    private final HashMap<UUID, Company> storage;
+    private final int MAX_CACHE_SIZE = 1000;
+
+    private final Map<UUID, Company> storage;
 
     public InMemoryRpCompany() {
-        this.storage = new HashMap<>();
+        this.storage = new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
+            @Override
+            protected boolean removeEldestEntry(Map.Entry<UUID, Company> eldest) {
+                return size() > MAX_CACHE_SIZE;
+            }
+        };
     }
 
     public Optional<Company> add(Company company) throws SQLException {
