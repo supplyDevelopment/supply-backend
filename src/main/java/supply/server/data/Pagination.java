@@ -1,5 +1,7 @@
 package supply.server.data;
 
-public record Pagination() {
+public record Pagination(
+        int limit,
+        int offset
+) {
 }
-// TODO: implement pagination
