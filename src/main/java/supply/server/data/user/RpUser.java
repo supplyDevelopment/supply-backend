@@ -1,6 +1,7 @@
 package supply.server.data.user;
 
 import com.jcabi.jdbc.JdbcSession;
+import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import supply.server.data.utils.Email;
@@ -42,6 +43,16 @@ public class RpUser {
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
+        jdbcSession
+                .sql("""
+                        INSERT INTO company_users
+                        (user_id, company_id)
+                        VALUES (?, ?)
+                        """)
+                .set(userId)
+                .set(createUser.companyId())
+                .insert(Outcome.VOID);
+
         return Optional.of(
                 new User(
                         userId,
@@ -49,13 +60,14 @@ public class RpUser {
                         createUser.email(),
                         createUser.phone(),
                         createUser.password(),
-                        null, // TODO: implement connection with company
+                        createUser.companyId(),
                         createUser.permissions(),
                         LocalDate.now(),
                         LocalDate.now()
                 )
         );
     }
+
     public Optional<User> getByEmail(String email) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
@@ -69,8 +81,10 @@ public class RpUser {
                            u.email,
                            u.phone,
                            u.created_at,
-                           u.updated_at
+                           u.updated_at,
+                           cu.company_id
                     FROM company_user u
+                    LEFT JOIN company_users cu ON u.id = cu.user_id
                     WHERE u.email = ?
                     """)
                 .set(email)
@@ -83,9 +97,7 @@ public class RpUser {
                 });
     }
 
-
-
-    static Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
+    private Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
         Email userEmail = new Email(rset.getString("email"));
         UserName userName = new UserName(
                 rset.getString("firstName"),
@@ -97,15 +109,13 @@ public class RpUser {
                 (String[]) rset.getArray("privileges").getArray()
         ).map(UserPermission::valueOf).toList();
 
-//        UUID companyId = rset.getObject("companyId", UUID.class);
-
         return Optional.of(new User(
                 UUID.fromString(rset.getString("id")),
                 userName,
                 userEmail,
                 userPhone,
                 rset.getString("password"),
-                null, // TODO: implement connection with company
+                rset.getObject("company_id", UUID.class),
                 userPermissions,
                 rset.getDate("created_at").toLocalDate(),
                 rset.getDate("updated_at").toLocalDate()
