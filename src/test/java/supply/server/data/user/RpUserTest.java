@@ -3,17 +3,25 @@ package supply.server.data.user;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DBConnection;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
+import supply.server.data.company.Company;
+import supply.server.data.company.CreateCompany;
+import supply.server.data.company.RpCompany;
+import supply.server.data.project.Project;
+import supply.server.data.project.RpProject;
+import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
+import supply.server.data.utils.company.Bil;
+import supply.server.data.utils.company.CompanyStatus;
+import supply.server.data.utils.company.Tax;
 import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.user.UserPermission;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -164,5 +172,86 @@ public class RpUserTest extends DBConnection {
         assertEquals(expected.updatedAt(), user.updatedAt());
     }
 
+    @Test
+    void getAllByName() throws SQLException {
+        RpCompany rpCompany = new RpCompany(dataSource);
+        UUID company1Id = rpCompany.add(new CreateCompany(
+                "thirdTestCompany",
+                List.of(new Email("examp1le@example.com")),
+                List.of(new Phone("+71234567895")),
+                new Bil("1234567895"),
+                new Tax("1234567895"),
+                List.of(new Address("test5")),
+                CompanyStatus.ACTIVE
+        )).map(Company::id).orElseThrow();
+        UUID company2Id = rpCompany.add(new CreateCompany(
+                "secondTestCompany",
+                List.of(new Email("exampl1e@example.com")),
+                List.of(new Phone("+71234567891")),
+                new Bil("1234567891"),
+                new Tax("1234567891"),
+                List.of(new Address("test1")),
+                CompanyStatus.ACTIVE
+        )).map(Company::id).orElseThrow();
+
+        RpUser rpUser = new RpUser(dataSource);
+        String[] additionLetters = new String[]{
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"
+        };
+        List<User> expected = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            if (i % 4 == 0) {
+                expected.add(rpUser.add(new CreateUser(
+                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
+                        new Email("example" + i + "@example.com"),
+                        new Phone("+7123456789" + i),
+                        "testPassword",
+                        company1Id,
+                        List.of(UserPermission.DELETE)
+                )).orElseThrow());
+            } else if (i % 2 == 0) {
+                rpUser.add(new CreateUser(
+                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
+                        new Email("example" + i + "@example.com"),
+                        new Phone("+7123456789" + i),
+                        "testPassword",
+                        company2Id,
+                        List.of(UserPermission.DELETE)
+                )).orElseThrow();
+            } else {
+                rpUser.add(new CreateUser(
+                        new UserName("agettingFirstName" + additionLetters[i], "agettingSecondName" + additionLetters[i], "agettingLastName" + additionLetters[i]),
+                        new Email("example" + i + "@example.com"),
+                        new Phone("+7123456789" + i),
+                        "testPassword",
+                        company1Id,
+                        List.of(UserPermission.DELETE)
+                ));
+            }
+        }
+
+        PaginatedList<User> users = rpUser.getAllByName("adding", company1Id, new Pagination(20, 0));
+        assertEquals(2, users.total());
+        for (User user: users.items()) {
+            for (User expectedUser: expected) {
+                if (user.id().equals(expectedUser.id())) {
+                    assertEquals(expectedUser.id(), user.id());
+                    assertEquals(expectedUser.name().getFirstName(), user.name().getFirstName());
+                    assertEquals(expectedUser.name().getSecondName(), user.name().getSecondName());
+                    assertEquals(expectedUser.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+                    assertEquals(expectedUser.email().getEmail(), user.email().getEmail());
+                    assertEquals(expectedUser.phone().getPhone(), user.phone().getPhone());
+                    assertEquals(expectedUser.password(), user.password());
+                    assertEquals(expectedUser.companyId(), user.companyId());
+                    assertEquals(expectedUser.permissions().get(0), user.permissions().get(0));
+                    assertEquals(expectedUser.createdAt(), user.createdAt());
+                    assertEquals(expectedUser.updatedAt(), user.updatedAt());
+                }
+            }
+        }
+        assertEquals(4, rpUser.getAllByName("agetting", company1Id, new Pagination(20, 0)).total());
+        assertEquals(6, rpUser.getAllByName("a", company1Id, new Pagination(20, 0)).total());
+        assertEquals(2, rpUser.getAllByName("", company2Id, new Pagination(20, 0)).total());
+    }
 
 }

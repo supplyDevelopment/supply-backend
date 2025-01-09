@@ -4,6 +4,8 @@ import com.jcabi.jdbc.JdbcSession;
 import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.Phone;
@@ -73,9 +75,9 @@ public class RpUser {
         return jdbcSession
                 .sql("""
                     SELECT u.id,
-                           (u.name).first_name as firstName,
-                           (u.name).second_name as secondName,
-                           (u.name).last_name as lastName,
+                           (u.name).first_name as first_name,
+                           (u.name).second_name as second_name,
+                           (u.name).last_name as last_name,
                            u.password,
                            u.privileges,
                            u.email,
@@ -102,9 +104,9 @@ public class RpUser {
         return jdbcSession
                 .sql("""
                     SELECT u.id,
-                           (u.name).first_name as firstName,
-                           (u.name).second_name as secondName,
-                           (u.name).last_name as lastName,
+                           (u.name).first_name as first_name,
+                           (u.name).second_name as second_name,
+                           (u.name).last_name as last_name,
                            u.password,
                            u.privileges,
                            u.email,
@@ -126,12 +128,72 @@ public class RpUser {
                 });
     }
 
+    public PaginatedList<User> getAllByName(String prefix, UUID companyId, Pagination pagination) throws SQLException {
+        String SQLWith = """
+                        WITH params AS (SELECT ? AS lower_prefix),
+                             user_table AS (
+                                 SELECT
+                                     u.id,
+                                     (u.name).first_name AS first_name,
+                                     (u.name).second_name AS second_name,
+                                     (u.name).last_name AS last_name,
+                                     u.email,
+                                     u.phone,
+                                     u.password,
+                                     u.privileges,
+                                     u.created_at,
+                                     u.updated_at,
+                                     cu.company_id
+                                 FROM company_user u
+                                 INNER JOIN company_users cu ON u.id = cu.user_id
+                                 JOIN params ON true
+                                 WHERE cu.company_id = ?
+                                   AND (
+                                        lower(concat((u.name).first_name, ' ', (u.name).second_name, ' ', (u.name).last_name)) LIKE concat(lower_prefix, '%') 
+                                        OR lower((u.name).first_name) LIKE concat(lower_prefix, '%')
+                                        OR lower((u.name).second_name) LIKE concat(lower_prefix, '%')
+                                        OR lower((u.name).last_name) LIKE concat(lower_prefix, '%')
+                                   )
+                             )
+                        SELECT *,
+                               (SELECT COUNT(*) FROM user_table) AS total_count
+                        FROM user_table
+                        LIMIT ?
+                        OFFSET ?;
+                    """;
+
+        // Выполняем запрос
+        return new JdbcSession(dataSource)
+                .sql(SQLWith)
+                .set(prefix.toLowerCase() + "%") // Префикс для фильтрации
+                .set(companyId) // Идентификатор компании
+                .set(pagination.limit()) // Лимит записей
+                .set(pagination.offset()) // Смещение записей
+                .select((rset, stmt) -> {
+                    List<User> users = new ArrayList<>();
+                    long total = 0;
+
+                    while (rset.next()) {
+                        if (total == 0) {
+                            total = rset.getLong("total_count"); // Общее количество записей
+                        }
+
+                        // Маппинг пользователя
+                        Optional<User> user = compactUserFromResultSet(rset);
+                        user.ifPresent(users::add);
+                    }
+
+                    return new PaginatedList<>(total, users);
+                });
+    }
+
+
     private Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
         Email userEmail = new Email(rset.getString("email"));
         UserName userName = new UserName(
-                rset.getString("firstName"),
-                rset.getString("secondName"),
-                rset.getString("lastName")
+                rset.getString("first_name"),
+                rset.getString("second_name"),
+                rset.getString("last_name")
         );
         Phone userPhone = new Phone(rset.getString("phone"));
         List<UserPermission> userPermissions = Arrays.stream(
