@@ -8,8 +8,6 @@ import supply.server.data.Pagination;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
 import supply.server.data.company.RpCompany;
-import supply.server.data.project.Project;
-import supply.server.data.project.RpProject;
 import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
@@ -173,7 +171,7 @@ public class RpUserTest extends DBConnection {
     }
 
     @Test
-    void getAllByName() throws SQLException {
+    void getAll() throws SQLException {
         RpCompany rpCompany = new RpCompany(dataSource);
         UUID company1Id = rpCompany.add(new CreateCompany(
                 "thirdTestCompany",
@@ -230,7 +228,7 @@ public class RpUserTest extends DBConnection {
             }
         }
 
-        PaginatedList<User> users = rpUser.getAllByName("adding", company1Id, new Pagination(20, 0));
+        PaginatedList<User> users = rpUser.getAll("adding", company1Id, new Pagination(20, 0));
         assertEquals(2, users.total());
         for (User user: users.items()) {
             for (User expectedUser: expected) {
@@ -249,9 +247,26 @@ public class RpUserTest extends DBConnection {
                 }
             }
         }
-        assertEquals(4, rpUser.getAllByName("agetting", company1Id, new Pagination(20, 0)).total());
-        assertEquals(6, rpUser.getAllByName("a", company1Id, new Pagination(20, 0)).total());
-        assertEquals(2, rpUser.getAllByName("", company2Id, new Pagination(20, 0)).total());
+        assertEquals(4, rpUser.getAll("agetting", company1Id, new Pagination(20, 0)).total());
+        assertEquals(6, rpUser.getAll("a", company1Id, new Pagination(20, 0)).total());
+        assertEquals(2, rpUser.getAll("", company2Id, new Pagination(20, 0)).total());
+
+        expected.add(rpUser.add(new CreateUser(
+                new UserName("gettingFirstNameas", "gettingSecondNameas", "gettingLastNameas"),
+                new Email("aexample" + 1 + "@example.com"),
+                new Phone("+70234567899"),
+                "testPassword",
+                company1Id,
+                List.of(UserPermission.DELETE)
+        )).orElseThrow());
+
+        PaginatedList<User> users2 = rpUser.getAll("a", company1Id, new Pagination(20, 0));
+
+        assertEquals(
+                expected.get(expected.size() - 1).id(),
+                users2.items().get(users2.items().size() - 1).id()
+        );
+
     }
 
 }
