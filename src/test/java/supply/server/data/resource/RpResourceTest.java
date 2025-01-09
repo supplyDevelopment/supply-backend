@@ -6,21 +6,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import supply.server.configuration.DBConnection;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
+import supply.server.data.company.CreateCompany;
+import supply.server.data.company.RpCompany;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
 import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
+import supply.server.data.utils.Address;
+import supply.server.data.utils.Email;
+import supply.server.data.utils.Phone;
 import supply.server.data.utils.Unit;
+import supply.server.data.utils.company.Bil;
+import supply.server.data.utils.company.CompanyStatus;
+import supply.server.data.utils.company.Tax;
+import supply.server.data.warehouse.CreateWarehouse;
+import supply.server.data.warehouse.RpWarehouse;
 
 import javax.sql.DataSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,6 +37,7 @@ public class RpResourceTest extends DBConnection {
 
     private final DataSource dataSource = dataSource();
 
+    // TODO check ability to use project an warehouse
     @Test
     void addTest() throws SQLException, MalformedURLException {
         RpProject rpProject = new RpProject(dataSource);
@@ -182,6 +192,102 @@ public class RpResourceTest extends DBConnection {
         assertEquals(expected.description(), actual.description());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
+    }
+
+    @Test
+    void getAllTest() throws SQLException, MalformedURLException {
+        UUID warehouse1Id = getWarehouseId();
+        UUID company1Id = getCompanyId();
+        RpCompany rpCompany = new RpCompany(dataSource);
+        UUID company2Id = rpCompany.add(new CreateCompany(
+                "tes1t",
+                List.of(new Email("e@e.com")),
+                List.of(new Phone("+79033073746")),
+                new Bil("1234"),
+                new Tax("1234"),
+                List.of(new Address("test")),
+                CompanyStatus.ACTIVE
+        )).orElseThrow().id();
+
+        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+        UUID warehouse2Id = rpWarehouse.add(new CreateWarehouse(
+                "test",
+                new Address("test"),
+                0l,
+                0l,
+                List.of(getUserId()),
+                company2Id
+        )).orElseThrow().id();
+
+        RpResource rpResource = new RpResource(dataSource);
+        List<Resource> expected = new ArrayList<>();
+        for (int i = 0; i < 16; i++) {
+            if (i % 4 == 0) {
+                expected.add(rpResource.add(new CreateResource(
+                        List.of(new URL("http://test.com")),
+                        "adding" + i,
+                        1,
+                        Unit.KG,
+                        ResourceType.PRODUCT,
+                        getUserId(),
+                        warehouse1Id,
+                        getProjectId(),
+                        ResourceStatus.ACTIVE,
+                        "testDescription"
+                )).orElseThrow());
+            } else if (i % 2 == 0) {
+                rpResource.add(new CreateResource(
+                        List.of(new URL("http://test.com")),
+                        "agetting" + i,
+                        1,
+                        Unit.KG,
+                        ResourceType.PRODUCT,
+                        getUserId(),
+                        warehouse2Id,
+                        getProjectId(),
+                        ResourceStatus.ACTIVE,
+                        "testDescription"
+                )).orElseThrow();
+            } else {
+                rpResource.add(new CreateResource(
+                        List.of(new URL("http://test.com")),
+                        "agetting" + i,
+                        1,
+                        Unit.KG,
+                        ResourceType.PRODUCT,
+                        getUserId(),
+                        warehouse1Id,
+                        getProjectId(),
+                        ResourceStatus.ACTIVE,
+                        "testDescription"
+                )).orElseThrow();
+            }
+        }
+
+        PaginatedList<Resource> actual = rpResource.getAll("adding", company1Id, new Pagination(20, 0));
+        assertEquals(4, actual.total());
+        for (Resource resource : actual.items()) {
+            for (Resource expectedResource : expected) {
+                if (expectedResource.id().equals(resource.id())) {
+                    assertEquals(expectedResource.id(), resource.id());
+                    assertEquals(expectedResource.images().get(0), resource.images().get(0));
+                    assertEquals(expectedResource.name(), resource.name());
+                    assertEquals(expectedResource.count(), resource.count());
+                    assertEquals(expectedResource.unit(), resource.unit());
+                    assertEquals(expectedResource.type(), resource.type());
+                    assertEquals(expectedResource.projectId(), resource.projectId());
+                    assertEquals(expectedResource.warehouseId(), resource.warehouseId());
+                    assertEquals(expectedResource.userId(), resource.userId());
+                    assertEquals(expectedResource.status(), resource.status());
+                    assertEquals(expectedResource.description(), resource.description());
+                    assertEquals(expectedResource.createdAt(), resource.createdAt());
+                    assertEquals(expectedResource.updatedAt(), resource.updatedAt());
+                }
+            }
+        }
+
+        assertEquals(12, rpResource.getAll("a", company1Id, new Pagination(20, 0)).total());
+        assertEquals(12, rpResource.getAll("", company1Id, new Pagination(20, 0)).total());
     }
 
     @Test

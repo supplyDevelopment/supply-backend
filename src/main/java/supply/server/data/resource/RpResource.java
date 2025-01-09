@@ -6,6 +6,7 @@ import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import supply.server.configuration.exception.InconsistentDatabaseException;
+import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
@@ -18,10 +19,7 @@ import java.sql.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 public class RpResource {
@@ -168,9 +166,102 @@ public class RpResource {
                 });
     }
 
-    public List<Resource> getAllByName(String prefix, ResourceFilters filters, UUID companyId, Pagination pagination) {
-        throw new NotImplementedException();
+    // TODO: implement filters
+    public PaginatedList<Resource> getAll(String prefix, UUID companyId, Pagination pagination) throws SQLException {
+        String SQLWith = """
+                WITH params AS (SELECT ? AS lower_prefix),
+                     resource_table AS (
+                         SELECT
+                             r.id,
+                             r.images,
+                             r.name,
+                             r.count,
+                             r.unit,
+                             r.type,
+                             r.projectId,
+                             r.status,
+                             r.description,
+                             r.warehouseId,
+                             r.created_at,
+                             r.updated_at,
+                             ru.user_id AS user_id,
+                             cr.company AS company_id,
+                             CASE
+                                 WHEN lower(r.name) LIKE concat((SELECT lower_prefix FROM params), '%')
+                                     THEN 1
+                                 WHEN lower(r.type::TEXT) LIKE concat((SELECT lower_prefix FROM params), '%')
+                                     THEN 2
+                                 WHEN lower(r.status::TEXT) LIKE concat((SELECT lower_prefix FROM params), '%')
+                                     THEN 3
+                                 ELSE 4
+                             END AS priority
+                         FROM resource r
+                         LEFT JOIN resource_users ru ON r.id = ru.resource_id
+                         LEFT JOIN company_resources cr ON r.id = cr.resource
+                         JOIN params ON true
+                         WHERE cr.company = ?
+                     )
+                SELECT *,
+                       (SELECT COUNT(*) FROM resource_table WHERE priority <= 3) AS total_count
+                FROM resource_table
+                WHERE priority <= 3
+                ORDER BY priority ASC, created_at DESC
+                LIMIT ?
+                OFFSET ?;
+            """;
+
+
+
+        return new JdbcSession(dataSource)
+                .sql(SQLWith)
+                .set(prefix.toLowerCase() + "%")
+                .set(companyId)
+                .set(pagination.limit())
+                .set(pagination.offset())
+                .select((rset, stmt) -> {
+                    List<Resource> resources = new ArrayList<>();
+                    long total = 0;
+
+                    while (rset.next()) {
+                        if (total == 0) {
+                            total = rset.getLong("total_count");
+                        }
+
+                        List<URL> images = null;
+                        Array imagesArray = rset.getArray("images");
+                        if (imagesArray != null) {
+                            images = Arrays.stream((String[]) imagesArray.getArray())
+                                    .map(url -> {
+                                        try {
+                                            return new URL(url);
+                                        } catch (MalformedURLException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    })
+                                    .toList();
+                        }
+
+                        resources.add(new Resource(
+                                rset.getObject("id", UUID.class),
+                                images,
+                                rset.getString("name"),
+                                rset.getInt("count"),
+                                Unit.valueOf(rset.getString("unit")),
+                                ResourceType.valueOf(rset.getString("type")),
+                                rset.getObject("projectId", UUID.class),
+                                ResourceStatus.valueOf(rset.getString("status")),
+                                rset.getString("description"),
+                                rset.getObject("warehouseId", UUID.class),
+                                rset.getObject("user_id", UUID.class),
+                                rset.getDate("created_at").toLocalDate(),
+                                rset.getDate("updated_at").toLocalDate()
+                        ));
+                    }
+
+                    return new PaginatedList<>(total, resources);
+                });
     }
+
 
     public List changeLogs(UUID resourceId, Pagination pagination) {
         throw new NotImplementedException();
