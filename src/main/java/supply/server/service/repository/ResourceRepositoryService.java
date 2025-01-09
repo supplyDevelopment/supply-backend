@@ -3,6 +3,8 @@ package supply.server.service.repository;
 import lombok.AllArgsConstructor;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
 import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
@@ -48,6 +50,16 @@ public class ResourceRepositoryService {
             throw new DbException(e.getMessage());
         }
         return resource;
+    }
+
+    public PaginatedList<Resource> getAll(String prefix, UUID companyId, Pagination pagination) {
+        PaginatedList<Resource> resources;
+        try {
+            resources = rpResource.getAll(prefix, companyId, pagination);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return resources;
     }
 
 }

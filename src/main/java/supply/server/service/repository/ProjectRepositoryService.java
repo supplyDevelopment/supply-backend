@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
+import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
@@ -52,8 +53,14 @@ public class ProjectRepositoryService {
         return project;
     }
 
-    public List<Project> getAll(String prefix, UUID companyId, Pagination pagination) {
-        throw new NotImplementedException();
+    public PaginatedList<Project> getAll(String prefix, UUID companyId, Pagination pagination) {
+        PaginatedList<Project> projects;
+        try {
+            projects = rpProject.getAll(prefix, companyId, pagination);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return projects;
     }
 
 }

@@ -3,6 +3,8 @@ package supply.server.service.repository;
 import lombok.AllArgsConstructor;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
 import supply.server.data.warehouse.CreateWarehouse;
 import supply.server.data.warehouse.RpWarehouse;
 import supply.server.data.warehouse.Warehouse;
@@ -48,6 +50,16 @@ public class WarehouseRepositoryService {
             throw new DbException(e.getMessage());
         }
         return warehouse;
+    }
+
+    public PaginatedList<Warehouse> getAll(String prefix, UUID companyId, Pagination pagination) {
+        PaginatedList<Warehouse> warehouses;
+        try {
+            warehouses = rpWarehouse.getAll(prefix, companyId, pagination);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return warehouses;
     }
 
 }
