@@ -167,7 +167,6 @@ public class RpUser {
                 OFFSET ?;
             """;
 
-        // Выполняем запрос
         return new JdbcSession(dataSource)
                 .sql(SQLWith)
                 .set(prefix.toLowerCase() + "%")
@@ -182,8 +181,6 @@ public class RpUser {
                         if (total == 0) {
                             total = rset.getLong("total_count");
                         }
-
-                        // Маппинг пользователя
                         Optional<User> user = compactUserFromResultSet(rset);
                         user.ifPresent(users::add);
                     }
