@@ -3,6 +3,8 @@ package supply.server.service.repository;
 import lombok.AllArgsConstructor;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.InMemoryRpUser;
 import supply.server.data.user.RpUser;
@@ -65,7 +67,7 @@ public class UserRepositoryService {
             Optional<User> userOpt = inMemoryRpUser.get(email);
 
             if (userOpt.isEmpty()) {
-                userOpt = rpUser.getByEmail(email);
+                userOpt = rpUser.get(email);
                 if (userOpt.isEmpty()) {
                     throw new DataNotFound("User with email " + email + " not found");
                 } else {
@@ -79,6 +81,16 @@ public class UserRepositoryService {
             throw new DbException(e.getMessage());
         }
         return user;
+    }
+
+    public PaginatedList<User> getAll(String prefix, UUID companyId, Pagination pagination) {
+        PaginatedList<User> users;
+        try {
+            users = rpUser.getAll(prefix, companyId, new Pagination(20, 0));
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return users;
     }
 
 }

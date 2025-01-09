@@ -25,7 +25,7 @@ public class UserEntityDetailsService implements UserDetailsService {
         RpUser rpUser = new RpUser(dataSource);
         Optional<User> user = Optional.empty();
         try {
-            user = rpUser.getByEmail(email);
+            user = rpUser.get(email);
         } catch (SQLException e) {
             log.error("Error in loadUserByUsername {}", e.getMessage());
         }

@@ -113,7 +113,7 @@ public class RpUserTest extends DBConnection {
     }
 
     @Test
-    void getByEmailTest() throws SQLException {
+    void getTest() throws SQLException {
         RpUser rpUser = new RpUser(dataSource);
 
         CreateUser createUser = new CreateUser(
@@ -126,7 +126,7 @@ public class RpUserTest extends DBConnection {
         );
 
         User expected = rpUser.add(createUser).orElseThrow();
-        User user = rpUser.getByEmail(expected.email().getEmail()).orElseThrow();
+        User user = rpUser.get(expected.email().getEmail()).orElseThrow();
 
         assertEquals(expected.id(), user.id());
         assertEquals(expected.name().getFirstName(), user.name().getFirstName());

@@ -98,7 +98,7 @@ public class RpUser {
                 });
     }
 
-    public Optional<User> getByEmail(String email) throws SQLException {
+    public Optional<User> get(String email) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
