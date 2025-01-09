@@ -127,6 +127,7 @@ public class RpUser {
                 });
     }
 
+    // TODO: implement filters
     public PaginatedList<User> getAll(String prefix, UUID companyId, Pagination pagination) throws SQLException {
         String SQLWith = """
                 WITH params AS (SELECT ? AS lower_prefix),
