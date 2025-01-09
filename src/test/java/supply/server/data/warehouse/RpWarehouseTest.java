@@ -3,12 +3,20 @@ package supply.server.data.warehouse;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DBConnection;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
+import supply.server.data.company.Company;
+import supply.server.data.company.CreateCompany;
+import supply.server.data.company.RpCompany;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
+import supply.server.data.utils.company.Bil;
+import supply.server.data.utils.company.CompanyStatus;
+import supply.server.data.utils.company.Tax;
 import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.user.UserPermission;
 
@@ -149,6 +157,86 @@ public class RpWarehouseTest extends DBConnection {
         assertEquals(expected.companyId(), actual.companyId());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
+    }
+
+    @Test
+    void getAllTest() throws SQLException {
+        RpCompany rpCompany = new RpCompany(dataSource);
+        UUID company1Id = rpCompany.add(new CreateCompany(
+                "thirdTestCompany",
+                List.of(new Email("examp1le@example.com")),
+                List.of(new Phone("+71234567895")),
+                new Bil("1234567895"),
+                new Tax("1234567895"),
+                List.of(new Address("test5")),
+                CompanyStatus.ACTIVE
+        )).map(Company::id).orElseThrow();
+        UUID company2Id = rpCompany.add(new CreateCompany(
+                "secondTestCompany",
+                List.of(new Email("exampl1e@example.com")),
+                List.of(new Phone("+71234567891")),
+                new Bil("1234567891"),
+                new Tax("1234567891"),
+                List.of(new Address("test1")),
+                CompanyStatus.ACTIVE
+        )).map(Company::id).orElseThrow();
+
+        UUID userId = getUserId();
+
+        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+        List<Warehouse> expected = new ArrayList<>();
+        for (int i = 0; i < 16; i++) {
+            if (i % 4 == 0) {
+                expected.add(rpWarehouse.add(new CreateWarehouse(
+                        "adding" + i,
+                        new Address("test" + i),
+                        0L,
+                        0L,
+                        List.of(userId),
+                        company1Id
+                )).orElseThrow());
+            } else if (i % 2 == 0) {
+                rpWarehouse.add(new CreateWarehouse(
+                        "getting" + i,
+                        new Address("test" + i),
+                        0L,
+                        0L,
+                        List.of(userId),
+                        company2Id
+                )).orElseThrow();
+            } else {
+                rpWarehouse.add(new CreateWarehouse(
+                        "agetting" + i,
+                        new Address("test" + i),
+                        0L,
+                        0L,
+                        List.of(userId),
+                        company1Id
+                )).orElseThrow();
+            }
+        }
+
+        PaginatedList<Warehouse> actual = rpWarehouse.getAll("adding", company1Id, new Pagination(20, 0));
+        assertEquals(4, actual.total());
+        for (Warehouse expectedWarehouse : expected) {
+            for (Warehouse actualWarehouse : actual.items()) {
+                if (expectedWarehouse.id().equals(actualWarehouse.id())) {
+                    assertEquals(expectedWarehouse.id(), actualWarehouse.id());
+                    assertEquals(expectedWarehouse.name(), actualWarehouse.name());
+                    assertEquals(expectedWarehouse.location().getAddress(), actualWarehouse.location().getAddress());
+                    assertEquals(expectedWarehouse.stockLevel(), actualWarehouse.stockLevel());
+                    assertEquals(expectedWarehouse.capacity(), actualWarehouse.capacity());
+                    assertEquals(expectedWarehouse.admins(), actualWarehouse.admins());
+                    assertEquals(expectedWarehouse.admins().get(0), actualWarehouse.admins().get(0));
+                    assertEquals(expectedWarehouse.companyId(), actualWarehouse.companyId());
+                    assertEquals(expectedWarehouse.createdAt(), actualWarehouse.createdAt());
+                    assertEquals(expectedWarehouse.updatedAt(), actualWarehouse.updatedAt());
+                }
+            }
+        }
+
+        assertEquals(12, rpWarehouse.getAll("a", company1Id, new Pagination(20, 0)).total());
+        assertEquals(12, rpWarehouse.getAll("", company1Id, new Pagination(20, 0)).total());
     }
 
 }
