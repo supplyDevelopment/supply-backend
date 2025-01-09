@@ -3,9 +3,22 @@ package supply.server.data.project;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DBConnection;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
+import supply.server.data.company.Company;
+import supply.server.data.company.CreateCompany;
+import supply.server.data.company.RpCompany;
+import supply.server.data.utils.Address;
+import supply.server.data.utils.Email;
+import supply.server.data.utils.Phone;
+import supply.server.data.utils.company.Bil;
+import supply.server.data.utils.company.CompanyStatus;
+import supply.server.data.utils.company.Tax;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,5 +88,59 @@ public class RpProjectTest extends DBConnection {
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
     }
+
+    @Test
+    void getAllTest() throws SQLException {
+        RpCompany rpCompany = new RpCompany(dataSource);
+        UUID company1Id = getCompanyId();
+        UUID company2Id = rpCompany.add(new CreateCompany(
+                        "secondTestCompany",
+                        List.of(new Email("exampl1e@example.com")),
+                        List.of(new Phone("+71234567891")),
+                        new Bil("1234567891"),
+                        new Tax("1234567891"),
+                        List.of(new Address("test1")),
+                        CompanyStatus.ACTIVE
+                )).map(Company::id).orElseThrow();
+
+        RpProject rpProject = new RpProject(dataSource);
+
+        List<String> names = List.of(
+                "addition",
+                "agetting"
+        );
+        List<Project> expected = new ArrayList<>();
+        long expectedSize = 0;
+        for (int i = 0; i < 16; i++) {
+            if (i % 4 == 0) {
+                expectedSize++;
+                expected.add(rpProject.add(names.get(0) + i, "description", company1Id).orElseThrow());
+            } else if (i % 2 == 0) {
+                rpProject.add(names.get(0) + i, "description", company2Id).orElseThrow();
+            } else {
+                rpProject.add(names.get(1) + i, "description", company1Id).orElseThrow();
+            }
+        }
+
+        PaginatedList<Project> actual = rpProject.getAll(names.get(0), company1Id, new Pagination(20, 0));
+        assertEquals(expectedSize, actual.total());
+        for (Project actualProject : actual.items()) {
+            for (Project expectedProject : expected) {
+                if (expectedProject.id().equals(actualProject.id())) {
+                    assertEquals(expectedProject.id(), actualProject.id());
+                    assertEquals(expectedProject.name(), actualProject.name());
+                    assertEquals(expectedProject.description(), actualProject.description());
+                    assertEquals(expectedProject.companyId(), actualProject.companyId());
+                    assertEquals(expectedProject.createdAt(), actualProject.createdAt());
+                    assertEquals(expectedProject.updatedAt(), actualProject.updatedAt());
+                }
+            }
+        }
+
+        assertEquals(0, rpProject.getAll(names.get(1), company2Id, new Pagination(20, 0)).total());
+        assertEquals(12, rpProject.getAll("a", company1Id, new Pagination(20, 0)).total());
+        assertEquals(12, rpProject.getAll("", company1Id, new Pagination(20, 0)).total());
+    }
+
 
 }

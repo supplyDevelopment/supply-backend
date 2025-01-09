@@ -6,11 +6,13 @@ import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Component;
+import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,8 +82,43 @@ public class RpProject {
                 });
     }
 
-    public List<Project> getAll(String prefix, UUID companyId, Pagination pagination) {
-        throw new NotImplementedException();
+    public PaginatedList<Project> getAll(String prefix, UUID companyId, Pagination pagination) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+
+        return jdbcSession
+                .sql("""
+                        SELECT
+                            p.id, p.name, p.description, p.created_at, p.updated_at,
+                            COUNT(*) OVER() AS total_count
+                        FROM project p
+                        INNER JOIN company_projects cp ON p.id = cp.project
+                        WHERE cp.company = ?
+                          AND p.name ILIKE ?
+                        LIMIT ?
+                        OFFSET ?
+                    """)
+                .set(companyId)
+                .set(prefix + "%")
+                .set(pagination.limit())
+                .set(pagination.offset())
+                .select((rset, stmt) -> {
+                    List<Project> projects = new ArrayList<>();
+                    long total = 0;
+                    while (rset.next()) {
+                        if (total == 0) {
+                            total = rset.getLong("total_count");
+                        }
+                        projects.add(new Project(
+                                rset.getObject("id", UUID.class),
+                                rset.getString("name"),
+                                rset.getString("description"),
+                                companyId,
+                                rset.getTimestamp("created_at").toLocalDateTime().toLocalDate(),
+                                rset.getTimestamp("updated_at").toLocalDateTime().toLocalDate()
+                        ));
+                    }
+                    return new PaginatedList<>(total, projects);
+                });
     }
 
 }
