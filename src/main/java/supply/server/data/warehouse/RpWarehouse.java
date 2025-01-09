@@ -71,7 +71,7 @@ public class RpWarehouse {
 
     }
 
-    public Optional<Warehouse> getById(UUID id) throws SQLException {
+    public Optional<Warehouse> get(UUID id) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""

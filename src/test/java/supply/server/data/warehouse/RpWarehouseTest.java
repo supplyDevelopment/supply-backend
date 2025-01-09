@@ -3,23 +3,16 @@ package supply.server.data.warehouse;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DBConnection;
-import supply.server.data.company.Company;
-import supply.server.data.company.CreateCompany;
-import supply.server.data.company.RpCompany;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
-import supply.server.data.utils.company.Bil;
-import supply.server.data.utils.company.CompanyStatus;
-import supply.server.data.utils.company.Tax;
 import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.user.UserPermission;
 
 import javax.sql.DataSource;
-import java.security.SecureRandom;
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
@@ -144,7 +137,7 @@ public class RpWarehouseTest extends DBConnection {
         );
 
         Warehouse expected = rpWarehouse.add(createWarehouse).orElseThrow();
-        Warehouse actual = rpWarehouse.getById(expected.id()).orElseThrow();
+        Warehouse actual = rpWarehouse.get(expected.id()).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.name(), actual.name());
