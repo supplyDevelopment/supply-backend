@@ -93,7 +93,7 @@ public class CompanyTest extends DBConnection {
         RpUser rpUser = new RpUser(dataSource);
         List<UUID> users = new ArrayList<>();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 9; i++) {
             users.add(rpUser.add(new CreateUser(
                     new UserName("testFirstName", "testSecondName", "testLastName"),
                     new Email("email" + i + "@email.com"),
@@ -103,6 +103,7 @@ public class CompanyTest extends DBConnection {
                     List.of(UserPermission.ADMIN)
             )).orElseThrow().id());
         }
+        users.add(getUserId());
         RpCompany rpCompany = new RpCompany(dataSource);
         Company company = rpCompany.get(getCompanyId()).orElseThrow();
 

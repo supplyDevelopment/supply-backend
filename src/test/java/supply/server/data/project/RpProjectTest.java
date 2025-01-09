@@ -139,7 +139,7 @@ public class RpProjectTest extends DBConnection {
 
         assertEquals(0, rpProject.getAll(names.get(1), company2Id, new Pagination(20, 0)).total());
         assertEquals(12, rpProject.getAll("a", company1Id, new Pagination(20, 0)).total());
-        assertEquals(12, rpProject.getAll("", company1Id, new Pagination(20, 0)).total());
+        assertEquals(14, rpProject.getAll("", company1Id, new Pagination(20, 0)).total());
     }
 
 
