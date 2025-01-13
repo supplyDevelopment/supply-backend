@@ -1,11 +1,12 @@
 package supply.server.service;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.stereotype.Service;
 import supply.server.data.InMemoryRepository;
 import supply.server.data.PgRepository;
 import supply.server.service.repository.*;
 
+@Service
 public class RepositoryService {
 
     private final PgRepository pgRepository;
@@ -44,6 +45,4 @@ public class RepositoryService {
                 pgRepository.rpResource()
         );
     }
-
-
 }

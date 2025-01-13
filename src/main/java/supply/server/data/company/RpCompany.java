@@ -3,6 +3,7 @@ package supply.server.data.company;
 import com.jcabi.jdbc.JdbcSession;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import supply.server.data.utils.Address;
 import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 @AllArgsConstructor
 public class RpCompany {
 

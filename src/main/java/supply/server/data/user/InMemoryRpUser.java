@@ -1,12 +1,13 @@
 package supply.server.data.user;
 
-import supply.server.data.company.Company;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class InMemoryRpUser {
 
     private final int MAX_CACHE_SIZE = 1000;

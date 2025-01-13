@@ -4,6 +4,7 @@ import com.jcabi.jdbc.JdbcSession;
 import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Component;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.utils.Email;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
+@Component
 @AllArgsConstructor
 public class RpUser {
 
