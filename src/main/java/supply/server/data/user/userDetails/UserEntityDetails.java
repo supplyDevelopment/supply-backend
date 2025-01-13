@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import supply.server.data.user.User;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class UserEntityDetails implements UserDetails {
@@ -27,7 +28,7 @@ public class UserEntityDetails implements UserDetails {
         return user.email().toString();
     }
 
-    public String getId() {
-        return user.id().toString();
+    public UUID getId() {
+        return user.id();
     }
 }
