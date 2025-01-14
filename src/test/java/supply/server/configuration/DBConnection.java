@@ -89,11 +89,11 @@ public class DBConnection {
         if (companyId.isEmpty()) {
             RpCompany rpCompany = new RpCompany(dataSource);
             CreateCompany createCompany = new CreateCompany(
-                    "addTestCompany",
+                    "testCompany",
                     List.of(new Email("example@example.com")),
                     List.of(new Phone("+71234567890")),
-                    new Bil("1234567890"),
-                    new Tax("1234567890"),
+                    new Bil("2234567890"),
+                    new Tax("2234567890"),
                     List.of(new Address("test")),
                     CompanyStatus.ACTIVE
             );
@@ -123,11 +123,10 @@ public class DBConnection {
                     new Email("example@example.com"),
                     new Phone("+71234567890"),
                     "testPassword",
-                    getCompanyId(),
                     List.of(UserPermission.DELETE)
             );
 
-            User user = rpUser.add(createUser).orElseThrow();
+            User user = rpUser.add(createUser, getCompanyId()).orElseThrow();
             return user.id();
         } else {
             return userId.get();
@@ -154,11 +153,10 @@ public class DBConnection {
                     new Address("test"),
                     0L,
                     0L,
-                    List.of(getUserId()),
-                    getCompanyId()
+                    List.of(getUserId())
             );
 
-            Warehouse warehouse = rpWarehouse.add(createWarehouse).orElseThrow();
+            Warehouse warehouse = rpWarehouse.add(createWarehouse, getCompanyId()).orElseThrow();
             return warehouse.id();
         } else {
             return warehouseId.get();

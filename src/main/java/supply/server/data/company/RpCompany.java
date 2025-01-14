@@ -89,6 +89,45 @@ public class RpCompany {
                 });
     }
 
+    public boolean projectCheck(UUID projectId, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        return jdbcSession
+                .sql("""
+                        SELECT project
+                        FROM company_projects
+                        WHERE company = ? AND project = ?
+                        """)
+                .set(companyId)
+                .set(projectId)
+                .select((rset, stmt) -> rset.next());
+    }
+
+    public boolean warehouseCheck(UUID warehouseId, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        return jdbcSession
+                .sql("""
+                        SELECT warehouse
+                        FROM company_warehouses
+                        WHERE company = ? AND warehouse = ?
+                        """)
+                .set(companyId)
+                .set(warehouseId)
+                .select((rset, stmt) -> rset.next());
+    }
+
+    public boolean userCheck(UUID userId, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        return jdbcSession
+                .sql("""
+                        SELECT user_id
+                        FROM company_users
+                        WHERE company_id = ? AND user_id = ?
+                        """)
+                .set(companyId)
+                .set(userId)
+                .select((rset, stmt) -> rset.next());
+    }
+
     private Optional<Company> compactCompanyFromResultSet(ResultSet rset) throws SQLException {
         String emails = rset.getString("contact_emails");
         emails = emails.substring(1, emails.length() - 1);
