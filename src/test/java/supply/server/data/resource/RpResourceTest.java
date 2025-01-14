@@ -208,9 +208,8 @@ public class RpResourceTest extends DBConnection {
                 new Address("test"),
                 0l,
                 0l,
-                List.of(getUserId()),
-                company2Id
-        )).orElseThrow().id();
+                List.of(getUserId())
+        ), company2Id).orElseThrow().id();
 
         RpResource rpResource = new RpResource(dataSource);
         List<Resource> expected = new ArrayList<>();

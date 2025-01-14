@@ -36,11 +36,10 @@ public class RpUserTest extends DBConnection {
                 new Email("example@example.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                getCompanyId(),
                 List.of(UserPermission.DELETE)
         );
 
-        User user = rpUser.add(createUser).orElseThrow();
+        User user = rpUser.add(createUser, getCompanyId()).orElseThrow();
 
         assertEquals(createUser.name().getFirstName(), user.name().getFirstName());
         assertEquals(createUser.name().getSecondName(), user.name().getSecondName());
@@ -122,11 +121,10 @@ public class RpUserTest extends DBConnection {
                 new Email("example1@example1.com"),
                 new Phone("+71234567891"),
                 "testPassword",
-                getCompanyId(),
                 List.of(UserPermission.DELETE)
         );
 
-        User expected = rpUser.add(createUser).orElseThrow();
+        User expected = rpUser.add(createUser, getCompanyId()).orElseThrow();
         User user = rpUser.get(expected.email().getEmail()).orElseThrow();
 
         assertEquals(expected.id(), user.id());
@@ -151,11 +149,10 @@ public class RpUserTest extends DBConnection {
                 new Email("example2@example2.com"),
                 new Phone("+71234567892"),
                 "testPassword",
-                getCompanyId(),
                 List.of(UserPermission.DELETE)
         );
 
-        User expected = rpUser.add(createUser).orElseThrow();
+        User expected = rpUser.add(createUser, getCompanyId()).orElseThrow();
         User user = rpUser.get(expected.id(), getCompanyId()).orElseThrow();
 
         assertEquals(expected.id(), user.id());
@@ -207,27 +204,24 @@ public class RpUserTest extends DBConnection {
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
-                        company1Id,
                         List.of(UserPermission.DELETE)
-                )).orElseThrow());
+                ), company1Id).orElseThrow());
             } else if (i % 2 == 0) {
                 rpUser.add(new CreateUser(
                         new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
-                        company2Id,
                         List.of(UserPermission.DELETE)
-                )).orElseThrow();
+                ), company2Id).orElseThrow();
             } else {
                 rpUser.add(new CreateUser(
                         new UserName("agettingFirstName" + additionLetters[i], "agettingSecondName" + additionLetters[i], "agettingLastName" + additionLetters[i]),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
-                        company1Id,
                         List.of(UserPermission.DELETE)
-                ));
+                ), company1Id);
             }
         }
 
@@ -259,9 +253,8 @@ public class RpUserTest extends DBConnection {
                 new Email("aexample" + 1 + "@example.com"),
                 new Phone("+70234567899"),
                 "testPassword",
-                company1Id,
                 List.of(UserPermission.DELETE)
-        )).orElseThrow());
+        ), company1Id).orElseThrow());
 
         PaginatedList<User> users2 = rpUser.getAll("a", company1Id, new Pagination(20, 0));
 

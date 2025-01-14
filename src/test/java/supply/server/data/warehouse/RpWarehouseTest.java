@@ -40,18 +40,16 @@ public class RpWarehouseTest extends DBConnection {
                 new Email("example@example.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                getCompanyId(),
                 List.of(UserPermission.DELETE)
-        )).orElseThrow();
+        ), getCompanyId()).orElseThrow();
 
         User user2 = rpUser.add(new CreateUser(
                 new UserName("testFirstName", "testSecondName", "testLastName"),
                 new Email("example0@example0.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                getCompanyId(),
                 List.of(UserPermission.DELETE)
-        )).orElseThrow();
+        ), getCompanyId()).orElseThrow();
 
         RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
 
@@ -60,11 +58,10 @@ public class RpWarehouseTest extends DBConnection {
                 new Address("test"),
                 0L,
                 0L,
-                List.of(user1.id(), user2.id()),
-                getCompanyId()
+                List.of(user1.id(), user2.id())
         );
 
-        Warehouse warehouse = rpWarehouse.add(createWarehouse).orElseThrow();
+        Warehouse warehouse = rpWarehouse.add(createWarehouse, getCompanyId()).orElseThrow();
 
         assertEquals(createWarehouse.name(), warehouse.name());
         assertEquals(createWarehouse.location().getAddress(), warehouse.location().getAddress());
@@ -129,9 +126,8 @@ public class RpWarehouseTest extends DBConnection {
                 new Email("example1@example1.com"),
                 new Phone("+71234567890"),
                 "testPassword",
-                getCompanyId(),
                 List.of(UserPermission.DELETE)
-        )).orElseThrow();
+        ), getCompanyId()).orElseThrow();
 
 
         RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
@@ -141,11 +137,10 @@ public class RpWarehouseTest extends DBConnection {
                 new Address("test"),
                 0L,
                 0L,
-                List.of(user.id()),
-                getCompanyId()
+                List.of(user.id())
         );
 
-        Warehouse expected = rpWarehouse.add(createWarehouse).orElseThrow();
+        Warehouse expected = rpWarehouse.add(createWarehouse, getCompanyId()).orElseThrow();
         Warehouse actual = rpWarehouse.get(expected.id(), getCompanyId()).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
@@ -195,27 +190,24 @@ public class RpWarehouseTest extends DBConnection {
                         new Address("test" + i),
                         0L,
                         0L,
-                        List.of(userId),
-                        company1Id
-                )).orElseThrow());
+                        List.of(userId)
+                ), company1Id).orElseThrow());
             } else if (i % 2 == 0) {
                 rpWarehouse.add(new CreateWarehouse(
                         "getting" + i,
                         new Address("test" + i),
                         0L,
                         0L,
-                        List.of(userId),
-                        company2Id
-                )).orElseThrow();
+                        List.of(userId)
+                ), company2Id).orElseThrow();
             } else {
                 rpWarehouse.add(new CreateWarehouse(
                         "agetting" + i,
                         new Address("test" + i),
                         0L,
                         0L,
-                        List.of(userId),
-                        company1Id
-                )).orElseThrow();
+                        List.of(userId)
+                ), company1Id).orElseThrow();
             }
         }
 

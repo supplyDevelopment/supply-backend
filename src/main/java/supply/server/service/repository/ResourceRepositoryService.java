@@ -5,6 +5,7 @@ import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
+import supply.server.data.company.RpCompany;
 import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;

@@ -26,7 +26,7 @@ public class RpUser {
 
     public final DataSource dataSource;
 
-    public Optional<User> add(CreateUser createUser) throws SQLException {
+    public Optional<User> add(CreateUser createUser, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
         Array privilegesArray = connection.createArrayOf("user_privilege", createUser.permissions().stream().map(UserPermission::name).toArray());
@@ -53,7 +53,7 @@ public class RpUser {
                         VALUES (?, ?)
                         """)
                 .set(userId)
-                .set(createUser.companyId())
+                .set(companyId)
                 .insert(Outcome.VOID);
 
         return Optional.of(
@@ -63,7 +63,7 @@ public class RpUser {
                         createUser.email(),
                         createUser.phone(),
                         createUser.password(),
-                        createUser.companyId(),
+                        companyId,
                         createUser.permissions(),
                         LocalDate.now(),
                         LocalDate.now()

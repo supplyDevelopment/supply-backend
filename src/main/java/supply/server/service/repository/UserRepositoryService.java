@@ -21,10 +21,10 @@ public class UserRepositoryService {
 
     private final InMemoryRpUser inMemoryRpUser;
 
-    public User add(CreateUser createUser) {
+    public User add(CreateUser createUser, UUID companyId) {
         User user;
         try {
-            Optional<User> userOpt = rpUser.add(createUser);
+            Optional<User> userOpt = rpUser.add(createUser, companyId);
 
             if (userOpt.isPresent()) {
                 user = userOpt.get();

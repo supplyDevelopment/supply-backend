@@ -18,10 +18,10 @@ public class WarehouseRepositoryService {
 
     private final RpWarehouse rpWarehouse;
 
-    public Warehouse add(CreateWarehouse createWarehouse) {
+    public Warehouse add(CreateWarehouse createWarehouse, UUID companyId) {
         Warehouse warehouse;
         try {
-            Optional<Warehouse> warehouseOpt = rpWarehouse.add(createWarehouse);
+            Optional<Warehouse> warehouseOpt = rpWarehouse.add(createWarehouse, companyId);
 
             if (warehouseOpt.isPresent()) {
                 warehouse = warehouseOpt.get();

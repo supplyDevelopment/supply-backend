@@ -22,7 +22,7 @@ public class RpWarehouse {
 
     public final DataSource dataSource;
 
-    public Optional<Warehouse> add(CreateWarehouse createWarehouse) throws SQLException {
+    public Optional<Warehouse> add(CreateWarehouse createWarehouse, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         UUID warehouseId = jdbcSession
                 .sql("""
@@ -57,7 +57,7 @@ public class RpWarehouse {
                         VALUES (?, ?)
                         """)
                 .set(warehouseId)
-                .set(createWarehouse.companyId())
+                .set(companyId)
                 .insert(Outcome.VOID);
 
         return Optional.of(new Warehouse(
@@ -67,7 +67,7 @@ public class RpWarehouse {
                 createWarehouse.stockLevel(),
                 createWarehouse.capacity(),
                 createWarehouse.admins(),
-                createWarehouse.companyId(),
+                companyId,
                 LocalDate.now(),
                 LocalDate.now(),
                 dataSource

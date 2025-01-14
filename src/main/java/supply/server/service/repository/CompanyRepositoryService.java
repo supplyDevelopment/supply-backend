@@ -60,4 +60,34 @@ public class CompanyRepositoryService {
         return company;
     }
 
+    public boolean projectCheck(UUID projectId, UUID companyId) {
+        boolean result;
+        try {
+            result = rpCompany.projectCheck(projectId, companyId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return result;
+    }
+
+    public boolean warehouseCheck(UUID warehouseId, UUID companyId) {
+        boolean result;
+        try {
+            result = rpCompany.warehouseCheck(warehouseId, companyId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return result;
+    }
+
+    public boolean userCheck(UUID userId, UUID companyId) {
+        boolean result;
+        try {
+            result = rpCompany.userCheck(userId, companyId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return result;
+    }
+
 }

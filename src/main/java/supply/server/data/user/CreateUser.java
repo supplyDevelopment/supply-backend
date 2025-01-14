@@ -13,7 +13,6 @@ public record CreateUser(
     Email email,
     Phone phone,
     String password,
-    UUID companyId,
     List<UserPermission> permissions
 ) {
 }

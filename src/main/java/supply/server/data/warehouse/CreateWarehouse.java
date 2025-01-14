@@ -11,7 +11,6 @@ public record CreateWarehouse(
         Long stockLevel,
         Long capacity,
 
-        List<UUID> admins,
-        UUID companyId
+        List<UUID> admins
 ) {
 }
