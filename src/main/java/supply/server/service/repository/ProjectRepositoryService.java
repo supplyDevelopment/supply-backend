@@ -36,10 +36,10 @@ public class ProjectRepositoryService {
         return project;
     }
 
-    public Project get(UUID projectId) {
+    public Project get(UUID projectId, UUID companyId) {
         Project project;
         try {
-            Optional<Project> projectOpt = rpProject.get(projectId);
+            Optional<Project> projectOpt = rpProject.get(projectId, companyId);
 
             if (projectOpt.isPresent()) {
                 project = projectOpt.get();

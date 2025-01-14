@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RpUserTest extends DBConnection {
 
@@ -155,7 +156,7 @@ public class RpUserTest extends DBConnection {
         );
 
         User expected = rpUser.add(createUser).orElseThrow();
-        User user = rpUser.get(expected.id()).orElseThrow();
+        User user = rpUser.get(expected.id(), getCompanyId()).orElseThrow();
 
         assertEquals(expected.id(), user.id());
         assertEquals(expected.name().getFirstName(), user.name().getFirstName());
@@ -168,6 +169,8 @@ public class RpUserTest extends DBConnection {
         assertEquals(expected.permissions().get(0), user.permissions().get(0));
         assertEquals(expected.createdAt(), user.createdAt());
         assertEquals(expected.updatedAt(), user.updatedAt());
+
+        assertTrue(rpUser.get(expected.id(), UUID.randomUUID()).isEmpty());
     }
 
     @Test

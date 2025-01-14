@@ -75,33 +75,6 @@ public class RpResource {
                 .set(createResource.userId())
                 .insert(Outcome.VOID);
 
-        Optional<UUID> companyId = jdbcSession
-                .sql("""
-                        SELECT company FROM company_warehouses
-                        WHERE warehouse = ?
-                        """)
-                .set(createResource.warehouseId())
-                .select((rset, stmt) -> {
-                    if (rset.next()) {
-                        return Optional.of(rset.getObject("company", UUID.class));
-                    }
-                    return Optional.empty();
-                });
-
-        if (companyId.isEmpty()) {
-            throw new InconsistentDatabaseException("Unable to find company for warehouse");
-        }
-
-        jdbcSession
-                .sql("""
-                        INSERT INTO company_resources
-                        (resource, company)
-                        VALUES (?, ?)
-                        """)
-                .set(resourceId)
-                .set(companyId.get())
-                .insert(Outcome.VOID);
-
         return Optional.of(new Resource(
                 resourceId,
                 createResource.images(),
@@ -119,18 +92,20 @@ public class RpResource {
         ));
     }
 
-    public Optional<Resource> get(UUID resourceId) throws SQLException {
+    public Optional<Resource> get(UUID resourceId, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                        SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
-                               r.status, r.description, r.warehouseId, r.created_at, r.updated_at,
-                               ru.user_id AS user_id
-                        FROM resource r
-                        LEFT JOIN resource_users ru ON r.id = ru.resource_id
-                        WHERE r.id = ?
-                        """)
+                    SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
+                           r.status, r.description, r.warehouseId, r.created_at, r.updated_at,
+                           ru.user_id AS user_id
+                    FROM resource r
+                    LEFT JOIN resource_users ru ON r.id = ru.resource_id
+                    JOIN company_warehouses cw ON r.warehouseId = cw.warehouse
+                    WHERE r.id = ? AND cw.company = ?
+            """)
                 .set(resourceId)
+                .set(companyId)
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         Array imagesArray = rset.getArray("images");
@@ -172,47 +147,41 @@ public class RpResource {
     public PaginatedList<Resource> getAll(String prefix, UUID companyId, Pagination pagination) throws SQLException {
         String SQLWith = """
                 WITH params AS (SELECT ? AS lower_prefix),
-                     resource_table AS (
-                         SELECT
-                             r.id,
-                             r.images,
-                             r.name,
-                             r.count,
-                             r.unit,
-                             r.type,
-                             r.projectId,
-                             r.status,
-                             r.description,
-                             r.warehouseId,
-                             r.created_at,
-                             r.updated_at,
-                             ru.user_id AS user_id,
-                             cr.company AS company_id,
-                             CASE
-                                 WHEN lower(r.name) LIKE concat((SELECT lower_prefix FROM params), '%')
-                                     THEN 1
-                                 WHEN lower(r.type::TEXT) LIKE concat((SELECT lower_prefix FROM params), '%')
-                                     THEN 2
-                                 WHEN lower(r.status::TEXT) LIKE concat((SELECT lower_prefix FROM params), '%')
-                                     THEN 3
-                                 ELSE 4
-                             END AS priority
-                         FROM resource r
-                         LEFT JOIN resource_users ru ON r.id = ru.resource_id
-                         LEFT JOIN company_resources cr ON r.id = cr.resource
-                         JOIN params ON true
-                         WHERE cr.company = ?
-                     )
-                SELECT *,
-                       (SELECT COUNT(*) FROM resource_table WHERE priority <= 3) AS total_count
-                FROM resource_table
-                WHERE priority <= 3
-                ORDER BY priority ASC, created_at DESC
-                LIMIT ?
-                OFFSET ?;
+                         resource_table AS (
+                             SELECT
+                                 r.id,
+                                 r.images,
+                                 r.name,
+                                 r.count,
+                                 r.unit,
+                                 r.type,
+                                 r.projectId,
+                                 r.status,
+                                 r.description,
+                                 r.warehouseId,
+                                 r.created_at,
+                                 r.updated_at,
+                                 ru.user_id AS user_id,
+                                 cw.company AS company_id, -- Используем связь через warehouse и company
+                                 CASE
+                                     WHEN lower(r.name) LIKE concat((SELECT lower_prefix FROM params), '%') THEN 1
+                                     WHEN lower(r.type::TEXT) LIKE concat((SELECT lower_prefix FROM params), '%') THEN 2
+                                     WHEN lower(r.status::TEXT) LIKE concat((SELECT lower_prefix FROM params), '%') THEN 3
+                                     ELSE 4
+                                 END AS priority
+                             FROM resource r
+                             LEFT JOIN resource_users ru ON r.id = ru.resource_id
+                             JOIN company_warehouses cw ON r.warehouseId = cw.warehouse  -- Замена связи на через warehouses
+                             JOIN params ON true
+                             WHERE cw.company = ? -- Фильтрация по company, через warehouse
+                         )
+                    SELECT *,
+                           (SELECT COUNT(*) FROM resource_table WHERE priority <= 3) AS total_count
+                    FROM resource_table
+                    WHERE priority <= 3
+                    ORDER BY priority ASC, created_at DESC
+                    LIMIT ? OFFSET ?
             """;
-
-
 
         return new JdbcSession(dataSource)
                 .sql(SQLWith)
@@ -285,8 +254,9 @@ public class RpResource {
         throw new NotImplementedException();
     }
 
-    public Resource edit(
+    public Optional<Resource> edit(
             UUID resourceId,
+            UUID companyId,
             Optional<String> name,
             Optional<Integer> count,
             Optional<UUID> projectId,
@@ -297,24 +267,31 @@ public class RpResource {
 
         jdbcSession
                 .sql("""
-                        UPDATE resource SET
-                        name = coalesce(?, name),
-                        count = coalesce(?, count),
-                        projectId = coalesce(?, projectId),
-                        status = coalesce(?::INVENTORY_ITEM_STATUS, status),
-                        description = coalesce(?, description)
-                        WHERE id = ?
-                        """)
+                    UPDATE resource SET
+                    name = coalesce(?, name),
+                    count = coalesce(?, count),
+                    projectId = coalesce(?, projectId),
+                    status = coalesce(?::INVENTORY_ITEM_STATUS, status),
+                    description = coalesce(?, description)
+                    WHERE id = ?
+                    AND EXISTS (
+                        SELECT 1
+                        FROM company_warehouses cw
+                        WHERE cw.company = ?
+                        AND cw.warehouse = resource.warehouseId
+                    )
+                    """)
                 .set(name.orElse(null))
                 .set(count.orElse(null))
                 .set(projectId.orElse(null))
                 .set(status.map(ResourceStatus::toString).orElse(null))
                 .set(description.orElse(null))
                 .set(resourceId)
+                .set(companyId)
                 .update(Outcome.VOID);
 
-        // TODO: create change log
-        return get(resourceId).orElseThrow();
+        return get(resourceId, companyId);
     }
+
 
 }

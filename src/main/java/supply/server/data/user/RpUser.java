@@ -71,14 +71,14 @@ public class RpUser {
         );
     }
 
-    public Optional<User> get(UUID id) throws SQLException {
+    public Optional<User> get(UUID userId, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
                     SELECT u.id,
-                           (u.name).first_name as first_name,
-                           (u.name).second_name as second_name,
-                           (u.name).last_name as last_name,
+                           (u.name).first_name AS first_name,
+                           (u.name).second_name AS second_name,
+                           (u.name).last_name AS last_name,
                            u.password,
                            u.privileges,
                            u.email,
@@ -88,9 +88,10 @@ public class RpUser {
                            cu.company_id
                     FROM company_user u
                     LEFT JOIN company_users cu ON u.id = cu.user_id
-                    WHERE u.id = ?
+                    WHERE u.id = ? AND cu.company_id = ?
                     """)
-                .set(id)
+                .set(userId)
+                .set(companyId)
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         return compactUserFromResultSet(rset);

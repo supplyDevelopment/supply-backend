@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RpWarehouseTest extends DBConnection {
 
@@ -145,7 +146,7 @@ public class RpWarehouseTest extends DBConnection {
         );
 
         Warehouse expected = rpWarehouse.add(createWarehouse).orElseThrow();
-        Warehouse actual = rpWarehouse.get(expected.id()).orElseThrow();
+        Warehouse actual = rpWarehouse.get(expected.id(), getCompanyId()).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.name(), actual.name());
@@ -157,6 +158,8 @@ public class RpWarehouseTest extends DBConnection {
         assertEquals(expected.companyId(), actual.companyId());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
+
+        assertTrue(rpWarehouse.get(expected.id(), UUID.randomUUID()).isEmpty());
     }
 
     @Test

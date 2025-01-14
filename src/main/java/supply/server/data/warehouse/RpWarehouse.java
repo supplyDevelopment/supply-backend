@@ -75,21 +75,22 @@ public class RpWarehouse {
 
     }
 
-    public Optional<Warehouse> get(UUID id) throws SQLException {
+    public Optional<Warehouse> get(UUID warehouseId, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                        SELECT w.id, w.name, w.location, w.stock_level,
-                               w.capacity, w.created_at, w.updated_at,
-                               ARRAY_AGG(DISTINCT wa.user_id) AS admins,
-                               cw.company AS company_id
-                        FROM warehouse w
-                        LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
-                        LEFT JOIN company_warehouses cw ON w.id = cw.warehouse
-                        WHERE w.id = ?
-                        GROUP BY w.id, cw.company
-                        """)
-                .set(id)
+                    SELECT w.id, w.name, w.location, w.stock_level,
+                           w.capacity, w.created_at, w.updated_at,
+                           ARRAY_AGG(DISTINCT wa.user_id) AS admins,
+                           cw.company AS company_id
+                    FROM warehouse w
+                    LEFT JOIN warehouse_admins wa ON w.id = wa.warehouse_id
+                    LEFT JOIN company_warehouses cw ON w.id = cw.warehouse
+                    WHERE w.id = ? AND cw.company = ?
+                    GROUP BY w.id, cw.company
+                    """)
+                .set(warehouseId)
+                .set(companyId)
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         return Optional.of(compactWarehouseFromResultSet(rset));

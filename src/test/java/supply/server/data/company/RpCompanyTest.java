@@ -108,7 +108,7 @@ public class RpCompanyTest extends DBConnection {
     }
 
     @Test
-    void getByNameTest() throws Exception {
+    void getTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
         CreateCompany createCompany = new CreateCompany(
                 "getTestCompany",

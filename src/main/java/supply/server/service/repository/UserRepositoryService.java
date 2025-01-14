@@ -39,15 +39,15 @@ public class UserRepositoryService {
         return user;
     }
 
-    public User get(UUID id) {
+    public User get(UUID userId, UUID companyId) {
         User user;
         try {
-            Optional<User> userOpt = inMemoryRpUser.get(id);
+            Optional<User> userOpt = inMemoryRpUser.get(userId, companyId);
 
             if (userOpt.isEmpty()) {
-                userOpt = rpUser.get(id);
+                userOpt = rpUser.get(userId, companyId);
                 if (userOpt.isEmpty()) {
-                    throw new DataNotFound("User with id " + id + " not found");
+                    throw new DataNotFound("User with id " + userId + " not found");
                 } else {
                     user = userOpt.get();
                     inMemoryRpUser.add(user);
@@ -86,7 +86,7 @@ public class UserRepositoryService {
     public PaginatedList<User> getAll(String prefix, UUID companyId, Pagination pagination) {
         PaginatedList<User> users;
         try {
-            users = rpUser.getAll(prefix, companyId, new Pagination(20, 0));
+            users = rpUser.getAll(prefix, companyId, pagination);
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }

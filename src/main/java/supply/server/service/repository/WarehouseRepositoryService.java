@@ -35,10 +35,10 @@ public class WarehouseRepositoryService {
         return warehouse;
     }
 
-    public Warehouse get(UUID warehouseId) {
+    public Warehouse get(UUID warehouseId, UUID companyId) {
         Warehouse warehouse;
         try {
-            Optional<Warehouse> warehouseOpt = rpWarehouse.get(warehouseId);
+            Optional<Warehouse> warehouseOpt = rpWarehouse.get(warehouseId, companyId);
 
             if (warehouseOpt.isPresent()) {
                 warehouse = warehouseOpt.get();

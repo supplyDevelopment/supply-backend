@@ -35,10 +35,10 @@ public class ResourceRepositoryService {
         return resource;
     }
 
-    public Resource get(UUID resourceId) {
+    public Resource get(UUID resourceId, UUID companyId) {
         Resource resource;
         try {
-            Optional<Resource> resourceOpt = rpResource.get(resourceId);
+            Optional<Resource> resourceOpt = rpResource.get(resourceId, companyId);
 
             if (resourceOpt.isPresent()) {
                 resource = resourceOpt.get();

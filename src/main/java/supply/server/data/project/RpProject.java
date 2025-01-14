@@ -56,17 +56,18 @@ public class RpProject {
         ));
     }
 
-    public Optional<Project> get(UUID projectId) throws SQLException {
+    public Optional<Project> get(UUID projectId, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
-                        SELECT p.id, p.name, p.description, p.created_at, p.updated_at,
-                               cp.company AS company_id
-                        FROM project p
-                        LEFT JOIN company_projects cp ON p.id = cp.project
-                        WHERE p.id = ?
-                        """)
+                    SELECT p.id, p.name, p.description, p.created_at, p.updated_at,
+                           cp.company AS company_id
+                    FROM project p
+                    LEFT JOIN company_projects cp ON p.id = cp.project
+                    WHERE p.id = ? AND cp.company = ?
+                    """)
                 .set(projectId)
+                .set(companyId)
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         return Optional.of(new Project(

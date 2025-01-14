@@ -37,17 +37,21 @@ public class InMemoryRpUser {
         return Optional.of(user);
     }
 
-    public Optional<User> get(UUID id) {
-        return storage.containsKey(id) ?
-                Optional.of(storage.get(id))
-                : Optional.empty();
+    public Optional<User> get(UUID id, UUID companyId) {
+        if (storage.containsKey(id)) {
+            User user = storage.get(id);
+            if (user.companyId().equals(companyId)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 
     public Optional<User> get(String email) {
         Optional<UUID> id = emailStorage.containsKey(email) ?
                 Optional.of(emailStorage.get(email))
                 : Optional.empty();
-        return id.flatMap(this::get);
+        return id.map(storage::get);
     }
 
 }

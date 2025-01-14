@@ -21,37 +21,20 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserService {
 
-    private final RepositoryService repository;
+    protected final RepositoryService repository;
 
-    private User user() {
+    protected User user() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new IllegalStateException("User not authenticated");
         }
-        UUID id = ((UserEntityDetails) authentication.getPrincipal()).getId();
-        return repository.getUser().get(id);
+
+        UserEntityDetails userEntityDetails = (UserEntityDetails) authentication.getPrincipal();
+
+        return repository.getUser().get(userEntityDetails.getId(), userEntityDetails.getCompanyId());
     }
 
     // TODO: add checks for permissions
-    // TODO: add validation for parameters and implement base methods
-    public PaginatedList<Project> projects(String prefix, Pagination pagination) {
-        return repository.getProject().getAll(prefix, user().companyId(), pagination);
-    }
-
-    public PaginatedList<Warehouse> warehouses(String prefix, Pagination pagination) {
-        return repository.getWarehouse().getAll(prefix, user().companyId(), pagination);
-    }
-
-    public PaginatedList<User> users(String prefix, Pagination pagination) {
-        return repository.getUser().getAll(prefix, user().companyId(), pagination);
-    }
-
-    public PaginatedList<Resource> resources(String prefix, Pagination pagination) {
-        return repository.getResource().getAll(prefix, user().companyId(), pagination);
-    }
-
-    public List<Supplier> suppliers() {
-        throw new NotImplementedException();
-    }
+    // TODO: add validation for parameters and implement base methods -
 
 }

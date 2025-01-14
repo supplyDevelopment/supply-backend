@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RpProjectTest extends DBConnection {
 
@@ -79,7 +80,7 @@ public class RpProjectTest extends DBConnection {
         UUID companyId = getCompanyId();
 
         Project expected = rpProject.add(name, description, companyId).orElseThrow();
-        Project actual = rpProject.get(expected.id()).orElseThrow();
+        Project actual = rpProject.get(expected.id(), companyId).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.name(), actual.name());
@@ -87,6 +88,8 @@ public class RpProjectTest extends DBConnection {
         assertEquals(expected.companyId(), actual.companyId());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
+
+        assertTrue(rpProject.get(expected.id(), UUID.randomUUID()).isEmpty());
     }
 
     @Test

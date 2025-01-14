@@ -1,7 +1,10 @@
 package supply.server.data.resource;
 
 import com.jcabi.jdbc.JdbcSession;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -32,7 +35,9 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RpResourceTest extends DBConnection {
 
     private final DataSource dataSource = dataSource();
@@ -80,21 +85,6 @@ public class RpResourceTest extends DBConnection {
                     if (rset.next()) return rset.getObject("company", UUID.class);
                     return null;
                 });
-
-        UUID companyFromResource = jdbcSession
-                .sql("""
-                        SELECT company
-                        FROM company_resources
-                        WHERE resource = ?
-                        """)
-                .set(resource.id())
-                .select((rset, stmt) -> {
-                    if (rset.next()) return rset.getObject("company", UUID.class);
-                    return null;
-                });
-
-        assertEquals(companyFromWarehouse, companyFromResource);
-
 
         Resource insertedResource = jdbcSession
                 .sql("""
@@ -177,7 +167,7 @@ public class RpResourceTest extends DBConnection {
         );
 
         Resource expected = rpResource.add(createResource).orElseThrow();
-        Resource actual = rpResource.get(expected.id()).orElseThrow();
+        Resource actual = rpResource.get(expected.id(), getCompanyId()).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.images().get(0), actual.images().get(0));
@@ -192,8 +182,11 @@ public class RpResourceTest extends DBConnection {
         assertEquals(expected.description(), actual.description());
         assertEquals(expected.createdAt(), actual.createdAt());
         assertEquals(expected.updatedAt(), actual.updatedAt());
+
+        assertTrue(rpResource.get(expected.id(), UUID.randomUUID()).isEmpty());
     }
 
+    @Order(0)
     @Test
     void getAllTest() throws SQLException, MalformedURLException {
         UUID warehouse1Id = getWarehouseId();
@@ -313,11 +306,12 @@ public class RpResourceTest extends DBConnection {
 
         Resource editedResource = rpResource.edit(
                 resource.id(),
+                getCompanyId(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.empty());
+                Optional.empty()).orElseThrow();
 
         assertEquals(resource.id(), editedResource.id());
         assertEquals(resource.images().get(0), editedResource.images().get(0));
@@ -328,6 +322,14 @@ public class RpResourceTest extends DBConnection {
         assertEquals(resource.projectId(), editedResource.projectId());
         assertEquals(resource.status(), editedResource.status());
         assertEquals(resource.description(), editedResource.description());
+
+        assertTrue(rpResource.edit(resource.id(),
+                UUID.randomUUID(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty(),
+                Optional.empty()).isEmpty());
     }
 
     @Test
@@ -353,11 +355,12 @@ public class RpResourceTest extends DBConnection {
 
         Resource editedResource = rpResource.edit(
                 resource.id(),
+                getCompanyId(),
                 Optional.of("editedName"),
                 Optional.of(2),
                 Optional.empty(),
                 Optional.empty(),
-                Optional.of("editedDescription"));
+                Optional.of("editedDescription")).orElseThrow();
 
         assertEquals(resource.id(), editedResource.id());
         assertEquals(resource.images().get(0), editedResource.images().get(0));
