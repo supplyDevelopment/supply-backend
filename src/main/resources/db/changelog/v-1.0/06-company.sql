@@ -26,11 +26,6 @@ CREATE TABLE company_warehouses(
     company     UUID NOT NULL REFERENCES company(id)
 );
 
-CREATE TABLE company_resources(
-    resource    UUID NOT NULL REFERENCES resource(id),
-    company     UUID NOT NULL REFERENCES company(id)
-);
-
 CREATE TABLE company_users(
     user_id      UUID NOT NULL REFERENCES company_user(id),
     company_id   UUID NOT NULL REFERENCES company(id)
