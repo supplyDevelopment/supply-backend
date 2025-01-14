@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import supply.server.data.user.userDetails.UserEntityDetailsService;
 
 import java.io.IOException;
+import java.util.UUID;
 
 
 @Component
@@ -26,16 +27,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
     @Autowired
     private UserEntityDetailsService userDetailsService;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
+    // TODO: use user id and company id
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UUID userId = UUID.fromString(jwtUtils.getUserIdFromJWTToken(jwt));
+                UUID companyId = UUID.fromString(jwtUtils.getCompanyIdFromJwtToken(jwt));
+
+                UserDetails userDetails = userDetailsService.loadUserById(userId, companyId);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,

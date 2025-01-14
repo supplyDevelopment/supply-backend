@@ -27,8 +27,8 @@ public class JwtUtils {
         UserEntityDetails userPrincipal = (UserEntityDetails) authentication.getPrincipal();
         try {
             return Jwts.builder()
-                    .setSubject((userPrincipal.getUsername()))
-                    .setId(userPrincipal.getId().toString())
+                    .setSubject(userPrincipal.getId().toString())
+                    .claim("company_id", userPrincipal.getCompanyId().toString())
                     .setIssuedAt(new Date())
                     .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                     .signWith(key(), SignatureAlgorithm.HS256)
@@ -43,18 +43,18 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String getUserIdFromJWTToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key()).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String getJwtToken(HttpServletRequest request) {
-        return request.getHeader("Authorization").substring(7);
+    public String getCompanyIdFromJwtToken(String token) {
+        return Jwts.parserBuilder().setSigningKey(key()).build()
+                .parseClaimsJws(token).getBody().get("company_id", String.class);
     }
 
-    public String getIdFromJwtToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key()).build()
-                .parseClaimsJws(token).getBody().getId();
+    public String getJwtToken(HttpServletRequest request) {
+        return request.getHeader("Authorization").substring(7);
     }
 
     public boolean validateJwtToken(String authToken) {

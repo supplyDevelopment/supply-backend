@@ -31,4 +31,8 @@ public class UserEntityDetails implements UserDetails {
     public UUID getId() {
         return user.id();
     }
+
+    public UUID getCompanyId() {
+        return user.companyId();
+    }
 }
