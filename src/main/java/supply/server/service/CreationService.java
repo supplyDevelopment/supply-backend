@@ -36,7 +36,7 @@ public class CreationService extends UserService {
         if (!validate(createResource)) {
             throw new IncorrectParameterException("Not allowed to create resource with this parameters");
         }
-        return repository.getResource().add(createResource);
+        return repository.getResource().add(createResource, user().companyId());
     }
 
     private boolean validate(CreateResource createResource) {

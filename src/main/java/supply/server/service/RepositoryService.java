@@ -36,13 +36,16 @@ public class RepositoryService {
                 inMemoryRepository.inMemoryRpUser()
         );
         project = new ProjectRepositoryService(
-                pgRepository.rpProject()
+                pgRepository.rpProject(),
+                inMemoryRepository.inMemoryRpProject()
         );
         warehouse = new WarehouseRepositoryService(
-                pgRepository.rpWarehouse()
+                pgRepository.rpWarehouse(),
+                inMemoryRepository.inMemoryRpWarehouse()
         );
         resource = new ResourceRepositoryService(
-                pgRepository.rpResource()
+                pgRepository.rpResource(),
+                inMemoryRepository.inMemoryRpResource()
         );
     }
 }
