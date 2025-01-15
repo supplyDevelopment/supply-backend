@@ -2,18 +2,10 @@ package supply.server.data.project;
 
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
-import supply.server.configuration.DBConnection;
+import supply.server.configuration.DataCreator;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.company.Company;
-import supply.server.data.company.CreateCompany;
-import supply.server.data.company.RpCompany;
-import supply.server.data.utils.Address;
-import supply.server.data.utils.Email;
-import supply.server.data.utils.Phone;
-import supply.server.data.utils.company.Bil;
-import supply.server.data.utils.company.CompanyStatus;
-import supply.server.data.utils.company.Tax;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -24,7 +16,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RpProjectTest extends DBConnection {
+public class RpProjectTest extends DataCreator {
 
     private final DataSource dataSource = dataSource();
 
@@ -33,7 +25,7 @@ public class RpProjectTest extends DBConnection {
         RpProject rpProject = new RpProject(dataSource);
         String name = "name";
         String description = "description";
-        UUID companyId = getCompanyId();
+        UUID companyId = getCompany(false).id();
 
         Project insertedProject = rpProject.add(name, description, companyId).orElseThrow();
 
@@ -42,7 +34,8 @@ public class RpProjectTest extends DBConnection {
         assertEquals(companyId, insertedProject.companyId());
 
         JdbcSession jdbcSession = new JdbcSession(dataSource);
-        Project project = jdbcSession.sql("""
+        Project project = jdbcSession
+                .sql("""
                         SELECT p.id, p.name, p.description, p.created_at, p.updated_at,
                                cp.company AS company_id
                         FROM project p
@@ -75,11 +68,9 @@ public class RpProjectTest extends DBConnection {
     @Test
     void getTest() throws SQLException {
         RpProject rpProject = new RpProject(dataSource);
-        String name = "getTestName";
-        String description = "getTestDescription";
-        UUID companyId = getCompanyId();
+        UUID companyId = getCompany(false).id();
 
-        Project expected = rpProject.add(name, description, companyId).orElseThrow();
+        Project expected = getProject(false);
         Project actual = rpProject.get(expected.id(), companyId).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
@@ -94,17 +85,7 @@ public class RpProjectTest extends DBConnection {
 
     @Test
     void getAllTest() throws SQLException {
-        RpCompany rpCompany = new RpCompany(dataSource);
-        UUID company1Id = getCompanyId();
-        UUID company2Id = rpCompany.add(new CreateCompany(
-                        "secondTestCompany",
-                        List.of(new Email("exampl1e@example.com")),
-                        List.of(new Phone("+71234567891")),
-                        new Bil("1234567891"),
-                        new Tax("1234567891"),
-                        List.of(new Address("test1")),
-                        CompanyStatus.ACTIVE
-                )).map(Company::id).orElseThrow();
+        List<UUID> companyIds = getCompanies(2, true).stream().map(Company::id).toList();
 
         RpProject rpProject = new RpProject(dataSource);
 
@@ -112,20 +93,21 @@ public class RpProjectTest extends DBConnection {
                 "addition",
                 "agetting"
         );
+
         List<Project> expected = new ArrayList<>();
         long expectedSize = 0;
         for (int i = 0; i < 16; i++) {
             if (i % 4 == 0) {
                 expectedSize++;
-                expected.add(rpProject.add(names.get(0) + i, "description", company1Id).orElseThrow());
+                expected.add(rpProject.add(names.get(0) + i, "description", companyIds.get(0)).orElseThrow());
             } else if (i % 2 == 0) {
-                rpProject.add(names.get(0) + i, "description", company2Id).orElseThrow();
+                rpProject.add(names.get(0) + i, "description", companyIds.get(1)).orElseThrow();
             } else {
-                rpProject.add(names.get(1) + i, "description", company1Id).orElseThrow();
+                rpProject.add(names.get(1) + i, "description", companyIds.get(0)).orElseThrow();
             }
         }
 
-        PaginatedList<Project> actual = rpProject.getAll(names.get(0), company1Id, new Pagination(20, 0));
+        PaginatedList<Project> actual = rpProject.getAll(names.get(0), companyIds.get(0), new Pagination(20, 0));
         assertEquals(expectedSize, actual.total());
         for (Project actualProject : actual.items()) {
             for (Project expectedProject : expected) {
@@ -140,9 +122,9 @@ public class RpProjectTest extends DBConnection {
             }
         }
 
-        assertEquals(0, rpProject.getAll(names.get(1), company2Id, new Pagination(20, 0)).total());
-        assertEquals(12, rpProject.getAll("a", company1Id, new Pagination(20, 0)).total());
-        assertEquals(14, rpProject.getAll("", company1Id, new Pagination(20, 0)).total());
+        assertEquals(0, rpProject.getAll(names.get(1), companyIds.get(1), new Pagination(20, 0)).total());
+        assertEquals(12, rpProject.getAll("a", companyIds.get(0), new Pagination(20, 0)).total());
+        assertEquals(12, rpProject.getAll("", companyIds.get(0), new Pagination(20, 0)).total());
     }
 
 
