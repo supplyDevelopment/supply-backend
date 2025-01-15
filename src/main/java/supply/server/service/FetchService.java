@@ -1,6 +1,7 @@
 package supply.server.service;
 
 import org.springframework.stereotype.Service;
+import supply.server.data.company.Company;
 import supply.server.data.project.Project;
 import supply.server.data.resource.Resource;
 import supply.server.data.user.User;
@@ -13,6 +14,10 @@ public class FetchService extends UserService {
 
     public FetchService(RepositoryService repository) {
         super(repository);
+    }
+
+    public Company getCompany() {
+        return repository.getCompany().get(user().companyId());
     }
 
     public Project getProject(UUID projectId) {
