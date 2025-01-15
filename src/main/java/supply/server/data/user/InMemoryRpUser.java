@@ -17,13 +17,13 @@ public class InMemoryRpUser {
     private final Map<String, UUID> emailStorage;
 
     public InMemoryRpUser() {
-        this.storage = new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
+        this.storage = new LinkedHashMap<>(MAX_CACHE_SIZE, 1f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<UUID, User> eldest) {
                 return size() > MAX_CACHE_SIZE;
             }
         };
-        this.emailStorage = new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
+        this.emailStorage = new LinkedHashMap<>(MAX_CACHE_SIZE, 1f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, UUID> eldest) {
                 return size() > MAX_CACHE_SIZE;
