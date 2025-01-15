@@ -2,30 +2,15 @@ package supply.server.data.resource;
 
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import supply.server.configuration.DBConnection;
+import supply.server.configuration.DataCreator;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
-import supply.server.data.company.CreateCompany;
-import supply.server.data.company.RpCompany;
-import supply.server.data.project.Project;
-import supply.server.data.project.RpProject;
 import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
-import supply.server.data.utils.Address;
-import supply.server.data.utils.Email;
-import supply.server.data.utils.Phone;
 import supply.server.data.utils.Unit;
-import supply.server.data.utils.company.Bil;
-import supply.server.data.utils.company.CompanyStatus;
-import supply.server.data.utils.company.Tax;
-import supply.server.data.warehouse.CreateWarehouse;
-import supply.server.data.warehouse.RpWarehouse;
+import supply.server.data.warehouse.Warehouse;
 
 import javax.sql.DataSource;
 import java.net.MalformedURLException;
@@ -38,29 +23,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class RpResourceTest extends DBConnection {
+public class RpResourceTest extends DataCreator {
 
     private final DataSource dataSource = dataSource();
 
-    // TODO check ability to use project an warehouse
     @Test
-    void addTest() throws SQLException, MalformedURLException {
-        RpProject rpProject = new RpProject(dataSource);
-        Project project = rpProject.add("testName", "testDescription", getCompanyId()).orElseThrow();
-
+    void addTest() throws SQLException {
         RpResource rpResource = new RpResource(dataSource);
-        CreateResource createResource = new CreateResource(
-                List.of(new URL("http://test.com")),
-                "testName",
-                1,
-                Unit.KG,
-                ResourceType.PRODUCT,
-                getUserId(),
-                getWarehouseId(),
-                project.id(),
-                ResourceStatus.ACTIVE,
-                "testDescription"
-                );
+        CreateResource createResource = generateResource(
+                getUser(true).id(),
+                getWarehouse(true).id(),
+                getProject(true).id()
+        );
 
         Resource resource = rpResource.add(createResource).orElseThrow();
 
@@ -73,18 +47,6 @@ public class RpResourceTest extends DBConnection {
         assertEquals(createResource.description(), resource.description());
 
         JdbcSession jdbcSession = new JdbcSession(dataSource);
-
-        UUID companyFromWarehouse = jdbcSession
-                .sql("""
-                        SELECT company
-                        FROM company_warehouses
-                        WHERE warehouse = ?
-                        """)
-                .set(resource.warehouseId())
-                .select((rset, stmt) -> {
-                    if (rset.next()) return rset.getObject("company", UUID.class);
-                    return null;
-                });
 
         Resource insertedResource = jdbcSession
                 .sql("""
@@ -148,26 +110,19 @@ public class RpResourceTest extends DBConnection {
     }
 
     @Test
-    void getTest() throws SQLException, MalformedURLException {
-        RpProject rpProject = new RpProject(dataSource);
-        Project project = rpProject.add("testName", "testDescription", getCompanyId()).orElseThrow();
-
+    void getTest() throws SQLException {
         RpResource rpResource = new RpResource(dataSource);
-        CreateResource createResource = new CreateResource(
-                List.of(new URL("http://test.com")),
-                "testName",
-                1,
-                Unit.KG,
-                ResourceType.PRODUCT,
-                getUserId(),
-                getWarehouseId(),
-                project.id(),
-                ResourceStatus.ACTIVE,
-                "testDescription"
+
+        Warehouse warehouse = getWarehouse(true);
+
+        CreateResource createResource = generateResource(
+                getUser(false).id(),
+                warehouse.id(),
+                getProject(false).id()
         );
 
         Resource expected = rpResource.add(createResource).orElseThrow();
-        Resource actual = rpResource.get(expected.id(), getCompanyId()).orElseThrow();
+        Resource actual = rpResource.get(expected.id(), warehouse.companyId()).orElseThrow();
 
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.images().get(0), actual.images().get(0));
@@ -186,30 +141,9 @@ public class RpResourceTest extends DBConnection {
         assertTrue(rpResource.get(expected.id(), UUID.randomUUID()).isEmpty());
     }
 
-    @Order(0)
     @Test
     void getAllTest() throws SQLException, MalformedURLException {
-        UUID warehouse1Id = getWarehouseId();
-        UUID company1Id = getCompanyId();
-        RpCompany rpCompany = new RpCompany(dataSource);
-        UUID company2Id = rpCompany.add(new CreateCompany(
-                "tes1t",
-                List.of(new Email("e@e.com")),
-                List.of(new Phone("+79033073746")),
-                new Bil("1234"),
-                new Tax("1234"),
-                List.of(new Address("test")),
-                CompanyStatus.ACTIVE
-        )).orElseThrow().id();
-
-        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
-        UUID warehouse2Id = rpWarehouse.add(new CreateWarehouse(
-                "test",
-                new Address("test"),
-                0l,
-                0l,
-                List.of(getUserId())
-        ), company2Id).orElseThrow().id();
+        List<Warehouse> warehouseIds = getWarehouses(2,true);
 
         RpResource rpResource = new RpResource(dataSource);
         List<Resource> expected = new ArrayList<>();
@@ -221,9 +155,9 @@ public class RpResourceTest extends DBConnection {
                         1,
                         Unit.KG,
                         ResourceType.PRODUCT,
-                        getUserId(),
-                        warehouse1Id,
-                        getProjectId(),
+                        getUser(false).id(),
+                        warehouseIds.get(0).id(),
+                        getProject(false).id(),
                         ResourceStatus.ACTIVE,
                         "testDescription"
                 )).orElseThrow());
@@ -234,9 +168,9 @@ public class RpResourceTest extends DBConnection {
                         1,
                         Unit.KG,
                         ResourceType.PRODUCT,
-                        getUserId(),
-                        warehouse2Id,
-                        getProjectId(),
+                        getUser(false).id(),
+                        warehouseIds.get(1).id(),
+                        getProject(false).id(),
                         ResourceStatus.ACTIVE,
                         "testDescription"
                 )).orElseThrow();
@@ -247,16 +181,16 @@ public class RpResourceTest extends DBConnection {
                         1,
                         Unit.KG,
                         ResourceType.PRODUCT,
-                        getUserId(),
-                        warehouse1Id,
-                        getProjectId(),
+                        getUser(false).id(),
+                        warehouseIds.get(0).id(),
+                        getProject(false).id(),
                         ResourceStatus.ACTIVE,
                         "testDescription"
                 )).orElseThrow();
             }
         }
 
-        PaginatedList<Resource> actual = rpResource.getAll("adding", company1Id, new Pagination(20, 0));
+        PaginatedList<Resource> actual = rpResource.getAll("adding", warehouseIds.get(0).companyId(), new Pagination(20, 0));
         assertEquals(4, actual.total());
         for (Resource resource : actual.items()) {
             for (Resource expectedResource : expected) {
@@ -278,34 +212,26 @@ public class RpResourceTest extends DBConnection {
             }
         }
 
-        assertEquals(12, rpResource.getAll("a", company1Id, new Pagination(20, 0)).total());
-        assertEquals(12, rpResource.getAll("", company1Id, new Pagination(20, 0)).total());
+        assertEquals(12, rpResource.getAll("a", warehouseIds.get(0).companyId(), new Pagination(20, 0)).total());
+        assertEquals(12, rpResource.getAll("", warehouseIds.get(0).companyId(), new Pagination(20, 0)).total());
     }
 
     @Test
-    void editNoParametersTest() throws SQLException, MalformedURLException {
-        RpProject rpProject = new RpProject(dataSource);
-        Project project = rpProject.add("testName", "testDescription", getCompanyId()).orElseThrow();
+    void editNoParametersTest() throws SQLException {
+        Warehouse warehouse = getWarehouse(true);
 
         RpResource rpResource = new RpResource(dataSource);
-        CreateResource createResource = new CreateResource(
-                List.of(new URL("http://test.com")),
-                "testName",
-                1,
-                Unit.KG,
-                ResourceType.PRODUCT,
-                getUserId(),
-                getWarehouseId(),
-                project.id(),
-                ResourceStatus.ACTIVE,
-                "testDescription"
+        CreateResource createResource = generateResource(
+                getUser(false).id(),
+                warehouse.id(),
+                getProject(false).id()
         );
 
         Resource resource = rpResource.add(createResource).orElseThrow();
 
         Resource editedResource = rpResource.edit(
                 resource.id(),
-                getCompanyId(),
+                warehouse.companyId(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
@@ -332,29 +258,21 @@ public class RpResourceTest extends DBConnection {
     }
 
     @Test
-    void editTest() throws SQLException, MalformedURLException {
-        RpProject rpProject = new RpProject(dataSource);
-        Project project = rpProject.add("testName", "testDescription", getCompanyId()).orElseThrow();
+    void editTest() throws SQLException {
+        Warehouse warehouse = getWarehouse(true);
 
         RpResource rpResource = new RpResource(dataSource);
-        CreateResource createResource = new CreateResource(
-                List.of(new URL("http://test.com")),
-                "testName",
-                1,
-                Unit.KG,
-                ResourceType.PRODUCT,
-                getUserId(),
-                getWarehouseId(),
-                project.id(),
-                ResourceStatus.ACTIVE,
-                "testDescription"
+        CreateResource createResource = generateResource(
+                getUser(false).id(),
+                warehouse.id(),
+                getProject(false).id()
         );
 
         Resource resource = rpResource.add(createResource).orElseThrow();
 
         Resource editedResource = rpResource.edit(
                 resource.id(),
-                getCompanyId(),
+                warehouse.companyId(),
                 Optional.of("editedName"),
                 Optional.of(2),
                 Optional.empty(),

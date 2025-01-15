@@ -1,16 +1,11 @@
 package supply.server.data.company;
 
 import com.jcabi.jdbc.JdbcSession;
-import supply.server.configuration.DBConnection;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import supply.server.configuration.DataCreator;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
-import supply.server.data.user.CreateUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 import supply.server.data.utils.Address;
@@ -19,12 +14,8 @@ import supply.server.data.utils.Phone;
 import supply.server.data.utils.company.Bil;
 import supply.server.data.utils.company.CompanyStatus;
 import supply.server.data.utils.company.Tax;
-import supply.server.data.utils.user.UserName;
-import supply.server.data.utils.user.UserPermission;
-import supply.server.data.warehouse.CreateWarehouse;
 import supply.server.data.warehouse.RpWarehouse;
 import supply.server.data.warehouse.Warehouse;
-import supply.server.requestEntity.company.CompanyRequestEntity;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -36,22 +27,15 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RpCompanyTest extends DBConnection {
+public class RpCompanyTest extends DataCreator {
 
     private final DataSource dataSource = dataSource();
 
     @Test
     void addTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
-        CreateCompany createCompany = new CreateCompany(
-                "addTestCompany",
-                List.of(new Email("example@example.com")),
-                List.of(new Phone("+71234567890")),
-                new Bil("1234567890"),
-                new Tax("1234567890"),
-                List.of(new Address("test")),
-                CompanyStatus.ACTIVE
-        );
+
+        CreateCompany createCompany = generateCompany();
         Company company = rpCompany.add(createCompany).orElseThrow();
 
         Assertions.assertEquals(createCompany.name(), company.name());
@@ -124,16 +108,7 @@ public class RpCompanyTest extends DBConnection {
     @Test
     void getTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
-        CreateCompany createCompany = new CreateCompany(
-                "getTestCompany",
-                List.of(new Email("example1@example.com")),
-                List.of(new Phone("+71234567891")),
-                new Bil("1234567891"),
-                new Tax("1234567891"),
-                List.of(new Address("test1")),
-                CompanyStatus.ACTIVE
-        );
-        Company expected = rpCompany.add(createCompany).orElseThrow();
+        Company expected = getCompany(false);
         Company actual = rpCompany.get(expected.id()).orElseThrow();
 
         Assertions.assertEquals(expected.id(), actual.id());
@@ -150,96 +125,41 @@ public class RpCompanyTest extends DBConnection {
 
     @Test
     void checkProjectTest() throws SQLException {
-        UUID company1Id = getCompanyId();
         RpCompany rpCompany = new RpCompany(dataSource);
-        CreateCompany createCompany = new CreateCompany(
-                "check1",
-                List.of(new Email("example1@example.com")),
-                List.of(new Phone("+71234567891")),
-                new Bil("1234567895"),
-                new Tax("1234567895"),
-                List.of(new Address("test1")),
-                CompanyStatus.ACTIVE
-        );
-        UUID company2Id = rpCompany.add(createCompany).orElseThrow().id();
+        List<UUID> companyIds = getCompanies(2, false).stream().map(Company::id).toList();
 
         RpProject rpProject = new RpProject(dataSource);
-        Project project1 = rpProject.add("testName", "testDescription", company1Id).orElseThrow();
-        Project project2 = rpProject.add("testName", "testDescription", company2Id).orElseThrow();
+        Project project1 = rpProject.add("testName", "testDescription", companyIds.get(0)).orElseThrow();
+        Project project2 = rpProject.add("testName", "testDescription", companyIds.get(1)).orElseThrow();
 
-        assertTrue(rpCompany.projectCheck(project1.id(), company1Id));
-        assertFalse(rpCompany.projectCheck(project2.id(), company1Id));
+        assertTrue(rpCompany.projectCheck(project1.id(), companyIds.get(0)));
+        assertFalse(rpCompany.projectCheck(project2.id(), companyIds.get(0)));
     }
 
     @Test
     void checkWarehouseTest() throws SQLException {
-        UUID company1Id = getCompanyId();
         RpCompany rpCompany = new RpCompany(dataSource);
-        CreateCompany createCompany = new CreateCompany(
-                "check2",
-                List.of(new Email("example1@example.com")),
-                List.of(new Phone("+71234567891")),
-                new Bil("1234567896"),
-                new Tax("1234567896"),
-                List.of(new Address("test1")),
-                CompanyStatus.ACTIVE
-        );
-        UUID company2Id = rpCompany.add(createCompany).orElseThrow().id();
+        List<UUID> companyIds = getCompanies(2, false).stream().map(Company::id).toList();
 
         RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
-        Warehouse warehouse1 = rpWarehouse.add(new CreateWarehouse(
-                "test1",
-                new Address("test"),
-                0L,
-                0L,
-                List.of()
-        ), company1Id).orElseThrow();
-        Warehouse warehouse2 = rpWarehouse.add(new CreateWarehouse(
-                "test2",
-                new Address("test"),
-                0L,
-                0L,
-                List.of()
-        ), company2Id).orElseThrow();
+        Warehouse warehouse1 = rpWarehouse.add(generateWarehouse(List.of()), companyIds.get(0)).orElseThrow();
+        Warehouse warehouse2 = rpWarehouse.add(generateWarehouse(List.of()), companyIds.get(1)).orElseThrow();
 
-        assertTrue(rpCompany.warehouseCheck(warehouse1.id(), company1Id));
-        assertFalse(rpCompany.warehouseCheck(warehouse2.id(), company1Id));
+        assertTrue(rpCompany.warehouseCheck(warehouse1.id(), companyIds.get(0)));
+        assertFalse(rpCompany.warehouseCheck(warehouse2.id(), companyIds.get(0)));
     }
 
     @Test
     void checkUserTest() throws SQLException {
-        UUID company1Id = getCompanyId();
         RpCompany rpCompany = new RpCompany(dataSource);
-        CreateCompany createCompany = new CreateCompany(
-                "check3",
-                List.of(new Email("example1@example.com")),
-                List.of(new Phone("+71234567891")),
-                new Bil("1234567897"),
-                new Tax("1234567897"),
-                List.of(new Address("test1")),
-                CompanyStatus.ACTIVE
-        );
-        UUID company2Id = rpCompany.add(createCompany).orElseThrow().id();
+        List<UUID> companyIds = getCompanies(2, false).stream().map(Company::id).toList();
 
         RpUser rpUser = new RpUser(dataSource);
+        User user1 = rpUser.add(generateUser(), companyIds.get(0)).orElseThrow();
+        User user2 = rpUser.add(generateUser(), companyIds.get(1)).orElseThrow();
 
-        User user1 = rpUser.add(new CreateUser(
-            new UserName("testFirstName", "testSecondName", "testLastName"),
-            new Email("example1@example.com"),
-            new Phone("+71234567891"),
-            "testPassword",
-            List.of(UserPermission.DELETE)
-        ), company1Id).orElseThrow();
-        User user2 = rpUser.add(new CreateUser(
-                new UserName("testFirstName", "testSecondName", "testLastName"),
-                new Email("example2@example.com"),
-                new Phone("+71234567892"),
-                "testPassword",
-                List.of(UserPermission.DELETE)
-        ), company2Id).orElseThrow();
-
-        assertTrue(rpCompany.userCheck(user1.id(), company1Id));
-        assertFalse(rpCompany.userCheck(user2.id(), company1Id));
+        assertTrue(rpCompany.userCheck(user1.id(), companyIds.get(0)));
+        assertFalse(rpCompany.userCheck(user2.id(), companyIds.get(0)));
     }
 
 }

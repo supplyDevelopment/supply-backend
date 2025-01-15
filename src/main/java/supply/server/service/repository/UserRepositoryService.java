@@ -46,11 +46,11 @@ public class UserRepositoryService {
 
             if (userOpt.isEmpty()) {
                 userOpt = rpUser.get(userId, companyId);
-                if (userOpt.isEmpty()) {
-                    throw new DataNotFound("User with id " + userId + " not found");
-                } else {
+                if (userOpt.isPresent()) {
                     user = userOpt.get();
                     inMemoryRpUser.add(user);
+                } else {
+                    throw new DataNotFound("User with id " + userId + " not found");
                 }
             }
             user = userOpt.get();

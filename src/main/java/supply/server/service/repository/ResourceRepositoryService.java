@@ -7,6 +7,7 @@ import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.company.RpCompany;
 import supply.server.data.resource.CreateResource;
+import supply.server.data.resource.InMemoryRpResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
 
@@ -19,13 +20,16 @@ public class ResourceRepositoryService {
 
     private final RpResource rpResource;
 
-    public Resource add(CreateResource createResource) {
+    private final InMemoryRpResource inMemoryRpResource;
+
+    public Resource add(CreateResource createResource, UUID companyId) {
         Resource resource;
         try {
             Optional<Resource> resourceOpt = rpResource.add(createResource);
 
             if (resourceOpt.isPresent()) {
                 resource = resourceOpt.get();
+                inMemoryRpResource.add(resource, companyId);
             } else {
                 throw new DbException("Failed to add resource");
             }
@@ -39,13 +43,18 @@ public class ResourceRepositoryService {
     public Resource get(UUID resourceId, UUID companyId) {
         Resource resource;
         try {
-            Optional<Resource> resourceOpt = rpResource.get(resourceId, companyId);
+            Optional<Resource> resourceOpt = inMemoryRpResource.get(resourceId, companyId);
 
-            if (resourceOpt.isPresent()) {
-                resource = resourceOpt.get();
-            } else {
-                throw new DataNotFound("Resource with id " + resourceId + " not found");
+            if (resourceOpt.isEmpty()) {
+                resourceOpt = rpResource.get(resourceId, companyId);
+                if (resourceOpt.isPresent()) {
+                    resource = resourceOpt.get();
+                    inMemoryRpResource.add(resource, companyId);
+                } else {
+                    throw new DataNotFound("Resource with id " + resourceId + " not found");
+                }
             }
+            resource = resourceOpt.get();
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());

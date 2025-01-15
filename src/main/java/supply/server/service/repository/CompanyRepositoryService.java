@@ -45,11 +45,11 @@ public class CompanyRepositoryService {
 
             if (companyOpt.isEmpty()) {
                 companyOpt = rpCompany.get(companyId);
-                if (companyOpt.isEmpty()) {
-                    throw new DataNotFound("Company with id " + companyId + " not found");
-                } else {
+                if (companyOpt.isPresent()) {
                     company = companyOpt.get();
                     inMemoryRpCompany.add(company);
+                } else {
+                    throw new DataNotFound("Company with id " + companyId + " not found");
                 }
             }
             company = companyOpt.get();

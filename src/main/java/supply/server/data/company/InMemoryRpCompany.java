@@ -11,12 +11,12 @@ import java.util.UUID;
 @Component
 public class InMemoryRpCompany {
 
-    private final int MAX_CACHE_SIZE = 1000;
+    private final int MAX_CACHE_SIZE = 200;
 
     private final Map<UUID, Company> storage;
 
     public InMemoryRpCompany() {
-        this.storage = new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
+        this.storage = new LinkedHashMap<>(MAX_CACHE_SIZE, 1f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry<UUID, Company> eldest) {
                 return size() > MAX_CACHE_SIZE;
