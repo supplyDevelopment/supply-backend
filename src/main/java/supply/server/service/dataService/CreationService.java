@@ -38,11 +38,12 @@ public class CreationService extends UserService {
     }
 
     public User createUser(CreateUser createUser) {
+        User user = repository.getUser().add(createUser, user().companyId());
         rabbitSendService.sendUserRegistrationEmail(
                 createUser.email().getEmail(),
                 createUser.password()
         );
-        return repository.getUser().add(createUser, user().companyId());
+        return user;
     }
 
     public User regenerateUserPassword(UUID userId) {
