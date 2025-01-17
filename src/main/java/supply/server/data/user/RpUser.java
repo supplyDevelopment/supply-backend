@@ -4,6 +4,7 @@ import com.jcabi.jdbc.JdbcSession;
 import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
@@ -25,11 +26,14 @@ import java.util.*;
 public class RpUser {
 
     public final DataSource dataSource;
+    private final PasswordEncoder passwordEncoder;
 
     public Optional<User> add(CreateUser createUser, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Connection connection = dataSource.getConnection();
         Array privilegesArray = connection.createArrayOf("user_privilege", createUser.permissions().stream().map(UserPermission::name).toArray());
+
+        String encodedPassword = passwordEncoder.encode(createUser.password());
 
         UUID userId = jdbcSession
                 .sql("""
@@ -41,7 +45,7 @@ public class RpUser {
                 .set(createUser.name().getLastName().orElse(null))
                 .set(createUser.email().getEmail())
                 .set(createUser.phone().getPhone())
-                .set(createUser.password())
+                .set(encodedPassword)
                 .set(privilegesArray)
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
@@ -62,7 +66,7 @@ public class RpUser {
                         createUser.name(),
                         createUser.email(),
                         createUser.phone(),
-                        createUser.password(),
+                        encodedPassword,
                         companyId,
                         createUser.permissions(),
                         LocalDate.now(),

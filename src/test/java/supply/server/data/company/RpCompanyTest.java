@@ -3,6 +3,7 @@ package supply.server.data.company;
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import supply.server.configuration.DataCreator;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
@@ -154,7 +155,7 @@ public class RpCompanyTest extends DataCreator {
         RpCompany rpCompany = new RpCompany(dataSource);
         List<UUID> companyIds = getCompanies(2, false).stream().map(Company::id).toList();
 
-        RpUser rpUser = new RpUser(dataSource);
+        RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
         User user1 = rpUser.add(generateUser(), companyIds.get(0)).orElseThrow();
         User user2 = rpUser.add(generateUser(), companyIds.get(1)).orElseThrow();
 

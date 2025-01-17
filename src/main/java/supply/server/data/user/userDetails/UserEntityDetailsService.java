@@ -2,19 +2,12 @@ package supply.server.data.user.userDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import supply.server.data.user.RpUser;
-import supply.server.data.user.User;
-import supply.server.service.RepositoryService;
-import supply.server.service.repository.UserRepositoryService;
+import supply.server.service.dataService.RepositoryService;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j

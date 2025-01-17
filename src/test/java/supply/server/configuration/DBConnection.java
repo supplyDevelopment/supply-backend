@@ -4,6 +4,7 @@ import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.postgresql.ds.PGSimpleDataSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -117,7 +118,7 @@ public class DBConnection {
                     return Optional.<UUID>empty();
                 });
         if (userId.isEmpty()) {
-            RpUser rpUser = new RpUser(dataSource);
+            RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
             CreateUser createUser = new CreateUser(
                     new UserName("testFirstName", "testSecondName", "testLastName"),
                     new Email("example@example.com"),

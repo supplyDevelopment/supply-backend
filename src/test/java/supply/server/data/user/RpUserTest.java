@@ -2,6 +2,8 @@ package supply.server.data.user;
 
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import supply.server.configuration.DataCreator;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
@@ -21,10 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class RpUserTest extends DataCreator {
 
     private final DataSource dataSource = dataSource();
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Test
     void addTest() throws SQLException {
-        RpUser rpUser = new RpUser(dataSource);
+        RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
         CreateUser createUser = generateUser();
 
         User user = rpUser.add(createUser, getCompany(false).id()).orElseThrow();
@@ -34,7 +37,7 @@ public class RpUserTest extends DataCreator {
         assertEquals(createUser.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
         assertEquals(createUser.email().getEmail(), user.email().getEmail());
         assertEquals(createUser.phone().getPhone(), user.phone().getPhone());
-        assertEquals(createUser.password(), user.password());
+        assertTrue(passwordEncoder.matches(createUser.password(), user.password()));
         assertEquals(createUser.permissions().get(0), user.permissions().get(0));
 
 
@@ -102,7 +105,7 @@ public class RpUserTest extends DataCreator {
 
     @Test
     void getTest() throws SQLException {
-        RpUser rpUser = new RpUser(dataSource);
+        RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
 
         User expected = getUser(false);
         User user = rpUser.get(expected.email().getEmail()).orElseThrow();
@@ -122,7 +125,7 @@ public class RpUserTest extends DataCreator {
 
     @Test
     void getByIdTest() throws SQLException {
-        RpUser rpUser = new RpUser(dataSource);
+        RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
 
         CreateUser createUser = generateUser();
 
@@ -148,7 +151,7 @@ public class RpUserTest extends DataCreator {
     void getAll() throws SQLException {
         List<UUID> companyIds = getCompanies(2, true).stream().map(Company::id).toList();
 
-        RpUser rpUser = new RpUser(dataSource);
+        RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
         String[] additionLetters = new String[]{
             "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"
         };

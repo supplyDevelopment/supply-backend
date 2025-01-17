@@ -1,4 +1,4 @@
-package supply.server.service;
+package supply.server.service.dataService;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;

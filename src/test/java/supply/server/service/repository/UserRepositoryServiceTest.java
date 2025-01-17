@@ -1,6 +1,8 @@
 package supply.server.service.repository;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import supply.server.configuration.DataCreator;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.data.user.CreateUser;
@@ -16,9 +18,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserRepositoryServiceTest extends DataCreator {
 
     private final InMemoryRpUser inMemoryRpUser = new InMemoryRpUser();
-    private final RpUser rpUser = new RpUser(dataSource);
+    private final RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
 
     private final UserRepositoryService userService = new UserRepositoryService(rpUser, inMemoryRpUser);
+
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Test
     void addAndGetTest() throws SQLException {
@@ -65,7 +69,7 @@ public class UserRepositoryServiceTest extends DataCreator {
         assertEquals(createUser.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
         assertEquals(createUser.email().getEmail(), user.email().getEmail());
         assertEquals(createUser.phone().getPhone(), user.phone().getPhone());
-        assertEquals(createUser.password(), user.password());
+        assertTrue(passwordEncoder.matches(createUser.password(), user.password()));
     }
 
     private void checkEquality(User expected, User actual) {

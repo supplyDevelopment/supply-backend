@@ -2,6 +2,7 @@ package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import supply.server.configuration.DataCreator;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.data.company.Company;
@@ -88,7 +89,7 @@ public class CompanyRepositoryServiceTest extends DataCreator {
     void checkUserTest() throws SQLException {
         List<UUID> companyIds = getCompanies(2, false).stream().map(Company::id).toList();
 
-        RpUser rpUser = new RpUser(dataSource);
+        RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
         User user1 = rpUser.add(generateUser(), companyIds.get(0)).orElseThrow();
         User user2 = rpUser.add(generateUser(), companyIds.get(1)).orElseThrow();
 

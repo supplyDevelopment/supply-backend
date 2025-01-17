@@ -1,6 +1,7 @@
 package supply.server.configuration;
 
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import supply.server.data.company.Company;
 import supply.server.data.company.RpCompany;
 import supply.server.data.project.Project;
@@ -100,7 +101,7 @@ public class DataCreator extends DataGenerator {
     }
 
     protected List<User> getUsers(int count, boolean unique) throws SQLException {
-        RpUser rpUser = new RpUser(dataSource());
+        RpUser rpUser = new RpUser(dataSource(), new BCryptPasswordEncoder());
         List<User> users = new ArrayList<>();
 
         int storedCount;
@@ -122,7 +123,7 @@ public class DataCreator extends DataGenerator {
     }
 
     protected User getUser(boolean unique) throws SQLException {
-        RpUser rpUser = new RpUser(dataSource());
+        RpUser rpUser = new RpUser(dataSource(), new BCryptPasswordEncoder());
         if (storedUsers.isEmpty() || unique) {
             User user = rpUser.add(generateUser(), getCompany(unique).id()).orElseThrow();
             storedUsers.add(user);

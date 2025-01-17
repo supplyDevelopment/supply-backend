@@ -1,4 +1,4 @@
-package supply.server.service;
+package supply.server.service.dataService;
 
 import org.springframework.stereotype.Service;
 import supply.server.configuration.exception.IncorrectParameterException;
