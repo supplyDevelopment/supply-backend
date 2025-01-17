@@ -10,6 +10,7 @@ import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.InMemoryRpResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
+import supply.server.data.resource.types.ResourceStatus;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -55,6 +56,40 @@ public class ResourceRepositoryService {
                 }
             }
             resource = resourceOpt.get();
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return resource;
+    }
+
+    public Resource edit(
+             UUID resourceId,
+             UUID companyId,
+             Optional<String> name,
+             Optional<Integer> count,
+             Optional<UUID> projectId,
+             Optional<ResourceStatus> status,
+             Optional<String> description
+    ) {
+        Resource resource;
+        try {
+            Optional<Resource> resourceOpt = rpResource.edit(
+                    resourceId,
+                    companyId,
+                    name,
+                    count,
+                    projectId,
+                    status,
+                    description
+            );
+
+            if (resourceOpt.isPresent()) {
+                resource = resourceOpt.get();
+                inMemoryRpResource.edit(resourceId, resource, companyId);
+            } else {
+                throw new DbException("Failed to edit resource with id " + resourceId);
+            }
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());

@@ -41,4 +41,9 @@ public class InMemoryRpResource {
         return Optional.empty();
     }
 
+    public Optional<Resource> edit(UUID id, Resource resource, UUID companyId) throws SQLException {
+        storage.put(id, Pair.of(companyId, resource));
+        return Optional.of(resource);
+    }
+
 }
