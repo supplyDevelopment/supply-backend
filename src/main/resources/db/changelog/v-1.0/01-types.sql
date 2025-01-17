@@ -25,9 +25,20 @@ CREATE DOMAIN EMAIL AS VARCHAR
 
 CREATE DOMAIN PHONE AS VARCHAR
     CHECK (
-        VALUE ~ '^\+7\d{10}$'
+        VALUE ~ '^(\\+7|8)\\d{10}$'
     );
 
 CREATE TYPE UNIT AS ENUM (
-    'KG'
-); -- грамы литры милилитры штуки куб см
+    'PCS',
+    'KG',
+    'G',
+    'L',
+    'ML',
+    'M3',
+    'CM3',
+    'M',
+    'CM',
+    'MM',
+    'M2',
+    'CM2'
+);
