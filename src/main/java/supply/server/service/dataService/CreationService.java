@@ -21,7 +21,10 @@ public class CreationService extends UserService {
         this.rabbitSendService = rabbitSendService;
     }
 
-    public Project createProject(String name, String description) {
+    public Project createProject(
+            String name,
+            String description
+    ) {
         return repository.getProject().add(name, description, user().companyId());
     }
 

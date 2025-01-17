@@ -2,6 +2,7 @@ package supply.server.data.utils;
 
 import lombok.Getter;
 import supply.server.configuration.exception.IncorrectInputException;
+import supply.server.configuration.exception.IncorrectParameterException;
 
 @Getter
 public class Email {
@@ -9,7 +10,7 @@ public class Email {
 
     public Email(String email) throws IncorrectInputException {
         if (!isValidEmail(email)) {
-            throw new IncorrectInputException("Email is invalid");
+            throw new IncorrectParameterException("Email is invalid " + email);
         }
         this.email = email;
     }

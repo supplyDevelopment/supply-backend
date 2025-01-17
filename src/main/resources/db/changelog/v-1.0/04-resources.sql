@@ -2,13 +2,14 @@ CREATE TYPE INVENTORY_ITEM_STATUS AS ENUM (
     'ACTIVE',
     'INACTIVE',
     'REPAIR',
-    'DELIVER'
-); -- отсутствует
+    'DELIVER',
+    'EMPTY'
+);
 
 CREATE TYPE RESOURCE_TYPE AS ENUM (
     'TOOL',
     'PRODUCT'
-); -- можно добавлять
+);
 
 CREATE TABLE project (
     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
