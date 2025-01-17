@@ -83,6 +83,22 @@ public class UserRepositoryService {
         return user;
     }
 
+    public User updatePassword(UUID userId, String password, UUID companyId) {
+        User user;
+        try {
+            Optional<User> userOpt = rpUser.updatePassword(userId, password, companyId);
+            if (userOpt.isEmpty()) {
+                throw new DbException("Failed to update password for user with id " + userId);
+            } else {
+                user = userOpt.get();
+                inMemoryRpUser.add(user);
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return user;
+    }
+
     public PaginatedList<User> getAll(String prefix, UUID companyId, Pagination pagination) {
         PaginatedList<User> users;
         try {

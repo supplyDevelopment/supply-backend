@@ -54,4 +54,10 @@ public class InMemoryRpUser {
         return id.map(storage::get);
     }
 
+    public Optional<User> update(UUID userId, User user) {
+        storage.put(userId, user);
+        emailStorage.put(user.email().getEmail(), userId);
+        return Optional.of(user);
+    }
+
 }

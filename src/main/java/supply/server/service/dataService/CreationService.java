@@ -11,6 +11,8 @@ import supply.server.data.warehouse.CreateWarehouse;
 import supply.server.data.warehouse.Warehouse;
 import supply.server.service.rabbitService.RabbitSendService;
 
+import java.util.UUID;
+
 @Service
 public class CreationService extends UserService {
 
@@ -41,6 +43,19 @@ public class CreationService extends UserService {
                 createUser.password()
         );
         return repository.getUser().add(createUser, user().companyId());
+    }
+
+    public User regenerateUserPassword(UUID userId) {
+        User user = repository.getUser().updatePassword(
+                userId,
+                UUID.randomUUID().toString().replace("-", ""),
+                user().companyId()
+        );
+        rabbitSendService.sendUserRegistrationEmail(
+                user.email().getEmail(),
+                user.password()
+        );
+        return user;
     }
 
     public Resource createResource(CreateResource createResource) {

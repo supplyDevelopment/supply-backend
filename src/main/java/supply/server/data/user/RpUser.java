@@ -134,6 +134,27 @@ public class RpUser {
                 });
     }
 
+    public Optional<User> updatePassword(UUID userId, String password, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        String encodedPassword = passwordEncoder.encode(password);
+        jdbcSession
+                .sql("""
+                    UPDATE company_user
+                    SET password = ?
+                    WHERE id = (
+                        SELECT user_id
+                        FROM company_users
+                        WHERE user_id = ? AND company_id = ?
+                    )
+                    """)
+                .set(encodedPassword)
+                .set(userId)
+                .set(companyId)
+                .update(Outcome.VOID);
+
+        return get(userId, companyId);
+    }
+
     // TODO: implement filters
     public PaginatedList<User> getAll(String prefix, UUID companyId, Pagination pagination) throws SQLException {
         String SQLWith = """
