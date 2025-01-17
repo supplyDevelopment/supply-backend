@@ -9,12 +9,16 @@ import supply.server.data.user.CreateUser;
 import supply.server.data.user.User;
 import supply.server.data.warehouse.CreateWarehouse;
 import supply.server.data.warehouse.Warehouse;
+import supply.server.service.rabbitService.RabbitSendService;
 
 @Service
 public class CreationService extends UserService {
 
-    public CreationService(RepositoryService repository) {
+    private final RabbitSendService rabbitSendService;
+
+    public CreationService(RepositoryService repository, RabbitSendService rabbitSendService) {
         super(repository);
+        this.rabbitSendService = rabbitSendService;
     }
 
     public Project createProject(String name, String description) {
@@ -29,6 +33,10 @@ public class CreationService extends UserService {
     }
 
     public User createUser(CreateUser createUser) {
+        rabbitSendService.sendUserRegistrationEmail(
+                createUser.email().getEmail(),
+                createUser.password()
+        );
         return repository.getUser().add(createUser, user().companyId());
     }
 
