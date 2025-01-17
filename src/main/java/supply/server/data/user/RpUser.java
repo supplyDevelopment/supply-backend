@@ -200,10 +200,13 @@ public class RpUser {
 
     private Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
         Email userEmail = new Email(rset.getString("email"));
+
+        String lastName = rset.getString("last_name");
+
         UserName userName = new UserName(
                 rset.getString("first_name"),
                 rset.getString("second_name"),
-                rset.getString("last_name")
+                Objects.isNull(lastName)? Optional.empty() : Optional.of(lastName)
         );
         Phone userPhone = new Phone(rset.getString("phone"));
         List<UserPermission> userPermissions = Arrays.stream(

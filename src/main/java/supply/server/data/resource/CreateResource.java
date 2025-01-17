@@ -20,4 +20,29 @@ public record CreateResource(
     ResourceStatus status,
     String description
 ) {
+    public CreateResource(
+            List<String> images,
+            String name,
+            int count,
+            String unit,
+            String type,
+            UUID userId,
+            UUID warehouseId,
+            UUID projectId,
+            String status,
+            String description
+    ) {
+        this(
+                images.stream().map(URL::new).toList(),
+                name,
+                Math.max(count, 0),
+                Unit.valueOf(unit),
+                ResourceType.fromString(type),
+                userId,
+                warehouseId,
+                projectId,
+                ResourceStatus.fromString(status),
+                description
+        );
+    }
 }

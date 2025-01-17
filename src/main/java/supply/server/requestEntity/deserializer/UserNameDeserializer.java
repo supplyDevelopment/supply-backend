@@ -9,6 +9,7 @@ import supply.server.configuration.exception.IncorrectInputException;
 import supply.server.data.utils.user.UserName;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class UserNameDeserializer extends JsonDeserializer<UserName> {
     @Override
@@ -20,7 +21,7 @@ public class UserNameDeserializer extends JsonDeserializer<UserName> {
             return new UserName(
                     node.get("firstName").asText(),
                     node.get("secondName").asText(),
-                    node.has("lastName") ? node.get("lastName").asText() : null
+                    node.has("lastName") ? Optional.of(node.get("lastName").asText()) : Optional.empty()
             );
         }
         throw new IncorrectInputException("User name is invalid");

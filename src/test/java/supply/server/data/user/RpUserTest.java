@@ -63,10 +63,12 @@ public class RpUserTest extends DataCreator {
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         Email userEmail = new Email(rset.getString("email"));
+                        String lastName = rset.getString("last_name");
+
                         UserName userName = new UserName(
-                                rset.getString("firstName"),
-                                rset.getString("secondName"),
-                                rset.getString("lastName")
+                                rset.getString("first_name"),
+                                rset.getString("second_name"),
+                                Objects.isNull(lastName)? Optional.empty() : Optional.of(lastName)
                         );
                         Phone userPhone = new Phone(rset.getString("phone"));
                         List<UserPermission> userPermissions = Arrays.stream(
@@ -159,7 +161,7 @@ public class RpUserTest extends DataCreator {
         for (int i = 0; i < 8; i++) {
             if (i % 4 == 0) {
                 expected.add(rpUser.add(new CreateUser(
-                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
+                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], Optional.of("addingLastName" + additionLetters[i])),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
@@ -167,7 +169,7 @@ public class RpUserTest extends DataCreator {
                 ), companyIds.get(0)).orElseThrow());
             } else if (i % 2 == 0) {
                 rpUser.add(new CreateUser(
-                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
+                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], Optional.of("addingLastName" + additionLetters[i])),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
@@ -175,7 +177,7 @@ public class RpUserTest extends DataCreator {
                 ), companyIds.get(1)).orElseThrow();
             } else {
                 rpUser.add(new CreateUser(
-                        new UserName("agettingFirstName" + additionLetters[i], "agettingSecondName" + additionLetters[i], "agettingLastName" + additionLetters[i]),
+                        new UserName("agettingFirstName" + additionLetters[i], "agettingSecondName" + additionLetters[i], Optional.of("agettingLastName" + additionLetters[i])),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
@@ -208,7 +210,7 @@ public class RpUserTest extends DataCreator {
         assertEquals(2, rpUser.getAll("", companyIds.get(1), new Pagination(20, 0)).total());
 
         expected.add(rpUser.add(new CreateUser(
-                new UserName("gettingFirstNameas", "gettingSecondNameas", "gettingLastNameas"),
+                new UserName("gettingFirstNameas", "gettingSecondNameas", Optional.of("gettingLastNameas")),
                 new Email("aexample" + 1 + "@example.com"),
                 new Phone("+70234567899"),
                 "testPassword",

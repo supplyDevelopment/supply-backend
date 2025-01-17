@@ -19,6 +19,7 @@ import supply.server.data.warehouse.CreateWarehouse;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class DataGenerator extends DBConnection {
@@ -46,7 +47,7 @@ public class DataGenerator extends DBConnection {
                 new UserName(
                         stringGenerator.generate(10, true, false),
                         stringGenerator.generate(10, true, false),
-                        stringGenerator.generate(10, true, false)
+                        Optional.of(stringGenerator.generate(10, true, false))
                 ),
                 new Email(stringGenerator.generate(2, true, true) + "@gmail.com"),
                 new Phone("+7" + stringGenerator.generate(10, false, true)),

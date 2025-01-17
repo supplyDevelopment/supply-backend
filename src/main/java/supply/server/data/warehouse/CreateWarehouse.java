@@ -13,4 +13,19 @@ public record CreateWarehouse(
 
         List<UUID> admins
 ) {
+    public CreateWarehouse(
+            String name,
+            String location,
+            Long stockLevel,
+            Long capacity,
+            List<UUID> admins
+    ) {
+        this(
+                name,
+                new Address(location),
+                stockLevel,
+                capacity,
+                admins
+        );
+    }
 }
