@@ -1,0 +1,15 @@
+User
+{
+  "name": {
+    "firstName": "name",
+    "secondName": "name",
+    "lastName": "name"
+  },
+  "email": "gd.host@yandex.ru",
+  "phone": "89033073746",
+  "password": "123456",
+  "companyId": "476f5296-eee1-4042-add8-147c1462708d",
+  "permissions": [
+    "ADMIN"
+  ]
+}
