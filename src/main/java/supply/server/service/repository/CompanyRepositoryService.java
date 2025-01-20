@@ -90,4 +90,14 @@ public class CompanyRepositoryService {
         return result;
     }
 
+    public boolean resourceCheck(UUID resourceId, UUID companyId) {
+        boolean result;
+        try {
+            result = rpCompany.resourceCheck(resourceId, companyId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return result;
+    }
+
 }

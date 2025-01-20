@@ -128,6 +128,21 @@ public class RpCompany {
                 .select((rset, stmt) -> rset.next());
     }
 
+    public boolean resourceCheck(UUID resourceId, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        return jdbcSession
+                .sql("""
+                SELECT 1
+                FROM resource r
+                INNER JOIN company_warehouses cw
+                ON r.warehouseId = cw.warehouse
+                WHERE r.id = ? AND cw.company = ?
+                """)
+                .set(resourceId)
+                .set(companyId)
+                .select((rset, stmt) -> rset.next());
+    }
+
     private Optional<Company> compactCompanyFromResultSet(ResultSet rset) throws SQLException {
         String emails = rset.getString("contact_emails");
         emails = emails.substring(1, emails.length() - 1);
