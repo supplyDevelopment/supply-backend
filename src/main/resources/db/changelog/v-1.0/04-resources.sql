@@ -39,8 +39,4 @@ CREATE TABLE resource_users (
     user_id      UUID NOT NULL REFERENCES company_user(id)
 );
 
-CREATE TABLE resource_operations (
-
-);
-
 -- изменять можно несколько параметров
