@@ -63,11 +63,11 @@ public class RpUserTest extends DataCreator {
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         Email userEmail = new Email(rset.getString("email"));
-                        String lastName = rset.getString("last_name");
+                        String lastName = rset.getString("lastName");
 
                         UserName userName = new UserName(
-                                rset.getString("first_name"),
-                                rset.getString("second_name"),
+                                rset.getString("firstName"),
+                                rset.getString("secondName"),
                                 Objects.isNull(lastName)? Optional.empty() : Optional.of(lastName)
                         );
                         Phone userPhone = new Phone(rset.getString("phone"));

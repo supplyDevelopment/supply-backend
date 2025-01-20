@@ -10,7 +10,6 @@ import supply.server.data.utils.Phone;
 import supply.server.data.utils.company.Bil;
 import supply.server.data.utils.company.CompanyStatus;
 import supply.server.data.utils.company.Tax;
-import supply.server.requestEntity.company.CompanyRequestEntity;
 
 import javax.sql.DataSource;
 import java.sql.Array;

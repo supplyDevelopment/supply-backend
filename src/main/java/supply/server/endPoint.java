@@ -3,17 +3,12 @@ package supply.server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-import supply.server.data.company.RpCompany;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import supply.server.data.supplier.RpSupplier;
 import supply.server.data.supplier.Supplier;
-import supply.server.data.utils.Email;
-import supply.server.data.utils.Phone;
-import supply.server.data.utils.company.Bil;
-import supply.server.data.utils.company.CompanyStatus;
-import supply.server.data.utils.company.Tax;
-import supply.server.requestEntity.company.CompanyRequestEntity;
-import supply.server.requestEntity.user.UserRequestEntity;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -31,8 +26,8 @@ public class endPoint {
     DataSource dataSource;
 
 
-    @PostMapping("/register")
-    public String register(@Valid @RequestBody UserRequestEntity userRequestEntity) throws SQLException {
+//    @PostMapping("/register")
+//    public String register(@Valid @RequestBody UserRequestEntity userRequestEntity) throws SQLException {
 //        RpUser rpUser = new RpUser(dataSource);
 //        Optional<User> user = rpUser.add(userRequestEntity);
 //        Optional<User> getUser = rpUser.getByEmail("gd.host@yandex.ru");
@@ -75,10 +70,10 @@ public class endPoint {
 //        Optional<Tool> gettool = rpTool.get(addtool.orElseThrow().id());
 //        Optional<Product> product = new RpProduct(dataSource).add(new Product(UUID.randomUUID(), "test", "test", 1, ItemStatus.ACTIVE, LocalDate.now()));
 //        Optional<Product> getProduct = new RpProduct(dataSource).get(product.orElseThrow().id());
-        Optional<Supplier> supplier = new RpSupplier(dataSource).add(new Supplier(UUID.randomUUID(), "test", List.of(), List.of(), "test", LocalDate.now(), null));
-        Optional<Supplier> getSupplier = new RpSupplier(dataSource).getById(supplier.orElseThrow().id());
-        return "";
-    }
+//        Optional<Supplier> supplier = new RpSupplier(dataSource).add(new Supplier(UUID.randomUUID(), "test", List.of(), List.of(), "test", LocalDate.now(), null));
+//        Optional<Supplier> getSupplier = new RpSupplier(dataSource).getById(supplier.orElseThrow().id());
+//        return "";
+//    }
 //
 //    @PostMapping("/r")
 //    public String r(@RequestBody String m) {

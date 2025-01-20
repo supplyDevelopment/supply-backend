@@ -4,6 +4,7 @@ import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
 import supply.server.data.utils.Unit;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,14 @@ public record CreateResource(
     ResourceStatus status,
     String description
 ) {
+    private static URL toURL(String image) {
+        try {
+            return new URL(image);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid URL: " + image, e);
+        }
+    }
+
     public CreateResource(
             List<String> images,
             String name,
@@ -33,7 +42,7 @@ public record CreateResource(
             String description
     ) {
         this(
-                images.stream().map(URL::new).toList(),
+                images.stream().map(CreateResource::toURL).toList(),
                 name,
                 Math.max(count, 0),
                 Unit.valueOf(unit),

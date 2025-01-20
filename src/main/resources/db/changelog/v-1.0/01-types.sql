@@ -25,7 +25,7 @@ CREATE DOMAIN EMAIL AS VARCHAR
 
 CREATE DOMAIN PHONE AS VARCHAR
     CHECK (
-        VALUE ~ '^(\\+7|8)\\d{10}$'
+        VALUE ~ '^\+7\d{10}$'
     );
 
 CREATE TYPE UNIT AS ENUM (
