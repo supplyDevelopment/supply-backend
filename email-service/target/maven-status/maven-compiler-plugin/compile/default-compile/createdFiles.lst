@@ -1,0 +1,4 @@
+supply\server\EmailServiceApplication.class
+supply\server\service\SendingMailService.class
+supply\server\configuration\RabbitConfig.class
+supply\server\service\RabbitMQListenerService.class
