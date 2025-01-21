@@ -4,13 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="593d6d73-8d03-4cda-a9b2-d7ff93d43854" name="Changes" comment="feat: email service added">
+    <list default="true" id="593d6d73-8d03-4cda-a9b2-d7ff93d43854" name="Changes" comment="feat: init new service">
+      <change afterPath="$PROJECT_DIR$/dump-service/src/main/java/supply/server/config/DatabaseConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dump-service/src/main/java/supply/server/service/BackupService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -32,6 +41,10 @@
     &quot;accountId&quot;: &quot;10f78159-0935-4260-9a7f-c4fc68ecb021&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -54,19 +67,29 @@
     "com.codeium.enabled": "true",
     "git-widget-placeholder": "dump-service",
     "jdk.selected.JAVA_MODULE": "openjdk-22",
-    "last_opened_file_path": "Q:/supply-backend/supply-backend",
+    "last_opened_file_path": "Q:/supply-backend/dump-service",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
+    "project.structure.side.proportion": "0.2",
+    "run.configurations.included.in.services": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="Q:\supply-backend" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
   </component>
   <component name="RunManager" selected="Spring Boot.SupplyApplication">
     <configuration name="DumpServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
@@ -108,7 +131,7 @@
       <option name="presentableId" value="Default" />
       <updated>1737405375826</updated>
       <workItem from="1737405376929" duration="1473000" />
-      <workItem from="1737467095911" duration="2051000" />
+      <workItem from="1737467095911" duration="3907000" />
     </task>
     <task id="LOCAL-00001" summary="feat: migration with email-service">
       <option name="closed" value="true" />
@@ -126,7 +149,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737406144620</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="feat: init new service">
+      <option name="closed" value="true" />
+      <created>1737482233803</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1737482233803</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -135,6 +166,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: migration with email-service" />
     <MESSAGE value="feat: email service added" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: email service added" />
+    <MESSAGE value="feat: init new service" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: init new service" />
   </component>
 </project>
