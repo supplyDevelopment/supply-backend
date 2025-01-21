@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="593d6d73-8d03-4cda-a9b2-d7ff93d43854" name="Changes" comment="feat: migration with email-service" />
+    <list default="true" id="593d6d73-8d03-4cda-a9b2-d7ff93d43854" name="Changes" comment="feat: email service added">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,18 +20,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "gghost1"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;gghost1&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/supplyDevelopment/supply-backend",
-    "accountId": "10f78159-0935-4260-9a7f-c4fc68ecb021"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/supplyDevelopment/supply-backend&quot;,
+    &quot;accountId&quot;: &quot;10f78159-0935-4260-9a7f-c4fc68ecb021&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -37,9 +39,9 @@
       </MavenGeneralSettings>
     </option>
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 7
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
   <component name="ProjectId" id="2ruODjzEr2Cny7TS3rYdrwPqNsn" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -50,11 +52,15 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "com.codeium.enabled": "true",
-    "git-widget-placeholder": "migration-email-service",
-    "last_opened_file_path": "Q:/supply-backend",
+    "git-widget-placeholder": "dump-service",
+    "jdk.selected.JAVA_MODULE": "openjdk-22",
+    "last_opened_file_path": "Q:/supply-backend/supply-backend",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm"
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -62,9 +68,23 @@
       <recent name="Q:\supply-backend" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Spring Boot.SupplyApplication">
+    <configuration name="DumpServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="supply.server.DumpServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EmailServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="mail-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="supply.server.EmailServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="SupplyApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="supply" />
+      <module name="main-service" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="supply.server.SupplyApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -87,7 +107,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737405375826</updated>
-      <workItem from="1737405376929" duration="678000" />
+      <workItem from="1737405376929" duration="1473000" />
+      <workItem from="1737467095911" duration="2051000" />
     </task>
     <task id="LOCAL-00001" summary="feat: migration with email-service">
       <option name="closed" value="true" />
@@ -97,7 +118,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737405868752</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="feat: email service added">
+      <option name="closed" value="true" />
+      <created>1737406144620</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1737406144620</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -105,6 +134,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: migration with email-service" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: migration with email-service" />
+    <MESSAGE value="feat: email service added" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: email service added" />
   </component>
 </project>
