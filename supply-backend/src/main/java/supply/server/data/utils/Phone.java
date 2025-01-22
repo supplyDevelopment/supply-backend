@@ -3,8 +3,10 @@ package supply.server.data.utils;
 import lombok.Getter;
 import supply.server.configuration.exception.IncorrectParameterException;
 
+import java.io.Serializable;
+
 @Getter
-public class Phone {
+public class Phone implements Serializable {
     private final String phone;
 
     public Phone(String phone) {

@@ -3,10 +3,11 @@ package supply.server.data.utils.user;
 import lombok.Getter;
 import supply.server.configuration.exception.IncorrectParameterException;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 @Getter
-public class UserName {
+public class UserName implements Serializable {
     private final String firstName;
     private final String secondName;
     private final Optional<String> lastName;

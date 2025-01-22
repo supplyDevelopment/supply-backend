@@ -13,6 +13,7 @@ import supply.server.data.utils.company.CompanyStatus;
 import supply.server.data.utils.company.Tax;
 
 import javax.sql.DataSource;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,7 +30,6 @@ public record Company (
         List<Address> addresses,
         CompanyStatus status,
         LocalDate createdAt,
-        LocalDate updatedAt,
-        DataSource dataSource
-) {
+        LocalDate updatedAt
+) implements Serializable {
 }

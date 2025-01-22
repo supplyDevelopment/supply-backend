@@ -1,5 +1,6 @@
 package supply.server.data.operation;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -13,5 +14,5 @@ public record MoveOperation(
     LocalDate createdAt,
     Boolean applied,
     LocalDate appliedAt
-) {
+) implements Serializable {
 }
