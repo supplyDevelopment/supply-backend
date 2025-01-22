@@ -1,14 +1,11 @@
-package supply.server.configuration;
+package supply.server.configuration.postres;
 
 import com.jcabi.jdbc.JdbcSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 import supply.server.configuration.liquibase.LiquibaseRunner;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;

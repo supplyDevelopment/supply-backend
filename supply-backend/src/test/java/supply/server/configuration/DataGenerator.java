@@ -1,5 +1,6 @@
 package supply.server.configuration;
 
+import supply.server.configuration.postres.DBConnection;
 import supply.server.data.company.CreateCompany;
 import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.types.ResourceStatus;
