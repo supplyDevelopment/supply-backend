@@ -1,5 +1,6 @@
 package supply.server.data;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import supply.server.configuration.exception.RedisLockException;
 
@@ -7,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class Redis<T> {
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -23,14 +25,18 @@ public class Redis<T> {
 
     public Optional<T> set(UUID id, T value) {
         try {
+            log.info("Acquiring lock for key {}", getKey(id));
             String lockValue = acquireLock(id);
             try {
+                log.info("Setting key {} to {}", getKey(id), value);
                 redisTemplate.opsForValue().set(getKey(id), value, TTL_SECONDS, TimeUnit.SECONDS);
+                log.info("Set key {} to {}", getKey(id), value);
                 return Optional.of(value);
             } finally {
                 releaseLock(getLockKey(id), lockValue);
             }
         } catch (RedisLockException e) {
+            log.error("Could not acquire lock with id {}", id, e);
             return Optional.empty();
         }
     }
@@ -38,12 +44,14 @@ public class Redis<T> {
     public Optional<T> get(UUID id) {
         Object value = redisTemplate.opsForValue().get(getKey(id));
         if (value == null) {
+            log.error("Key {} not found", getKey(id));
             return Optional.empty();
         }
         try {
             T result = (T) value;
             return Optional.of(result);
         } catch (ClassCastException e) {
+            log.error("Cast");
             return Optional.empty();
         }
     }
@@ -72,7 +80,7 @@ public class Redis<T> {
     }
 
     private String getLockKey(UUID id) {
-        return LOCK + id;
+        return LOCK + prefix + id;
     }
 
     private String getLockValue() {

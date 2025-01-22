@@ -40,7 +40,7 @@ public class RedisConnection {
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new JdkSerializationRedisSerializer());
-        template.setEnableTransactionSupport(true);
+        template.setEnableTransactionSupport(false);
 
         template.afterPropertiesSet();
         this.redisTemplate = template;
