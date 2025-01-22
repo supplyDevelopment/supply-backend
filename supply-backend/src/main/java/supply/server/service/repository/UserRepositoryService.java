@@ -1,13 +1,12 @@
 package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.Redis;
 import supply.server.data.user.CreateUser;
-import supply.server.data.user.InMemoryRpUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 
@@ -51,11 +50,11 @@ public class UserRepositoryService {
                     user = userOpt.get();
                     inMemoryRpUser.set(user.id(), user);
                 } else {
-                    throw new DataNotFound("User with id " + userId + " not found");
+                    throw new DataNotFoundException("User with id " + userId + " not found");
                 }
             } else {
                 if (!userOpt.get().companyId().equals(companyId)) {
-                    throw new DataNotFound("User with id " + userId + " not found");
+                    throw new DataNotFoundException("User with id " + userId + " not found");
                 }
             }
             user = userOpt.get();
@@ -72,7 +71,7 @@ public class UserRepositoryService {
             Optional<User> userOpt = rpUser.get(email);
 
             if (userOpt.isEmpty()) {
-                throw new DataNotFound("User with email " + email + " not found");
+                throw new DataNotFoundException("User with email " + email + " not found");
             }
             user = userOpt.get();
 

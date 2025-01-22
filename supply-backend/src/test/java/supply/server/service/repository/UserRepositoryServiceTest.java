@@ -4,10 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.data.Redis;
 import supply.server.data.user.CreateUser;
-import supply.server.data.user.InMemoryRpUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 
@@ -61,7 +60,7 @@ public class UserRepositoryServiceTest extends DataCreator {
 
         assertTrue(inMemoryRpUser.get(user.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> userService.get(UUID.randomUUID(), companyId));
+        assertThrows(DataNotFoundException.class, () -> userService.get(UUID.randomUUID(), companyId));
     }
 
     private void checkEquality(CreateUser createUser, User user) {

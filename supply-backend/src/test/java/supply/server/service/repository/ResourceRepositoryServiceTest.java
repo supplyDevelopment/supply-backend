@@ -3,11 +3,10 @@ package supply.server.service.repository;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.data.Redis;
 import supply.server.data.company.Company;
 import supply.server.data.resource.CreateResource;
-import supply.server.data.resource.InMemoryRpResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
 
@@ -63,7 +62,7 @@ public class ResourceRepositoryServiceTest extends DataCreator {
 
         assertTrue(inMemoryRpResource.get(resource.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> resourceService.get(UUID.randomUUID(), company.id()));
+        assertThrows(DataNotFoundException.class, () -> resourceService.get(UUID.randomUUID(), company.id()));
     }
 
     private void checkEquality(CreateResource createResource, Resource resource) {

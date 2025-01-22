@@ -2,11 +2,10 @@ package supply.server.service.repository;
 
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.data.Redis;
 import supply.server.data.user.User;
 import supply.server.data.warehouse.CreateWarehouse;
-import supply.server.data.warehouse.InMemoryRpWarehouse;
 import supply.server.data.warehouse.RpWarehouse;
 import supply.server.data.warehouse.Warehouse;
 
@@ -57,7 +56,7 @@ public class WarehouseRepositoryServiceTest extends DataCreator {
 
         assertTrue(inMemoryRpWarehouse.get(warehouse.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> warehouseService.get(UUID.randomUUID(), companyId));
+        assertThrows(DataNotFoundException.class, () -> warehouseService.get(UUID.randomUUID(), companyId));
     }
 
     private void checkEquality(CreateWarehouse createWarehouse, Warehouse warehouse) {

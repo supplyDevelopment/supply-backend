@@ -2,7 +2,7 @@ package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
@@ -53,11 +53,11 @@ public class ResourceRepositoryService {
                     resource = resourceOpt.get();
                     inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
                 } else {
-                    throw new DataNotFound("Resource with id " + resourceId + " not found");
+                    throw new DataNotFoundException("Resource with id " + resourceId + " not found");
                 }
             } else {
                 if (!resourcePairOpt.get().getKey().equals(companyId)) {
-                    throw new DataNotFound("Resource with id " + resourceId + " not found");
+                    throw new DataNotFoundException("Resource with id " + resourceId + " not found");
                 }
                 resource = resourcePairOpt.get().getValue();
             }

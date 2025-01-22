@@ -1,24 +1,19 @@
 package supply.server;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
-import supply.server.data.supplier.RpSupplier;
-import supply.server.data.supplier.Supplier;
 import supply.server.data.utils.company.Bil;
 import supply.server.data.utils.company.CompanyStatus;
 import supply.server.data.utils.company.Tax;
 import supply.server.service.dataService.RepositoryService;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/")

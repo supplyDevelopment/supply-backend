@@ -2,9 +2,8 @@ package supply.server.service.repository;
 
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.data.Redis;
-import supply.server.data.project.InMemoryRpProject;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
 
@@ -71,7 +70,7 @@ public class ProjectRepositoryServiceTest extends DataCreator {
 
         assertTrue(inMemoryRpProject.get(project.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> projectService.get(UUID.randomUUID(), companyId));
+        assertThrows(DataNotFoundException.class, () -> projectService.get(UUID.randomUUID(), companyId));
     }
 
 }

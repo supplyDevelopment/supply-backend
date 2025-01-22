@@ -1,13 +1,12 @@
 package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.Redis;
 import supply.server.data.warehouse.CreateWarehouse;
-import supply.server.data.warehouse.InMemoryRpWarehouse;
 import supply.server.data.warehouse.RpWarehouse;
 import supply.server.data.warehouse.Warehouse;
 
@@ -50,11 +49,11 @@ public class WarehouseRepositoryService {
                     warehouse = warehouseOpt.get();
                     inMemoryRpWarehouse.set(warehouse.id(), warehouse);
                 } else {
-                    throw new DataNotFound("Warehouse with id " + warehouseId + " not found");
+                    throw new DataNotFoundException("Warehouse with id " + warehouseId + " not found");
                 }
             } else {
                 if (!warehouseOpt.get().companyId().equals(companyId)) {
-                    throw new DataNotFound("Warehouse with id " + warehouseId + " not found");
+                    throw new DataNotFoundException("Warehouse with id " + warehouseId + " not found");
                 }
             }
             warehouse = warehouseOpt.get();

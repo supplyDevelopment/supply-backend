@@ -1,7 +1,7 @@
 package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
@@ -49,11 +49,11 @@ public class ProjectRepositoryService {
                     project = projectOpt.get();
                     inMemoryRpProject.set(project.id(), project);
                 } else {
-                    throw new DataNotFound("Project with id " + projectId + " not found");
+                    throw new DataNotFoundException("Project with id " + projectId + " not found");
                 }
             } else {
                 if (!projectOpt.get().companyId().equals(companyId)) {
-                    throw new DataNotFound("Project with id " + projectId + " not found");
+                    throw new DataNotFoundException("Project with id " + projectId + " not found");
                 }
             }
             project = projectOpt.get();

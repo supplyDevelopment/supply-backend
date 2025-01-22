@@ -1,8 +1,8 @@
 package supply.server.data.user;
 
 import supply.server.data.utils.Email;
-import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.Phone;
+import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.user.UserPermission;
 
 import java.io.Serializable;

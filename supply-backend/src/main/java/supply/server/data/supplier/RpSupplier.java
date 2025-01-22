@@ -7,13 +7,12 @@ import supply.server.data.utils.Email;
 import supply.server.data.utils.Phone;
 
 import javax.sql.DataSource;
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class RpSupplier {

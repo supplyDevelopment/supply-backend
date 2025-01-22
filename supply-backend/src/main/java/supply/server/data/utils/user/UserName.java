@@ -4,7 +4,6 @@ import lombok.Getter;
 import supply.server.configuration.exception.IncorrectParameterException;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 @Getter
 public class UserName implements Serializable {

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.utils.Email;
-import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.Phone;
+import supply.server.data.utils.user.UserName;
 import supply.server.data.utils.user.UserPermission;
 
 import javax.sql.DataSource;
