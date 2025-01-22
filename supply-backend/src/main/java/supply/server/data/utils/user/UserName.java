@@ -10,12 +10,14 @@ import java.util.Optional;
 public class UserName implements Serializable {
     private final String firstName;
     private final String secondName;
-    private final Optional<String> lastName;
+    private final String lastName;
 
-    public UserName(String firstName, String secondName, Optional<String> lastName) {
+    public UserName(String firstName, String secondName, String lastName) {
         checkName(firstName);
         checkName(secondName);
-        lastName.ifPresent(this::checkName);
+        if (lastName != null) {
+            checkName(lastName);
+        }
         this.firstName = firstName;
         this.secondName = secondName;
         this.lastName = lastName;

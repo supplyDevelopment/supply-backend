@@ -1,8 +1,10 @@
 package supply.server.service.repository;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DataCreator;
 import supply.server.configuration.exception.DataNotFound;
+import supply.server.data.Redis;
 import supply.server.data.company.Company;
 import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.InMemoryRpResource;
@@ -16,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ResourceRepositoryServiceTest extends DataCreator {
 
-    private final InMemoryRpResource inMemoryRpResource = new InMemoryRpResource();
+    private final Redis<Pair<UUID, Resource>> inMemoryRpResource = new Redis<>(redisTemplate, "resource:");
     private final RpResource rpResource = new RpResource(dataSource);
     private final ResourceRepositoryService resourceService = new ResourceRepositoryService(rpResource, inMemoryRpResource);
 
@@ -35,7 +37,7 @@ public class ResourceRepositoryServiceTest extends DataCreator {
         Resource actual1 = resourceService.get(resource.id(), company.id());
         checkEquality(resource, actual1);
 
-        Resource actual2 = inMemoryRpResource.get(resource.id(), company.id()).orElseThrow();
+        Resource actual2 = inMemoryRpResource.get(resource.id()).orElseThrow().getValue();
         checkEquality(resource, actual2);
 
         Resource actual3 = rpResource.get(resource.id(), company.id()).orElseThrow();
@@ -54,12 +56,12 @@ public class ResourceRepositoryServiceTest extends DataCreator {
         Resource resource = rpResource.add(createResource).orElseThrow();
         checkEquality(createResource, resource);
 
-        assertTrue(inMemoryRpResource.get(resource.id(), company.id()).isEmpty());
+        assertTrue(inMemoryRpResource.get(resource.id()).isEmpty());
 
         Resource actual = resourceService.get(resource.id(), company.id());
         checkEquality(resource, actual);
 
-        assertTrue(inMemoryRpResource.get(resource.id(), company.id()).isPresent());
+        assertTrue(inMemoryRpResource.get(resource.id()).isPresent());
 
         assertThrows(DataNotFound.class, () -> resourceService.get(UUID.randomUUID(), company.id()));
     }

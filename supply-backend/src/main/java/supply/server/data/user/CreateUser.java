@@ -25,7 +25,7 @@ public record CreateUser(
             Optional<String> password,
             List<UserPermission> permissions) {
         this(
-                new UserName(firstName, secondName, lastName),
+                new UserName(firstName, secondName, lastName.orElse(null)),
                 new Email(email),
                 new Phone(phone),
                 password.orElse(UUID.randomUUID().toString().replace("-", "")),

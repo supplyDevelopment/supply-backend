@@ -117,7 +117,7 @@ public class DBConnection {
         if (userId.isEmpty()) {
             RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
             CreateUser createUser = new CreateUser(
-                    new UserName("testFirstName", "testSecondName", Optional.of("testLastName")),
+                    new UserName("testFirstName", "testSecondName", "testLastName"),
                     new Email("example@example.com"),
                     new Phone("+71234567890"),
                     "testPassword",
