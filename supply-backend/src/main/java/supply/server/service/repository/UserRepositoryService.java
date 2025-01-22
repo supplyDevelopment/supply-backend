@@ -5,6 +5,7 @@ import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
+import supply.server.data.Redis;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.InMemoryRpUser;
 import supply.server.data.user.RpUser;
@@ -19,7 +20,7 @@ public class UserRepositoryService {
 
     private final RpUser rpUser;
 
-    private final InMemoryRpUser inMemoryRpUser;
+    private final Redis<User> inMemoryRpUser;
 
     public User add(CreateUser createUser, UUID companyId) {
         User user;
@@ -28,7 +29,7 @@ public class UserRepositoryService {
 
             if (userOpt.isPresent()) {
                 user = userOpt.get();
-                inMemoryRpUser.add(user);
+                inMemoryRpUser.set(user.id(), user);
             } else {
                 throw new DbException("Failed to add user");
             }
@@ -42,14 +43,18 @@ public class UserRepositoryService {
     public User get(UUID userId, UUID companyId) {
         User user;
         try {
-            Optional<User> userOpt = inMemoryRpUser.get(userId, companyId);
+            Optional<User> userOpt = inMemoryRpUser.get(userId);
 
             if (userOpt.isEmpty()) {
                 userOpt = rpUser.get(userId, companyId);
                 if (userOpt.isPresent()) {
                     user = userOpt.get();
-                    inMemoryRpUser.add(user);
+                    inMemoryRpUser.set(user.id(), user);
                 } else {
+                    throw new DataNotFound("User with id " + userId + " not found");
+                }
+            } else {
+                if (!userOpt.get().companyId().equals(companyId)) {
                     throw new DataNotFound("User with id " + userId + " not found");
                 }
             }
@@ -64,16 +69,10 @@ public class UserRepositoryService {
     public User get(String email) {
         User user;
         try {
-            Optional<User> userOpt = inMemoryRpUser.get(email);
+            Optional<User> userOpt = rpUser.get(email);
 
             if (userOpt.isEmpty()) {
-                userOpt = rpUser.get(email);
-                if (userOpt.isEmpty()) {
-                    throw new DataNotFound("User with email " + email + " not found");
-                } else {
-                    user = userOpt.get();
-                    inMemoryRpUser.add(user);
-                }
+                throw new DataNotFound("User with email " + email + " not found");
             }
             user = userOpt.get();
 
@@ -91,7 +90,7 @@ public class UserRepositoryService {
                 throw new DbException("Failed to update password for user with id " + userId);
             } else {
                 user = userOpt.get();
-                inMemoryRpUser.add(user);
+                inMemoryRpUser.set(user.id(), user);
             }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());

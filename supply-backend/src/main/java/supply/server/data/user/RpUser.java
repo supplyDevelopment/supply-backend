@@ -42,7 +42,7 @@ public class RpUser {
                         """)
                 .set(createUser.name().getFirstName())
                 .set(createUser.name().getSecondName())
-                .set(createUser.name().getLastName().orElse(null))
+                .set(createUser.name().getLastName())
                 .set(createUser.email().getEmail())
                 .set(createUser.phone().getPhone())
                 .set(encodedPassword)
@@ -222,12 +222,10 @@ public class RpUser {
     private Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
         Email userEmail = new Email(rset.getString("email"));
 
-        String lastName = rset.getString("last_name");
-
         UserName userName = new UserName(
                 rset.getString("first_name"),
                 rset.getString("second_name"),
-                Objects.isNull(lastName)? Optional.empty() : Optional.of(lastName)
+                rset.getString("last_name")
         );
         Phone userPhone = new Phone(rset.getString("phone"));
         List<UserPermission> userPermissions = Arrays.stream(

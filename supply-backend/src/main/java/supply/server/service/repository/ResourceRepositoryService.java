@@ -1,13 +1,13 @@
 package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
-import supply.server.data.company.RpCompany;
+import supply.server.data.Redis;
 import supply.server.data.resource.CreateResource;
-import supply.server.data.resource.InMemoryRpResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
 import supply.server.data.resource.types.ResourceStatus;
@@ -21,7 +21,7 @@ public class ResourceRepositoryService {
 
     private final RpResource rpResource;
 
-    private final InMemoryRpResource inMemoryRpResource;
+    private final Redis<Pair<UUID, Resource>> inMemoryRpResource;
 
     public Resource add(CreateResource createResource, UUID companyId) {
         Resource resource;
@@ -30,7 +30,7 @@ public class ResourceRepositoryService {
 
             if (resourceOpt.isPresent()) {
                 resource = resourceOpt.get();
-                inMemoryRpResource.add(resource, companyId);
+                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
             } else {
                 throw new DbException("Failed to add resource");
             }
@@ -44,18 +44,23 @@ public class ResourceRepositoryService {
     public Resource get(UUID resourceId, UUID companyId) {
         Resource resource;
         try {
-            Optional<Resource> resourceOpt = inMemoryRpResource.get(resourceId, companyId);
+            Optional<Pair<UUID, Resource>> resourcePairOpt = inMemoryRpResource.get(resourceId);
 
-            if (resourceOpt.isEmpty()) {
+            if (resourcePairOpt.isEmpty()) {
+                Optional<Resource> resourceOpt;
                 resourceOpt = rpResource.get(resourceId, companyId);
                 if (resourceOpt.isPresent()) {
                     resource = resourceOpt.get();
-                    inMemoryRpResource.add(resource, companyId);
+                    inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
                 } else {
                     throw new DataNotFound("Resource with id " + resourceId + " not found");
                 }
+            } else {
+                if (!resourcePairOpt.get().getKey().equals(companyId)) {
+                    throw new DataNotFound("Resource with id " + resourceId + " not found");
+                }
+                resource = resourcePairOpt.get().getValue();
             }
-            resource = resourceOpt.get();
 
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
@@ -86,7 +91,7 @@ public class ResourceRepositoryService {
 
             if (resourceOpt.isPresent()) {
                 resource = resourceOpt.get();
-                inMemoryRpResource.edit(resourceId, resource, companyId);
+                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
             } else {
                 throw new DbException("Failed to edit resource with id " + resourceId);
             }

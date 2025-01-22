@@ -4,8 +4,10 @@ import lombok.Getter;
 import supply.server.configuration.exception.IncorrectInputException;
 import supply.server.configuration.exception.IncorrectParameterException;
 
+import java.io.Serializable;
+
 @Getter
-public class Email {
+public class Email implements Serializable {
     private final String email;
 
     public Email(String email) throws IncorrectInputException {

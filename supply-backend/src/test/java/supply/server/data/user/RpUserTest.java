@@ -34,7 +34,7 @@ public class RpUserTest extends DataCreator {
 
         assertEquals(createUser.name().getFirstName(), user.name().getFirstName());
         assertEquals(createUser.name().getSecondName(), user.name().getSecondName());
-        assertEquals(createUser.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+        assertEquals(createUser.name().getLastName(), user.name().getLastName());
         assertEquals(createUser.email().getEmail(), user.email().getEmail());
         assertEquals(createUser.phone().getPhone(), user.phone().getPhone());
         assertTrue(passwordEncoder.matches(createUser.password(), user.password()));
@@ -63,13 +63,11 @@ public class RpUserTest extends DataCreator {
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         Email userEmail = new Email(rset.getString("email"));
-                        String lastName = rset.getString("lastName");
 
                         UserName userName = new UserName(
                                 rset.getString("firstName"),
                                 rset.getString("secondName"),
-                                Objects.isNull(lastName)? Optional.empty() : Optional.of(lastName)
-                        );
+                                rset.getString("lastName")                        );
                         Phone userPhone = new Phone(rset.getString("phone"));
                         List<UserPermission> userPermissions = Arrays.stream(
                                 (String[]) rset.getArray("privileges").getArray()
@@ -95,7 +93,7 @@ public class RpUserTest extends DataCreator {
         assertEquals(user.id(), userFromDB.id());
         assertEquals(user.name().getFirstName(), userFromDB.name().getFirstName());
         assertEquals(user.name().getSecondName(), userFromDB.name().getSecondName());
-        assertEquals(user.name().getLastName().orElse(null), userFromDB.name().getLastName().orElse(null));
+        assertEquals(user.name().getLastName(), userFromDB.name().getLastName());
         assertEquals(user.email().getEmail(), userFromDB.email().getEmail());
         assertEquals(user.phone().getPhone(), userFromDB.phone().getPhone());
         assertEquals(user.password(), userFromDB.password());
@@ -115,7 +113,7 @@ public class RpUserTest extends DataCreator {
         assertEquals(expected.id(), user.id());
         assertEquals(expected.name().getFirstName(), user.name().getFirstName());
         assertEquals(expected.name().getSecondName(), user.name().getSecondName());
-        assertEquals(expected.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+        assertEquals(expected.name().getLastName(), user.name().getLastName());
         assertEquals(expected.email().getEmail(), user.email().getEmail());
         assertEquals(expected.phone().getPhone(), user.phone().getPhone());
         assertEquals(expected.password(), user.password());
@@ -137,7 +135,7 @@ public class RpUserTest extends DataCreator {
         assertEquals(expected.id(), user.id());
         assertEquals(expected.name().getFirstName(), user.name().getFirstName());
         assertEquals(expected.name().getSecondName(), user.name().getSecondName());
-        assertEquals(expected.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+        assertEquals(expected.name().getLastName(), user.name().getLastName());
         assertEquals(expected.email().getEmail(), user.email().getEmail());
         assertEquals(expected.phone().getPhone(), user.phone().getPhone());
         assertEquals(expected.password(), user.password());
@@ -161,7 +159,7 @@ public class RpUserTest extends DataCreator {
         for (int i = 0; i < 8; i++) {
             if (i % 4 == 0) {
                 expected.add(rpUser.add(new CreateUser(
-                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], Optional.of("addingLastName" + additionLetters[i])),
+                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
@@ -169,7 +167,7 @@ public class RpUserTest extends DataCreator {
                 ), companyIds.get(0)).orElseThrow());
             } else if (i % 2 == 0) {
                 rpUser.add(new CreateUser(
-                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], Optional.of("addingLastName" + additionLetters[i])),
+                        new UserName("addingFirstName" + additionLetters[i], "addingSecondName" + additionLetters[i], "addingLastName" + additionLetters[i]),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
@@ -177,7 +175,7 @@ public class RpUserTest extends DataCreator {
                 ), companyIds.get(1)).orElseThrow();
             } else {
                 rpUser.add(new CreateUser(
-                        new UserName("agettingFirstName" + additionLetters[i], "agettingSecondName" + additionLetters[i], Optional.of("agettingLastName" + additionLetters[i])),
+                        new UserName("agettingFirstName" + additionLetters[i], "agettingSecondName" + additionLetters[i], "agettingLastName" + additionLetters[i]),
                         new Email("example" + i + "@example.com"),
                         new Phone("+7123456789" + i),
                         "testPassword",
@@ -194,7 +192,7 @@ public class RpUserTest extends DataCreator {
                     assertEquals(expectedUser.id(), user.id());
                     assertEquals(expectedUser.name().getFirstName(), user.name().getFirstName());
                     assertEquals(expectedUser.name().getSecondName(), user.name().getSecondName());
-                    assertEquals(expectedUser.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+                    assertEquals(expectedUser.name().getLastName(), user.name().getLastName());
                     assertEquals(expectedUser.email().getEmail(), user.email().getEmail());
                     assertEquals(expectedUser.phone().getPhone(), user.phone().getPhone());
                     assertEquals(expectedUser.password(), user.password());
@@ -210,7 +208,7 @@ public class RpUserTest extends DataCreator {
         assertEquals(2, rpUser.getAll("", companyIds.get(1), new Pagination(20, 0)).total());
 
         expected.add(rpUser.add(new CreateUser(
-                new UserName("gettingFirstNameas", "gettingSecondNameas", Optional.of("gettingLastNameas")),
+                new UserName("gettingFirstNameas", "gettingSecondNameas", "gettingLastNameas"),
                 new Email("aexample" + 1 + "@example.com"),
                 new Phone("+70234567899"),
                 "testPassword",

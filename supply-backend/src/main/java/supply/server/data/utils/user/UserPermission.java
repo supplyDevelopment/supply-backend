@@ -2,7 +2,9 @@ package supply.server.data.utils.user;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public enum UserPermission implements GrantedAuthority {
+import java.io.Serializable;
+
+public enum UserPermission implements GrantedAuthority, Serializable {
     READ,
     WRITE,
     DELETE,

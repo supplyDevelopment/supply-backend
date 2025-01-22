@@ -3,12 +3,15 @@ package supply.server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import supply.server.data.company.Company;
+import supply.server.data.company.CreateCompany;
 import supply.server.data.supplier.RpSupplier;
 import supply.server.data.supplier.Supplier;
+import supply.server.data.utils.company.Bil;
+import supply.server.data.utils.company.CompanyStatus;
+import supply.server.data.utils.company.Tax;
+import supply.server.service.dataService.RepositoryService;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -23,7 +26,7 @@ import java.util.UUID;
 @Tag(name = "Anonymous" , description = "Registration and login")
 public class endPoint {
 
-    DataSource dataSource;
+    RepositoryService repositoryService;
 
 
 //    @PostMapping("/register")
@@ -79,10 +82,9 @@ public class endPoint {
 //    public String r(@RequestBody String m) {
 //        return m;
 //    }
-//    @GetMapping("/")
-//    public String init() throws SQLException {
-//        RpCompany rpCompany = new RpCompany(dataSource);
-//        rpCompany.add(new CompanyRequestEntity("test", List.of(new Email("gd.host@yandex.ru")), List.of(new Phone("+79033073746")), new Bil("test"), new Tax("test"), List.of(), CompanyStatus.ACTIVE));
-//        return "Hi";
-//    }
+    @GetMapping("/")
+    public String init() throws SQLException {
+        Company company = repositoryService.getCompany().add(new CreateCompany("test", List.of(), List.of(), new Bil("test"), new Tax("test"), List.of(), CompanyStatus.ACTIVE));
+        return repositoryService.getCompany().get(company.id()).name();
+    }
 }

@@ -2,7 +2,9 @@ package supply.server.data.resource.types;
 
 import supply.server.configuration.exception.IncorrectParameterException;
 
-public enum ResourceStatus {
+import java.io.Serializable;
+
+public enum ResourceStatus implements Serializable {
     ACTIVE,
     INACTIVE,
     REPAIR,

@@ -5,6 +5,7 @@ import supply.server.configuration.exception.DataNotFound;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.InMemoryRepository;
 import supply.server.data.PgRepository;
+import supply.server.data.Redis;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
 import supply.server.data.company.InMemoryRpCompany;
@@ -19,7 +20,7 @@ public class CompanyRepositoryService {
 
     private final RpCompany rpCompany;
 
-    private final InMemoryRpCompany inMemoryRpCompany;
+    private final Redis<Company> inMemoryRpCompany;
 
     public Company add(CreateCompany createCompany) {
         Company company;
@@ -28,7 +29,7 @@ public class CompanyRepositoryService {
 
             if (companyOpt.isPresent()) {
                 company = companyOpt.get();
-                inMemoryRpCompany.add(company);
+                inMemoryRpCompany.set(company.id(), company);
             } else {
                 throw new DbException("Failed to add company");
             }
@@ -47,7 +48,7 @@ public class CompanyRepositoryService {
                 companyOpt = rpCompany.get(companyId);
                 if (companyOpt.isPresent()) {
                     company = companyOpt.get();
-                    inMemoryRpCompany.add(company);
+                    inMemoryRpCompany.set(company.id(), company);
                 } else {
                     throw new DataNotFound("Company with id " + companyId + " not found");
                 }
