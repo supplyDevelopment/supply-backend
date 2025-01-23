@@ -16,6 +16,11 @@ CREATE TABLE company(
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE company_subscribe(
+    company     UUID NOT NULL REFERENCES company(id),
+    expires_at  TIMESTAMPTZ NOT NULL
+);
+
 CREATE TABLE company_projects(
     project     UUID NOT NULL REFERENCES project(id),
     company     UUID NOT NULL REFERENCES company(id)
