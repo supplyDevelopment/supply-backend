@@ -48,22 +48,49 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue subscribeNotificationQueue() {
+        return QueueBuilder.durable("subscribe.notification")
+                .withArgument("x-dead-letter-exchange", "")
+                .withArgument("x-dead-letter-routing-key", "subscribe.notification.dlq")
+                .build();
+    }
+
+    @Bean
+    public Queue subscribeNotificationDlqQueue() {
+        return new Queue("subscribe.notification.dlq", true);
+    }
+
+    @Bean
     public DirectExchange exchange() {
         return new DirectExchange("user.registration.exchange");
     }
 
     @Bean
-    public Binding binding() {
+    public Binding userRegistrationBinding() {
         return BindingBuilder.bind(userRegistrationQueue())
                 .to(exchange())
                 .with("user.registration");
     }
 
     @Bean
-    public Binding dlqBinding() {
+    public Binding userRegistrationDlqBinding() {
         return BindingBuilder.bind(userRegistrationDlqQueue())
                 .to(exchange())
                 .with("user.registration.dlq");
     }
 
+    @Bean
+    public Binding subscribeNotificationBinding() {
+        return BindingBuilder.bind(subscribeNotificationQueue())
+                .to(exchange())
+                .with("subscribe.notification");
+    }
+
+    @Bean
+    public Binding subscribeNotificationDlqBinding() {
+        return BindingBuilder.bind(subscribeNotificationDlqQueue())
+                .to(exchange())
+                .with("subscribe.notification.dlq");
+    }
 }
+

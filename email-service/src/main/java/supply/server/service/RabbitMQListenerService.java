@@ -19,11 +19,22 @@ public class RabbitMQListenerService {
     public void sendRegistrationEmail(@Payload Map<String, String> message) {
         String email = message.get("email");
         String password = message.get("password");
-        log.info("Registration mail sent to {}", email);
         try {
             sendingMailService.sendRegistrationEmail(email, password);
         } catch (Exception e) {
             log.error("Registration mail error {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    @RabbitListener(queues = "subscribe.notification", containerFactory = "rabbitListenerContainerFactory")
+    public void sendSubscribeNotificationEmail(@Payload Map<String, String> message) {
+        String email = message.get("email");
+        int daysLeft = Integer.parseInt(message.get("daysLeft"));
+        try {
+            sendingMailService.sendSubscribeNotificationEmail(email, daysLeft);
+        } catch (Exception e) {
+            log.error("Subscribe notification mail error {}", e.getMessage());
             throw e;
         }
     }
