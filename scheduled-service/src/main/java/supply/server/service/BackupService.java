@@ -1,5 +1,6 @@
 package supply.server.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -7,6 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 public class BackupService {
 
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/supplydb";
@@ -14,7 +16,6 @@ public class BackupService {
     private static final String DB_PASSWORD = "your_password";
     private static final String BACKUP_DIR = "/path/to/backup/directory/";
     private static final String BACKUP_FILE = BACKUP_DIR + "backup-" + System.currentTimeMillis() + ".sql";
-    private static final Logger log = LoggerFactory.getLogger(BackupService.class);
 
     @Scheduled(cron = "0 0 * * * ?")
     public void performBackup() {
