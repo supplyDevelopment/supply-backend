@@ -1,6 +1,8 @@
 package supply.server.data.utils.company;
 
-public enum CompanyStatus {
+import java.io.Serializable;
+
+public enum CompanyStatus implements Serializable {
     ACTIVE,
     INACTIVE;
 

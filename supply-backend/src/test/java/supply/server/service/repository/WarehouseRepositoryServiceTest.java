@@ -2,10 +2,10 @@ package supply.server.service.repository;
 
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
+import supply.server.data.Redis;
 import supply.server.data.user.User;
 import supply.server.data.warehouse.CreateWarehouse;
-import supply.server.data.warehouse.InMemoryRpWarehouse;
 import supply.server.data.warehouse.RpWarehouse;
 import supply.server.data.warehouse.Warehouse;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class WarehouseRepositoryServiceTest extends DataCreator {
 
-    private final InMemoryRpWarehouse inMemoryRpWarehouse = new InMemoryRpWarehouse();
+    private final Redis<Warehouse> inMemoryRpWarehouse = new Redis<>(redisTemplate, "warehouse:");
     private final RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
 
     private final WarehouseRepositoryService warehouseService = new WarehouseRepositoryService(rpWarehouse, inMemoryRpWarehouse);
@@ -37,7 +37,7 @@ public class WarehouseRepositoryServiceTest extends DataCreator {
         Warehouse actual2 = rpWarehouse.get(warehouse.id(), companyId).orElseThrow();
         checkEquality(warehouse, actual2);
 
-        Warehouse actual3 = inMemoryRpWarehouse.get(warehouse.id(), companyId).orElseThrow();
+        Warehouse actual3 = inMemoryRpWarehouse.get(warehouse.id()).orElseThrow();
         checkEquality(warehouse, actual3);
     }
 
@@ -49,14 +49,14 @@ public class WarehouseRepositoryServiceTest extends DataCreator {
 
         Warehouse warehouse = rpWarehouse.add(createWarehouse, companyId).orElseThrow();
 
-        assertTrue(inMemoryRpWarehouse.get(warehouse.id(), companyId).isEmpty());
+        assertTrue(inMemoryRpWarehouse.get(warehouse.id()).isEmpty());
 
         Warehouse actual = warehouseService.get(warehouse.id(), companyId);
         checkEquality(warehouse, actual);
 
-        assertTrue(inMemoryRpWarehouse.get(warehouse.id(), companyId).isPresent());
+        assertTrue(inMemoryRpWarehouse.get(warehouse.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> warehouseService.get(UUID.randomUUID(), companyId));
+        assertThrows(DataNotFoundException.class, () -> warehouseService.get(UUID.randomUUID(), companyId));
     }
 
     private void checkEquality(CreateWarehouse createWarehouse, Warehouse warehouse) {

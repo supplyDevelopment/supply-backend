@@ -7,8 +7,6 @@ import supply.server.data.resource.RpResource;
 import supply.server.data.user.RpUser;
 import supply.server.data.warehouse.RpWarehouse;
 
-import javax.sql.DataSource;
-
 @Service
 public record PgRepository(
         RpCompany rpCompany,

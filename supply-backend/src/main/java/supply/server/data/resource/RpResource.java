@@ -6,7 +6,6 @@ import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Component;
-import supply.server.configuration.exception.InconsistentDatabaseException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.resource.types.ResourceStatus;

@@ -7,19 +7,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="mail-service" />
-        <module name="server" />
         <module name="main-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="supply" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="mail-service" options="-parameters" />
       <module name="main-service" options="-parameters" />
-      <module name="server" options="-parameters" />
       <module name="supply" options="-parameters" />
     </option>
   </component>

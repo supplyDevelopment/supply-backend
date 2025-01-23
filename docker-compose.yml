@@ -35,6 +35,19 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7
+    command: [ "redis-server", "--requirepass", "5432" ]
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "5432", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   app:
     build: ./supply-backend
     depends_on:
@@ -50,6 +63,9 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: 5432
     ports:
       - "8080:8080"
     networks:

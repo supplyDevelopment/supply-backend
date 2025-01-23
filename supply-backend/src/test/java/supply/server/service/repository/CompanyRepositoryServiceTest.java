@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
+import supply.server.data.Redis;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
-import supply.server.data.company.InMemoryRpCompany;
 import supply.server.data.company.RpCompany;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AllArgsConstructor
 public class CompanyRepositoryServiceTest extends DataCreator {
 
-    private final InMemoryRpCompany inMemoryRpCompany = new InMemoryRpCompany();
+    private final Redis<Company> inMemoryRpCompany = new Redis<>(redisTemplate, "company:");
     private final RpCompany rpCompany = new RpCompany(dataSource);
 
     private final CompanyRepositoryService companyService = new CompanyRepositoryService(rpCompany, inMemoryRpCompany);
@@ -58,7 +58,7 @@ public class CompanyRepositoryServiceTest extends DataCreator {
 
         assertTrue(inMemoryRpCompany.get(company.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> companyService.get(UUID.randomUUID()));
+        assertThrows(DataNotFoundException.class, () -> companyService.get(UUID.randomUUID()));
     }
 
     @Test

@@ -4,9 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="593d6d73-8d03-4cda-a9b2-d7ff93d43854" name="Changes" comment="feat: init new service">
-      <change afterPath="$PROJECT_DIR$/dump-service/src/main/java/supply/server/service/SubscribeService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dump-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/dump-service/pom.xml" afterDir="false" />
+    <list default="true" id="593d6d73-8d03-4cda-a9b2-d7ff93d43854" name="Changes" comment="feat: configuration updated&#10;feat: docker-compose file updated to run redis">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/email-service/target/mail-service-1.0.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/email-service/target/mail-service-1.0.0.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/email-service/target/mail-service-1.0.0.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/email-service/target/mail-service-1.0.0.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/configuration/exception/DataNotFound.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/configuration/exception/DataNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/configuration/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/configuration/security/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/PgRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/PgRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/company/Company.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/company/Company.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/company/InMemoryRpCompany.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/operation/CreateMoveOperation.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/operation/CreateMoveOperation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/project/InMemoryRpProject.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/resource/InMemoryRpResource.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/resource/RpResource.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/resource/RpResource.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/supplier/RpSupplier.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/supplier/RpSupplier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/user/InMemoryRpUser.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/user/RpUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/user/RpUser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/user/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/utils/user/UserName.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/utils/user/UserName.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/warehouse/InMemoryRpWarehouse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/warehouse/Warehouse.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/data/warehouse/Warehouse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/endPoint.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/endPoint.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/CompanyRepositoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/CompanyRepositoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/ProjectRepositoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/ProjectRepositoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/ResourceRepositoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/ResourceRepositoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/UserRepositoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/UserRepositoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/WarehouseRepositoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/main/java/supply/server/service/repository/WarehouseRepositoryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/CompanyRepositoryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/CompanyRepositoryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/ProjectRepositoryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/ProjectRepositoryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/ResourceRepositoryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/ResourceRepositoryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/UserRepositoryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/UserRepositoryServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/WarehouseRepositoryServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/supply-backend/src/test/java/supply/server/service/repository/WarehouseRepositoryServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,6 +44,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Exception" />
         <option value="Class" />
       </list>
     </option>
@@ -23,7 +52,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="dev" />
+        <entry key="$PROJECT_DIR$" value="redis-migrate" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -39,10 +68,6 @@
     &quot;url&quot;: &quot;https://github.com/supplyDevelopment/supply-backend&quot;,
     &quot;accountId&quot;: &quot;10f78159-0935-4260-9a7f-c4fc68ecb021&quot;
   }
-}</component>
-  <component name="KubernetesApiPersistence">{}</component>
-  <component name="KubernetesApiProvider">{
-  &quot;isMigrated&quot;: true
 }</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
@@ -60,47 +85,104 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;com.codeium.enabled&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dump-service&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;openjdk-22&quot;,
-    &quot;last_opened_file_path&quot;: &quot;Q:/supply-backend/dump-service&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.InMemoryRpCompanyTest.addAndGet.executor": "Run",
+    "JUnit.InMemoryRpCompanyTest.executor": "Run",
+    "JUnit.InMemoryRpCompanyTest.syncAccessAddAndGetTest.executor": "Run",
+    "JUnit.RedisCacheTest.executor": "Run",
+    "JUnit.java in main-service.executor": "Run",
+    "JUnit.te.test.executor": "Run",
+    "Maven.mail-service [clean].executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "com.codeium.enabled": "true",
+    "git-widget-placeholder": "dev",
+    "last_opened_file_path": "Q:/supply-backend/supply-backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="Q:\supply-backend" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="configurationTypes">
-      <set>
-        <option value="MicronautRunConfigurationType" />
-        <option value="QuarkusRunConfigurationType" />
-        <option value="SpringBootApplicationConfigurationType" />
-      </set>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean" />
     </option>
   </component>
   <component name="RunManager" selected="Spring Boot.SupplyApplication">
-    <configuration name="DumpServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="server" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="supply.server.DumpServiceApplication" />
+    <configuration name="RedisCacheTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="main-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="supply.server.redis.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="supply.server.redis" />
+      <option name="MAIN_CLASS_NAME" value="supply.server.redis.RedisCacheTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="EmailServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="mail-service" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="supply.server.EmailServiceApplication" />
+    <configuration name="RedisCacheTest.addAndGet" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="main-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="supply.server.redis.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="supply.server.redis" />
+      <option name="MAIN_CLASS_NAME" value="supply.server.redis.RedisCacheTest" />
+      <option name="METHOD_NAME" value="addAndGet" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RedisCacheTest.syncAccessAddAndGetTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="main-service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="supply.server.redis.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="supply.server.redis" />
+      <option name="MAIN_CLASS_NAME" value="supply.server.redis.RedisCacheTest" />
+      <option name="METHOD_NAME" value="syncAccessAddAndGetTest" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="java in main-service" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="main-service" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/supply-backend/src/test/java" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="te.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="main-service" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="te" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -112,6 +194,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.java in main-service" />
+        <item itemvalue="JUnit.te.test" />
+        <item itemvalue="JUnit.RedisCacheTest" />
+        <item itemvalue="JUnit.RedisCacheTest.syncAccessAddAndGetTest" />
+        <item itemvalue="JUnit.RedisCacheTest.addAndGet" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -129,8 +220,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737405375826</updated>
-      <workItem from="1737405376929" duration="1473000" />
-      <workItem from="1737467095911" duration="3907000" />
+      <workItem from="1737405376929" duration="678000" />
+      <workItem from="1737561532972" duration="11231000" />
     </task>
     <task id="LOCAL-00001" summary="feat: migration with email-service">
       <option name="closed" value="true" />
@@ -140,23 +231,55 @@
       <option name="project" value="LOCAL" />
       <updated>1737405868752</updated>
     </task>
-    <task id="LOCAL-00002" summary="feat: email service added">
+    <task id="LOCAL-00002" summary="feat: redis cache service implemented">
       <option name="closed" value="true" />
-      <created>1737406144620</created>
+      <created>1737560725271</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1737406144620</updated>
+      <updated>1737560725271</updated>
     </task>
-    <task id="LOCAL-00003" summary="feat: init new service">
+    <task id="LOCAL-00003" summary="feat: exception implemented&#10;feat: configuration for redis tests implemented">
       <option name="closed" value="true" />
-      <created>1737482233803</created>
+      <created>1737560775309</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1737482233803</updated>
+      <updated>1737560775309</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat: all entities implements Serializable">
+      <option name="closed" value="true" />
+      <created>1737561175320</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1737561175320</updated>
+    </task>
+    <task id="LOCAL-00005" summary="feat: bug fixed&#10;Tested-by: unit tests">
+      <option name="closed" value="true" />
+      <created>1737563496012</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1737563496012</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: all methods with cache migrated to redis">
+      <option name="closed" value="true" />
+      <created>1737569062254</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737569062254</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feat: configuration updated&#10;feat: docker-compose file updated to run redis">
+      <option name="closed" value="true" />
+      <created>1737575170402</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1737575170402</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -164,8 +287,12 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: migration with email-service" />
-    <MESSAGE value="feat: email service added" />
-    <MESSAGE value="feat: init new service" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: init new service" />
+    <MESSAGE value="feat: redis cache service implemented" />
+    <MESSAGE value="feat: exception implemented&#10;feat: configuration for redis tests implemented" />
+    <MESSAGE value="feat: all entities implements Serializable" />
+    <MESSAGE value="feat: bug fixed&#10;Tested-by: unit tests" />
+    <MESSAGE value="feat: all methods with cache migrated to redis" />
+    <MESSAGE value="feat: configuration updated&#10;feat: docker-compose file updated to run redis" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: configuration updated&#10;feat: docker-compose file updated to run redis" />
   </component>
 </project>

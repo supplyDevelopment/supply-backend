@@ -2,7 +2,9 @@ package supply.server.data.utils;
 
 import supply.server.configuration.exception.IncorrectParameterException;
 
-public enum Unit {
+import java.io.Serializable;
+
+public enum Unit implements Serializable {
     PCS("шт"),
 
     KG("кг"),

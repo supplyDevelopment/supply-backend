@@ -87,8 +87,7 @@ public class RpCompanyTest extends DataCreator {
                                 companyAddresses,
                                 CompanyStatus.valueOf(rset.getString("status")),
                                 rset.getDate("created_at").toLocalDate(),
-                                rset.getDate("updated_at").toLocalDate(),
-                                dataSource
+                                rset.getDate("updated_at").toLocalDate()
                         ));
                     }
                     return Optional.<Company>empty();

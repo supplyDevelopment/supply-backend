@@ -1,17 +1,15 @@
 package supply.server.service.repository;
 
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
 import supply.server.configuration.exception.DbException;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
-import supply.server.data.project.InMemoryRpProject;
+import supply.server.data.Redis;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +18,7 @@ public class ProjectRepositoryService {
 
     private final RpProject rpProject;
 
-    private final InMemoryRpProject inMemoryRpProject;
+    private final Redis<Project> inMemoryRpProject;
 
     public Project add(String name, String description, UUID companyId) {
         Project project;
@@ -29,7 +27,7 @@ public class ProjectRepositoryService {
 
             if (projectOpt.isPresent()) {
                 project = projectOpt.get();
-                inMemoryRpProject.add(project);
+                inMemoryRpProject.set(project.id(), project);
             } else {
                 throw new DbException("Failed to add project");
             }
@@ -43,15 +41,19 @@ public class ProjectRepositoryService {
     public Project get(UUID projectId, UUID companyId) {
         Project project;
         try {
-            Optional<Project> projectOpt = inMemoryRpProject.get(projectId, companyId);
+            Optional<Project> projectOpt = inMemoryRpProject.get(projectId);
 
             if (projectOpt.isEmpty()) {
                 projectOpt = rpProject.get(projectId, companyId);
                 if (projectOpt.isPresent()) {
                     project = projectOpt.get();
-                    inMemoryRpProject.add(project);
+                    inMemoryRpProject.set(project.id(), project);
                 } else {
-                    throw new DataNotFound("Project with id " + projectId + " not found");
+                    throw new DataNotFoundException("Project with id " + projectId + " not found");
+                }
+            } else {
+                if (!projectOpt.get().companyId().equals(companyId)) {
+                    throw new DataNotFoundException("Project with id " + projectId + " not found");
                 }
             }
             project = projectOpt.get();

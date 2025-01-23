@@ -2,7 +2,9 @@ package supply.server.data.resource.types;
 
 import supply.server.configuration.exception.IncorrectParameterException;
 
-public enum ResourceType {
+import java.io.Serializable;
+
+public enum ResourceType implements Serializable {
     TOOL,
     PRODUCT;
 

@@ -2,8 +2,8 @@ package supply.server.service.repository;
 
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
-import supply.server.data.project.InMemoryRpProject;
+import supply.server.configuration.exception.DataNotFoundException;
+import supply.server.data.Redis;
 import supply.server.data.project.Project;
 import supply.server.data.project.RpProject;
 
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ProjectRepositoryServiceTest extends DataCreator {
 
-    private final InMemoryRpProject inMemoryRpProject = new InMemoryRpProject();
+    private final Redis<Project> inMemoryRpProject = new Redis<>(redisTemplate, "project:");
     private final RpProject rpProject = new RpProject(dataSource);
 
     private final ProjectRepositoryService projectService = new ProjectRepositoryService(rpProject, inMemoryRpProject);
@@ -36,7 +36,7 @@ public class ProjectRepositoryServiceTest extends DataCreator {
         assertEquals(project.description(), actual1.description());
         assertEquals(project.companyId(), actual1.companyId());
 
-        Project actual2 = inMemoryRpProject.get(project.id(), companyId).orElseThrow();
+        Project actual2 = inMemoryRpProject.get(project.id()).orElseThrow();
         assertEquals(project.id(), actual2.id());
         assertEquals(project.name(), actual2.name());
         assertEquals(project.description(), actual2.description());
@@ -60,7 +60,7 @@ public class ProjectRepositoryServiceTest extends DataCreator {
         assertEquals(description, project.description());
         assertEquals(companyId, project.companyId());
 
-        assertTrue(inMemoryRpProject.get(project.id(), companyId).isEmpty());
+        assertTrue(inMemoryRpProject.get(project.id()).isEmpty());
 
         Project actual = projectService.get(project.id(), companyId);
         assertEquals(project.id(), actual.id());
@@ -68,9 +68,9 @@ public class ProjectRepositoryServiceTest extends DataCreator {
         assertEquals(project.description(), actual.description());
         assertEquals(project.companyId(), actual.companyId());
 
-        assertTrue(inMemoryRpProject.get(project.id(), companyId).isPresent());
+        assertTrue(inMemoryRpProject.get(project.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> projectService.get(UUID.randomUUID(), companyId));
+        assertThrows(DataNotFoundException.class, () -> projectService.get(UUID.randomUUID(), companyId));
     }
 
 }

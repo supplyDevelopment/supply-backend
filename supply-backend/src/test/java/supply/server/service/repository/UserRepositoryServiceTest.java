@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import supply.server.configuration.DataCreator;
-import supply.server.configuration.exception.DataNotFound;
+import supply.server.configuration.exception.DataNotFoundException;
+import supply.server.data.Redis;
 import supply.server.data.user.CreateUser;
-import supply.server.data.user.InMemoryRpUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
 
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserRepositoryServiceTest extends DataCreator {
 
-    private final InMemoryRpUser inMemoryRpUser = new InMemoryRpUser();
+    private final Redis<User> inMemoryRpUser = new Redis<>(redisTemplate, "user:");
     private final RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
 
     private final UserRepositoryService userService = new UserRepositoryService(rpUser, inMemoryRpUser);
@@ -41,7 +41,7 @@ public class UserRepositoryServiceTest extends DataCreator {
         User actual3 = rpUser.get(user.id(), companyId).orElseThrow();
         checkEquality(user, actual3);
 
-        User actual4 = inMemoryRpUser.get(user.id(), companyId).orElseThrow();
+        User actual4 = inMemoryRpUser.get(user.id()).orElseThrow();
         checkEquality(user, actual4);
     }
 
@@ -53,20 +53,20 @@ public class UserRepositoryServiceTest extends DataCreator {
         User user = rpUser.add(createUser, companyId).orElseThrow();
         checkEquality(createUser, user);
 
-        assertTrue(inMemoryRpUser.get(user.id(), companyId).isEmpty());
+        assertTrue(inMemoryRpUser.get(user.id()).isEmpty());
 
         User actual = userService.get(user.id(), companyId);
         checkEquality(user, actual);
 
-        assertTrue(inMemoryRpUser.get(user.id(), companyId).isPresent());
+        assertTrue(inMemoryRpUser.get(user.id()).isPresent());
 
-        assertThrows(DataNotFound.class, () -> userService.get(UUID.randomUUID(), companyId));
+        assertThrows(DataNotFoundException.class, () -> userService.get(UUID.randomUUID(), companyId));
     }
 
     private void checkEquality(CreateUser createUser, User user) {
         assertEquals(createUser.name().getFirstName(), user.name().getFirstName());
         assertEquals(createUser.name().getSecondName(), user.name().getSecondName());
-        assertEquals(createUser.name().getLastName().orElse(null), user.name().getLastName().orElse(null));
+        assertEquals(createUser.name().getLastName(), user.name().getLastName());
         assertEquals(createUser.email().getEmail(), user.email().getEmail());
         assertEquals(createUser.phone().getPhone(), user.phone().getPhone());
         assertTrue(passwordEncoder.matches(createUser.password(), user.password()));
@@ -76,7 +76,7 @@ public class UserRepositoryServiceTest extends DataCreator {
         assertEquals(expected.id(), actual.id());
         assertEquals(expected.name().getFirstName(), actual.name().getFirstName());
         assertEquals(expected.name().getSecondName(), actual.name().getSecondName());
-        assertEquals(expected.name().getLastName().orElse(null), actual.name().getLastName().orElse(null));
+        assertEquals(expected.name().getLastName(), actual.name().getLastName());
         assertEquals(expected.email().getEmail(), actual.email().getEmail());
         assertEquals(expected.phone().getPhone(), actual.phone().getPhone());
         assertEquals(expected.password(), actual.password());
