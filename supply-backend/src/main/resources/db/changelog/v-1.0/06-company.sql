@@ -18,6 +18,7 @@ CREATE TABLE company(
 
 CREATE TABLE company_subscribe(
     company     UUID NOT NULL REFERENCES company(id),
+    last_payment_id   VARCHAR(128) NOT NULL UNIQUE,
     expires_at  TIMESTAMPTZ NOT NULL
 );
 

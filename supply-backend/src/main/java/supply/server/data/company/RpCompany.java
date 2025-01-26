@@ -1,6 +1,7 @@
 package supply.server.data.company;
 
 import com.jcabi.jdbc.JdbcSession;
+import com.jcabi.jdbc.Outcome;
 import com.jcabi.jdbc.SingleOutcome;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -82,6 +83,46 @@ public class RpCompany {
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         return compactCompanyFromResultSet(rset);
+                    }
+                    return Optional.empty();
+                });
+    }
+
+    public Optional<Subscribe> add(UUID companyId, String lastPaymentId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+
+        jdbcSession
+                .sql("""
+                        INSERT INTO company_subscribe company, last_payment_id, expires_at
+                        VALUES (?, ?, ?)
+                        """)
+                .set(companyId)
+                .set(lastPaymentId)
+                .set(LocalDate.now().plusMonths(1))
+                .insert(Outcome.VOID);
+        return Optional.of(new Subscribe(
+                companyId,
+                lastPaymentId,
+                LocalDate.now().plusMonths(1)
+        ));
+    }
+
+    public Optional<Subscribe> getSubscribe(UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        return jdbcSession
+                .sql("""
+                        SELECT company, last_payment_id, expires_at
+                        FROM company_subscribe
+                        WHERE company = ?
+                        """)
+                .set(companyId)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(new Subscribe(
+                                rset.getObject("company", UUID.class),
+                                rset.getString("last_payment_id"),
+                                rset.getDate("expires_at").toLocalDate()
+                        ));
                     }
                     return Optional.empty();
                 });
