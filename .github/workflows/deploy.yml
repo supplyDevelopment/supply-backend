@@ -1,0 +1,65 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+        - deploy
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '22'
+
+      - name: Build supply-backend
+        run: |
+          cd supply-backend
+          ./mvnw clean package -DskipTests
+
+      - name: Build email-service
+        run: |
+          cd email-service
+          ./mvnw clean package -DskipTests
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: jars
+          path: |
+            supply-backend/target/*.jar
+            email-service/target/*.jar
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: jars
+          path: artifacts
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_HOST }}
+
+      - name: Deploy to server
+        run: |
+          scp -o StrictHostKeyChecking=no -r artifacts/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/backend/target/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          cd /backend
+          git pull origin deploy
+          docker-compose down
+          docker-compose up -d --build
+          EOF
