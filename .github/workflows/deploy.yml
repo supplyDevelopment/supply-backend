@@ -59,9 +59,9 @@ jobs:
 
       - name: Deploy to server
         run: |
-          scp -o StrictHostKeyChecking=no -r artifacts/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/backend/target/
+          scp -o StrictHostKeyChecking=no -r artifacts/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/backend/supply-backend/target/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd /backend
+          cd /backend/supply-backend
           git pull origin deploy
           docker-compose down
           docker-compose up -d --build
