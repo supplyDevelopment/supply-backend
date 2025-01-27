@@ -59,12 +59,12 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /backend/supply-backend/supply-backend/target"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /backend/supply-backend/email-service/target"
-          scp -o StrictHostKeyChecking=no artifacts/supply-backend/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/backend/supply-backend/supply-backend/target/
-          scp -o StrictHostKeyChecking=no artifacts/email-service/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/backend/supply-backend/email-service/target/
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /root/backend/supply-backend/supply-backend/target"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /root/backend/supply-backend/email-service/target"
+          scp -o StrictHostKeyChecking=no artifacts/supply-backend/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/supply-backend/target/
+          scp -o StrictHostKeyChecking=no artifacts/email-service/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/email-service/target/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd /backend/supply-backend
+          cd root/backend/supply-backend
           git pull origin deploy
           docker-compose down
           docker-compose up -d --build
