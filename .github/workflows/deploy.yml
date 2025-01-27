@@ -64,7 +64,7 @@ jobs:
           scp -o StrictHostKeyChecking=no artifacts/supply-backend/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/supply-backend/target/
           scp -o StrictHostKeyChecking=no artifacts/email-service/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/email-service/target/
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd root/backend/supply-backend
+          cd /root/backend/supply-backend
           git pull origin deploy
           docker-compose down
           docker-compose up -d --build
