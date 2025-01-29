@@ -40,11 +40,11 @@ public class RpUser {
                         INSERT INTO company_user (name, email, phone, password, privileges, created_at)
                         VALUES ((?, ?, ?)::USER_NAME, ?::EMAIL, ?::PHONE, ?, ?::user_privilege[], ?)
                         """)
-                .set(createUser.name().getFirstName())
-                .set(createUser.name().getSecondName())
-                .set(createUser.name().getLastName())
+                .set(Objects.isNull(createUser.name()) ? null : createUser.name().getFirstName())
+                .set(Objects.isNull(createUser.name()) ? null : createUser.name().getSecondName())
+                .set(Objects.isNull(createUser.name()) ? null : createUser.name().getLastName())
                 .set(createUser.email().getEmail())
-                .set(createUser.phone().getPhone())
+                .set(Objects.isNull(createUser.phone()) ? null : createUser.phone().getPhone())
                 .set(encodedPassword)
                 .set(privilegesArray)
                 .set(LocalDate.now())
@@ -221,13 +221,17 @@ public class RpUser {
 
     private Optional<User> compactUserFromResultSet(ResultSet rset) throws SQLException {
         Email userEmail = new Email(rset.getString("email"));
-
-        UserName userName = new UserName(
-                rset.getString("first_name"),
-                rset.getString("second_name"),
-                rset.getString("last_name")
-        );
-        Phone userPhone = new Phone(rset.getString("phone"));
+        UserName userName;
+        if (Objects.isNull(rset.getString("first_name")) || Objects.isNull(rset.getString("second_name"))) {
+            userName = null;
+        } else {
+            userName = new UserName(
+                    rset.getString("first_name"),
+                    rset.getString("second_name"),
+                    rset.getString("last_name")
+            );
+        }
+        Phone userPhone = Objects.isNull(rset.getString("phone")) ? null : new Phone(rset.getString("phone"));
         List<UserPermission> userPermissions = Arrays.stream(
                 (String[]) rset.getArray("privileges").getArray()
         ).map(UserPermission::valueOf).toList();

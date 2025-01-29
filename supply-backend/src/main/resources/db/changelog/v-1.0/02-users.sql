@@ -1,10 +1,10 @@
 CREATE TABLE company_user (
      id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-     name        USER_NAME NOT NULL,
+     name        USER_NAME,
      password    VARCHAR(1024) NOT NULL,
      privileges  user_privilege[],
      email       EMAIL NOT NULL UNIQUE,
-     phone       PHONE NOT NULL,
+     phone       PHONE,
      created_at  TIMESTAMPTZ NOT NULL,
      updated_at  TIMESTAMPTZ DEFAULT NOW()
 ); -- можно удалять
