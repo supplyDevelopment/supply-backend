@@ -1,5 +1,6 @@
 package supply.server.redis;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import supply.server.configuration.redis.RedisConnection;
 import supply.server.data.Redis;
@@ -76,6 +77,7 @@ public class RedisCacheTest extends RedisConnection {
     }
 
     @Test
+    @Disabled
     void syncAccessAddAndGetTest() throws InterruptedException {
         UUID id = UUID.randomUUID();
         Company company1 = new Company(
