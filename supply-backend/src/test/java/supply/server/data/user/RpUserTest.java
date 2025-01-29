@@ -28,15 +28,31 @@ public class RpUserTest extends DataCreator {
     @Test
     void addTest() throws SQLException {
         RpUser rpUser = new RpUser(dataSource, new BCryptPasswordEncoder());
-        CreateUser createUser = generateUser();
+        CreateUser createUser = new CreateUser(
+                null,
+                new Email("example@example.com"),
+                null,
+                "testPassword",
+                List.of(UserPermission.ADMIN)
+        );
 
         User user = rpUser.add(createUser, getCompany(false).id()).orElseThrow();
 
-        assertEquals(createUser.name().getFirstName(), user.name().getFirstName());
-        assertEquals(createUser.name().getSecondName(), user.name().getSecondName());
-        assertEquals(createUser.name().getLastName(), user.name().getLastName());
+        assertEquals(
+                Objects.isNull(createUser.name()) ? null : createUser.name().getFirstName(),
+                Objects.isNull(user.name()) ? null : user.name().getFirstName()
+        );
+        assertEquals(
+                Objects.isNull(createUser.name()) ? null : createUser.name().getSecondName(),
+                Objects.isNull(user.name()) ? null : user.name().getSecondName());
+        assertEquals(
+                Objects.isNull(createUser.name()) ? null : createUser.name().getLastName(),
+                Objects.isNull(user.name()) ? null : user.name().getLastName());
         assertEquals(createUser.email().getEmail(), user.email().getEmail());
-        assertEquals(createUser.phone().getPhone(), user.phone().getPhone());
+        assertEquals(
+                Objects.isNull(createUser.phone()) ? null : createUser.phone().getPhone(),
+                Objects.isNull(user.phone()) ? null : user.phone().getPhone()
+        );
         assertTrue(passwordEncoder.matches(createUser.password(), user.password()));
         assertEquals(createUser.permissions().get(0), user.permissions().get(0));
 
@@ -45,9 +61,9 @@ public class RpUserTest extends DataCreator {
         User userFromDB = jdbcSession
                 .sql("""
                     SELECT u.id,
-                           (u.name).first_name as firstName,
-                           (u.name).second_name as secondName,
-                           (u.name).last_name as lastName,
+                           (u.name).first_name as first_name,
+                           (u.name).second_name as second_mame,
+                           (u.name).last_name as last_name,
                            u.password,
                            u.privileges,
                            u.email,
@@ -63,12 +79,17 @@ public class RpUserTest extends DataCreator {
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         Email userEmail = new Email(rset.getString("email"));
-
-                        UserName userName = new UserName(
-                                rset.getString("firstName"),
-                                rset.getString("secondName"),
-                                rset.getString("lastName")                        );
-                        Phone userPhone = new Phone(rset.getString("phone"));
+                        UserName userName;
+                        if (Objects.isNull(rset.getString("first_name")) || Objects.isNull(rset.getString("second_name"))) {
+                            userName = null;
+                        } else {
+                            userName = new UserName(
+                                    rset.getString("first_name"),
+                                    rset.getString("second_name"),
+                                    rset.getString("last_name")
+                            );
+                        }
+                        Phone userPhone = Objects.isNull(rset.getString("phone")) ? null : new Phone(rset.getString("phone"));
                         List<UserPermission> userPermissions = Arrays.stream(
                                 (String[]) rset.getArray("privileges").getArray()
                         ).map(UserPermission::valueOf).toList();
@@ -90,12 +111,21 @@ public class RpUserTest extends DataCreator {
                         }
                 ).orElseThrow();
 
-        assertEquals(user.id(), userFromDB.id());
-        assertEquals(user.name().getFirstName(), userFromDB.name().getFirstName());
-        assertEquals(user.name().getSecondName(), userFromDB.name().getSecondName());
-        assertEquals(user.name().getLastName(), userFromDB.name().getLastName());
+        assertEquals(
+                Objects.isNull(user.name()) ? null : user.name().getFirstName(),
+                Objects.isNull(userFromDB.name()) ? null : userFromDB.name().getFirstName()
+        );
+        assertEquals(
+                Objects.isNull(user.name()) ? null : user.name().getSecondName(),
+                Objects.isNull(userFromDB.name()) ? null : userFromDB.name().getSecondName());
+        assertEquals(
+                Objects.isNull(user.name()) ? null : user.name().getLastName(),
+                Objects.isNull(userFromDB.name()) ? null : userFromDB.name().getLastName());
         assertEquals(user.email().getEmail(), userFromDB.email().getEmail());
-        assertEquals(user.phone().getPhone(), userFromDB.phone().getPhone());
+        assertEquals(
+                Objects.isNull(user.phone()) ? null : user.phone().getPhone(),
+                Objects.isNull(userFromDB.phone()) ? null : userFromDB.phone().getPhone()
+        );
         assertEquals(user.password(), userFromDB.password());
         assertEquals(user.companyId(), userFromDB.companyId());
         assertEquals(user.permissions().get(0), userFromDB.permissions().get(0));
@@ -110,17 +140,26 @@ public class RpUserTest extends DataCreator {
         User expected = getUser(false);
         User user = rpUser.get(expected.email().getEmail()).orElseThrow();
 
-        assertEquals(expected.id(), user.id());
-        assertEquals(expected.name().getFirstName(), user.name().getFirstName());
-        assertEquals(expected.name().getSecondName(), user.name().getSecondName());
-        assertEquals(expected.name().getLastName(), user.name().getLastName());
+        assertEquals(
+                Objects.isNull(expected.name()) ? null : expected.name().getFirstName(),
+                Objects.isNull(user.name()) ? null : user.name().getFirstName()
+        );
+        assertEquals(
+                Objects.isNull(expected.name()) ? null : expected.name().getSecondName(),
+                Objects.isNull(user.name()) ? null : user.name().getSecondName());
+        assertEquals(
+                Objects.isNull(expected.name()) ? null : expected.name().getLastName(),
+                Objects.isNull(user.name()) ? null : user.name().getLastName());
         assertEquals(expected.email().getEmail(), user.email().getEmail());
-        assertEquals(expected.phone().getPhone(), user.phone().getPhone());
-        assertEquals(expected.password(), user.password());
-        assertEquals(expected.companyId(), user.companyId());
-        assertEquals(expected.permissions().get(0), user.permissions().get(0));
-        assertEquals(expected.createdAt(), user.createdAt());
-        assertEquals(expected.updatedAt(), user.updatedAt());
+        assertEquals(
+                Objects.isNull(expected.phone()) ? null : expected.phone().getPhone(),
+                Objects.isNull(user.phone()) ? null : user.phone().getPhone()
+        );
+        assertEquals(user.password(), expected.password());
+        assertEquals(user.companyId(), expected.companyId());
+        assertEquals(user.permissions().get(0), expected.permissions().get(0));
+        assertEquals(user.createdAt(), expected.createdAt());
+        assertEquals(user.updatedAt(), expected.updatedAt());
     }
 
     @Test

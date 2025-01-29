@@ -18,10 +18,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @AllArgsConstructor
@@ -42,16 +39,17 @@ public class RpCompany {
         UUID companyId = jdbcSession
                 .sql("""
                         INSERT INTO company (name, contact_emails, contact_phones,
-                         bil_address, tax, addresses, status, created_at)
-                         VALUES (?, ?, ?, ?, ?, ?, ?::COMPANY_STATUS, ?)
+                         bil_address, tax, addresses, status, expires_at, created_at)
+                         VALUES (?, ?, ?, ?, ?, ?, ?::COMPANY_STATUS, ?, ?)
                         """)
                 .set(createCompany.name())
                 .set(emailsArray)
                 .set(phonesArray)
-                .set(createCompany.bil_address().getBil())
-                .set(createCompany.tax().getTax())
+                .set(Objects.isNull(createCompany.bil_address()) ? null : createCompany.bil_address().getBil())
+                .set(Objects.isNull(createCompany.tax()) ? null : createCompany.tax().getTax())
                 .set(addressesArray)
                 .set(createCompany.status().toString())
+                .set(LocalDate.now())
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
@@ -65,8 +63,40 @@ public class RpCompany {
                 createCompany.addresses(),
                 createCompany.status(),
                 LocalDate.now(),
+                LocalDate.now(),
                 LocalDate.now()
         ));
+    }
+
+    public Optional<Company> extendSubscription(int months, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Optional<LocalDate> expiresAt = jdbcSession
+                .sql("""
+                        SELECT expires_at
+                        FROM company
+                        WHERE id = ?
+                        """)
+                .set(companyId)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(rset.getDate("expires_at").toLocalDate());
+                    }
+                    return Optional.empty();
+                });
+        if (expiresAt.isEmpty()) {
+            return Optional.empty();
+        }
+        LocalDate extendedExpiresAt = expiresAt.get().plusMonths(months);
+        jdbcSession
+                .sql("""
+                        UPDATE company
+                        SET expires_at = ?
+                        WHERE id = ?
+                        """)
+                .set(extendedExpiresAt)
+                .set(companyId)
+                .update(Outcome.VOID);
+        return get(companyId);
     }
 
     public Optional<Company> get(UUID companyId) throws SQLException {
@@ -74,7 +104,7 @@ public class RpCompany {
         return jdbcSession
                 .sql("""
                         SELECT id, name, contact_emails, contact_phones,
-                         bil_address, tax, addresses, status,
+                         bil_address, tax, addresses, status, expires_at,
                          created_at, updated_at
                         FROM company
                         WHERE id = ?
@@ -83,46 +113,6 @@ public class RpCompany {
                 .select((rset, stmt) -> {
                     if (rset.next()) {
                         return compactCompanyFromResultSet(rset);
-                    }
-                    return Optional.empty();
-                });
-    }
-
-    public Optional<Subscribe> add(UUID companyId, String lastPaymentId) throws SQLException {
-        JdbcSession jdbcSession = new JdbcSession(dataSource);
-
-        jdbcSession
-                .sql("""
-                        INSERT INTO company_subscribe company, last_payment_id, expires_at
-                        VALUES (?, ?, ?)
-                        """)
-                .set(companyId)
-                .set(lastPaymentId)
-                .set(LocalDate.now().plusMonths(1))
-                .insert(Outcome.VOID);
-        return Optional.of(new Subscribe(
-                companyId,
-                lastPaymentId,
-                LocalDate.now().plusMonths(1)
-        ));
-    }
-
-    public Optional<Subscribe> getSubscribe(UUID companyId) throws SQLException {
-        JdbcSession jdbcSession = new JdbcSession(dataSource);
-        return jdbcSession
-                .sql("""
-                        SELECT company, last_payment_id, expires_at
-                        FROM company_subscribe
-                        WHERE company = ?
-                        """)
-                .set(companyId)
-                .select((rset, stmt) -> {
-                    if (rset.next()) {
-                        return Optional.of(new Subscribe(
-                                rset.getObject("company", UUID.class),
-                                rset.getString("last_payment_id"),
-                                rset.getDate("expires_at").toLocalDate()
-                        ));
                     }
                     return Optional.empty();
                 });
@@ -201,15 +191,19 @@ public class RpCompany {
                 addresses.split(",")
         ).filter(string -> !string.isEmpty()).map(Address::new).toList();
 
+        String bill = rset.getString("bil_address");
+        String tax = rset.getString("tax");
+
         return Optional.of(new Company(
                 UUID.fromString(rset.getString("id")),
                 rset.getString("name"),
                 companyEmails,
                 companyPhones,
-                new Bil(rset.getString("bil_address")),
-                new Tax(rset.getString("tax")),
+                new Bil(Objects.isNull(bill) ? null : bill),
+                new Tax(Objects.isNull(tax) ? null : tax),
                 companyAddresses,
                 CompanyStatus.valueOf(rset.getString("status")),
+                rset.getDate("expires_at").toLocalDate(),
                 rset.getDate("created_at").toLocalDate(),
                 rset.getDate("updated_at").toLocalDate()
         ));
