@@ -78,7 +78,6 @@ public class RedisCacheTest extends RedisConnection {
 
     @Disabled
     @Test
-    @Disabled
     void syncAccessAddAndGetTest() throws InterruptedException {
         UUID id = UUID.randomUUID();
         Company company1 = new Company(
