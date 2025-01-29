@@ -37,6 +37,7 @@ public class RedisCacheTest extends RedisConnection {
                 List.of(new Address("test")),
                 CompanyStatus.ACTIVE,
                 LocalDate.now(),
+                LocalDate.now(),
                 LocalDate.now()
         );
         Optional<Company> result = rpCompany.set(company.id(), company);
@@ -87,6 +88,7 @@ public class RedisCacheTest extends RedisConnection {
                 List.of(new Address("test")),
                 CompanyStatus.ACTIVE,
                 LocalDate.now(),
+                LocalDate.now(),
                 LocalDate.now()
         );
         Company company2 = new Company(
@@ -98,6 +100,7 @@ public class RedisCacheTest extends RedisConnection {
                 new Tax("2234567890"),
                 List.of(new Address("test")),
                 CompanyStatus.ACTIVE,
+                LocalDate.now(),
                 LocalDate.now(),
                 LocalDate.now()
         );
