@@ -5,21 +5,16 @@ CREATE TYPE COMPANY_STATUS AS ENUM (
 
 CREATE TABLE company(
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name            VARCHAR(1024) NOT NULL UNIQUE,
+    name            VARCHAR(1024),
     contact_emails  EMAIL[] NOT NULL,
-    contact_phones  PHONE[] NOT NULL,
-    bil_address     VARCHAR(128) NOT NULL UNIQUE,
-    tax             VARCHAR(128) NOT NULL UNIQUE,
-    addresses       VARCHAR(1024)[] NOT NULL,
+    contact_phones  PHONE[],
+    bil_address     VARCHAR(128),
+    tax             VARCHAR(128),
+    addresses       VARCHAR(1024)[],
     status          COMPANY_STATUS NOT NULL,
+    expires_at      TIMESTAMPTZ NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL,
     updated_at      TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE company_subscribe(
-    company     UUID NOT NULL REFERENCES company(id),
-    last_payment_id   VARCHAR(128) NOT NULL UNIQUE,
-    expires_at  TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE company_projects(

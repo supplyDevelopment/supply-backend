@@ -20,10 +20,7 @@ import supply.server.data.warehouse.Warehouse;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -36,22 +33,36 @@ public class RpCompanyTest extends DataCreator {
     void addTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
 
-        CreateCompany createCompany = generateCompany();
+        CreateCompany createCompany = new CreateCompany(
+                null,
+                List.of(new Email("example@example.com")),
+                List.of(),
+                null,
+                null,
+                List.of(),
+                CompanyStatus.ACTIVE
+        );
         Company company = rpCompany.add(createCompany).orElseThrow();
 
         Assertions.assertEquals(createCompany.name(), company.name());
-        Assertions.assertEquals(createCompany.contactEmails().get(0).getEmail(), company.contactEmails().get(0).getEmail());
-        Assertions.assertEquals(createCompany.contactPhones().get(0).getPhone(), company.contactPhones().get(0).getPhone());
-        Assertions.assertEquals(createCompany.bil_address().getBil(), company.bil_address().getBil());
-        Assertions.assertEquals(createCompany.tax().getTax(), company.tax().getTax());
-        Assertions.assertEquals(createCompany.addresses().get(0).getAddress(), company.addresses().get(0).getAddress());
+        Assertions.assertEquals(createCompany.contactEmails().stream().map(Email::getEmail).toList(), company.contactEmails().stream().map(Email::getEmail).toList());
+        Assertions.assertEquals(createCompany.contactPhones().stream().map(Phone::getPhone).toList(), company.contactPhones().stream().map(Phone::getPhone).toList());
+        Assertions.assertEquals(
+                Objects.isNull(createCompany.bil_address()) ? null : createCompany.bil_address().getBil(),
+                Objects.isNull(company.bil_address()) ? null : company.bil_address().getBil()
+        );
+        Assertions.assertEquals(
+                Objects.isNull(createCompany.tax()) ? null : createCompany.tax().getTax(),
+                Objects.isNull(company.tax()) ? null : company.tax().getTax()
+        );
+        Assertions.assertEquals(createCompany.addresses().stream().map(Address::getAddress).toList(), company.addresses().stream().map(Address::getAddress).toList());
         Assertions.assertEquals(createCompany.status(), company.status());
 
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         Company actual = jdbcSession
                 .sql("""
                         SELECT id, name, contact_emails, contact_phones,
-                         bil_address, tax, addresses, status,
+                         bil_address, tax, addresses, status, expires_at,
                          created_at, updated_at
                         FROM company
                         WHERE id = ?
@@ -86,6 +97,7 @@ public class RpCompanyTest extends DataCreator {
                                 new Tax(rset.getString("tax")),
                                 companyAddresses,
                                 CompanyStatus.valueOf(rset.getString("status")),
+                                rset.getDate("expires_at").toLocalDate(),
                                 rset.getDate("created_at").toLocalDate(),
                                 rset.getDate("updated_at").toLocalDate()
                         ));
@@ -95,11 +107,17 @@ public class RpCompanyTest extends DataCreator {
 
         Assertions.assertEquals(actual.id(), company.id());
         Assertions.assertEquals(actual.name(), company.name());
-        Assertions.assertEquals(actual.contactEmails().get(0).getEmail(), company.contactEmails().get(0).getEmail());
-        Assertions.assertEquals(actual.contactPhones().get(0).getPhone(), company.contactPhones().get(0).getPhone());
-        Assertions.assertEquals(actual.bil_address().getBil(), company.bil_address().getBil());
-        Assertions.assertEquals(actual.tax().getTax(), company.tax().getTax());
-        Assertions.assertEquals(actual.addresses().get(0).getAddress(), company.addresses().get(0).getAddress());
+        Assertions.assertEquals(actual.contactEmails().stream().map(Email::getEmail).toList(), company.contactEmails().stream().map(Email::getEmail).toList());
+        Assertions.assertEquals(actual.contactPhones().stream().map(Phone::getPhone).toList(), company.contactPhones().stream().map(Phone::getPhone).toList());
+        Assertions.assertEquals(
+                Objects.isNull(actual.bil_address()) ? null : actual.bil_address().getBil(),
+                Objects.isNull(company.bil_address()) ? null : company.bil_address().getBil()
+        );
+        Assertions.assertEquals(
+                Objects.isNull(actual.tax()) ? null : actual.tax().getTax(),
+                Objects.isNull(company.tax()) ? null : company.tax().getTax()
+        );
+        Assertions.assertEquals(actual.addresses().stream().map(Address::getAddress).toList(), company.addresses().stream().map(Address::getAddress).toList());
         Assertions.assertEquals(actual.status(), company.status());
         Assertions.assertEquals(actual.createdAt(), company.createdAt());
         Assertions.assertEquals(actual.updatedAt(), company.updatedAt());
@@ -108,16 +126,30 @@ public class RpCompanyTest extends DataCreator {
     @Test
     void getTest() throws Exception {
         RpCompany rpCompany = new RpCompany(dataSource);
-        Company expected = getCompany(false);
+        Company expected = rpCompany.add(new CreateCompany(
+                null,
+                List.of(new Email("example@example.com")),
+                List.of(),
+                null,
+                null,
+                List.of(),
+                CompanyStatus.ACTIVE
+        )).orElseThrow();
         Company actual = rpCompany.get(expected.id()).orElseThrow();
 
         Assertions.assertEquals(expected.id(), actual.id());
         Assertions.assertEquals(expected.name(), actual.name());
-        Assertions.assertEquals(expected.contactEmails().get(0).getEmail(), actual.contactEmails().get(0).getEmail());
-        Assertions.assertEquals(expected.contactPhones().get(0).getPhone(), actual.contactPhones().get(0).getPhone());
-        Assertions.assertEquals(expected.bil_address().getBil(), actual.bil_address().getBil());
-        Assertions.assertEquals(expected.tax().getTax(), actual.tax().getTax());
-        Assertions.assertEquals(expected.addresses().get(0).getAddress(), actual.addresses().get(0).getAddress());
+        Assertions.assertEquals(expected.contactEmails().stream().map(Email::getEmail).toList(), actual.contactEmails().stream().map(Email::getEmail).toList());
+        Assertions.assertEquals(expected.contactPhones().stream().map(Phone::getPhone).toList(), actual.contactPhones().stream().map(Phone::getPhone).toList());
+        Assertions.assertEquals(
+                Objects.isNull(expected.bil_address()) ? null : expected.bil_address().getBil(),
+                Objects.isNull(actual.bil_address()) ? null : actual.bil_address().getBil()
+        );
+        Assertions.assertEquals(
+                Objects.isNull(expected.tax()) ? null : expected.tax().getTax(),
+                Objects.isNull(actual.tax()) ? null : actual.tax().getTax()
+        );
+        Assertions.assertEquals(expected.addresses().stream().map(Address::getAddress).toList(), actual.addresses().stream().map(Address::getAddress).toList());
         Assertions.assertEquals(expected.status(), actual.status());
         Assertions.assertEquals(expected.createdAt(), actual.createdAt());
         Assertions.assertEquals(expected.updatedAt(), actual.updatedAt());

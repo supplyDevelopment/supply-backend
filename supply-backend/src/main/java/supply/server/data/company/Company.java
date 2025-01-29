@@ -21,6 +21,7 @@ public record Company (
         Tax tax,
         List<Address> addresses,
         CompanyStatus status,
+        LocalDate subscriptionExpiresAt,
         LocalDate createdAt,
         LocalDate updatedAt
 ) implements Serializable {

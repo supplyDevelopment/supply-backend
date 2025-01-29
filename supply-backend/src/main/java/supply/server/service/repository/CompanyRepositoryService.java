@@ -36,6 +36,23 @@ public class CompanyRepositoryService {
         return company;
     }
 
+    public Company extendSubscription(int months, UUID companyId) {
+        Company company;
+        try {
+            Optional<Company> companyOpt = rpCompany.extendSubscription(months, companyId);
+
+            if (companyOpt.isPresent()) {
+                company = companyOpt.get();
+                inMemoryRpCompany.set(company.id(), company);
+            } else {
+                throw new DataNotFoundException("Company with id " + companyId + " not found");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return company;
+    }
+
     public Company get(UUID companyId) {
         Company company;
         try {

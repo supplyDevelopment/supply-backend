@@ -16,6 +16,6 @@ public record CreateCompany(
         Bil bil_address,
         Tax tax,
         List<Address> addresses,
-        CompanyStatus status
+        CompanyStatus status // TODO: remove redundant field, default to ACTIVE
 ) {
 }
