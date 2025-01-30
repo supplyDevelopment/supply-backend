@@ -1,0 +1,96 @@
+name: Build, Push and Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'supply-backend/**'
+      - 'email-service/**'
+      - 'scheduled-service/**'
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: ${{ github.repository_owner }}
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - { name: 'app', path: './supply-backend', image: 'app' }
+          - { name: 'message-service', path: './email-service', image: 'email-service' }
+          - { name: 'scheduled-service', path: './scheduled-service', image: 'scheduled-service' }
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Docker setup
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{ matrix.service.path }}
+          file: ${{ matrix.service.path }}/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.service.image }}:latest
+            ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ matrix.service.image }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup variables
+        id: vars
+        run: |
+          echo "REGISTRY_PATH=${{ env.REGISTRY }}/${{ env.OWNER }}" >> $GITHUB_ENV
+          echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
+
+      - name: Replace image placeholders
+        run: |
+          find kubernetes/ -type f -name "*.yaml" -exec sed -i \
+            -e "s|registry-placeholder/app:image-tag-placeholder|${{ env.REGISTRY_PATH }}/app:${{ env.SHORT_SHA }}|g" \
+            -e "s|registry-placeholder/email-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/email-service:${{ env.SHORT_SHA }}|g" \
+            -e "s|registry-placeholder/scheduled-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/scheduled-service:${{ env.SHORT_SHA }}|g" {} +
+
+      - name: Validate manifests
+        uses: azure/k8s-actions/k8s-public-helm-schema-validation@v1
+        with:
+          manifests: ${{ format('./kubernetes/{0}', join('./kubernetes/*.yaml', ',')) }}
+
+      - name: Commit manifests
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add kubernetes/
+          git commit -m "CI: Update images to ${{ env.SHORT_SHA }}" || echo "No changes to commit"
+          git push
+
+      - name: Deploy to cluster
+        uses: appleboy/ssh-action@v1.0.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/backend/supply-backend
+            git pull origin deploy
+            kubectl apply -f kubernetes/ --namespace=supply-app --prune=true
+            kubectl rollout status deployment/app -n supply-app --timeout=3m
+            kubectl rollout status deployment/message-service -n supply-app --timeout=2m
+            kubectl rollout status deployment/scheduled-service -n supply-app --timeout=2m

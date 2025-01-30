@@ -1,71 +1,71 @@
-name: Deploy to Server
-
-on:
-  push:
-    branches:
-        - deploy
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '22'
-
-      - name: Install Maven
-        run: sudo apt-get install -y maven
-
-      - name: Build supply-backend
-        run: |
-          cd supply-backend
-          mvn clean package -DskipTests
-
-      - name: Build email-service
-        run: |
-          cd email-service
-          mvn clean package -DskipTests
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: jars
-          path: |
-            supply-backend/target/*.jar
-            email-service/target/*.jar
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: jars
-          path: artifacts
-
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.SSH_HOST }}
-
-      - name: Deploy to server
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /root/backend/supply-backend/supply-backend/target"
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /root/backend/supply-backend/email-service/target"
-          scp -o StrictHostKeyChecking=no artifacts/supply-backend/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/supply-backend/target/
-          scp -o StrictHostKeyChecking=no artifacts/email-service/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/email-service/target/
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          cd /root/backend/supply-backend
-          git pull origin deploy
-          docker-compose down
-          docker-compose up -d --build
-          EOF
+#name: Deploy to Server
+#
+#on:
+#  push:
+#    branches:
+#        - deploy
+#
+#jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Set up JDK
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin'
+#          java-version: '22'
+#
+#      - name: Install Maven
+#        run: sudo apt-get install -y maven
+#
+#      - name: Build supply-backend
+#        run: |
+#          cd supply-backend
+#          mvn clean package -DskipTests
+#
+#      - name: Build email-service
+#        run: |
+#          cd email-service
+#          mvn clean package -DskipTests
+#
+#      - name: Upload artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: jars
+#          path: |
+#            supply-backend/target/*.jar
+#            email-service/target/*.jar
+#
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: build
+#
+#    steps:
+#      - name: Download artifacts
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: jars
+#          path: artifacts
+#
+#      - name: Install SSH key
+#        uses: shimataro/ssh-key-action@v2
+#        with:
+#          key: ${{ secrets.SSH_PRIVATE_KEY }}
+#          known_hosts: ${{ secrets.SSH_HOST }}
+#
+#      - name: Deploy to server
+#        run: |
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /root/backend/supply-backend/supply-backend/target"
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p /root/backend/supply-backend/email-service/target"
+#          scp -o StrictHostKeyChecking=no artifacts/supply-backend/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/supply-backend/target/
+#          scp -o StrictHostKeyChecking=no artifacts/email-service/target/*.jar ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/root/backend/supply-backend/email-service/target/
+#          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+#          cd /root/backend/supply-backend
+#          git pull origin deploy
+#          docker-compose down
+#          docker-compose up -d --build
+#          EOF
