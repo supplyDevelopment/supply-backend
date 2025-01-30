@@ -1,10 +1,10 @@
 # Используем многостадийную сборку
-FROM maven:3.8.6-openjdk-22-slim AS build
+FROM maven:3.8.6-openjdk-21-slim AS build
 WORKDIR /app
 COPY src ./src
 COPY pom.xml .
 RUN mvn clean package -DskipTests
 
-FROM openjdk:22-jdk-slim
+FROM openjdk:21-jdk-slim
 COPY --from=build /app/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
