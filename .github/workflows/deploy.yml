@@ -3,10 +3,6 @@ name: Build, Push and Deploy
 on:
   push:
     branches: [ deploy ]
-    paths:
-      - 'supply-backend/**'
-      - 'email-service/**'
-      - 'scheduled-service/**'
 
 env:
   REGISTRY: ghcr.io
