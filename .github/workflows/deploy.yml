@@ -2,7 +2,7 @@ name: Build, Push and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ deploy ]
     paths:
       - 'supply-backend/**'
       - 'email-service/**'
