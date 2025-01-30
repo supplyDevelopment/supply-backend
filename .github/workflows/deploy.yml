@@ -76,9 +76,11 @@ jobs:
             -e "s|registry-placeholder/scheduled-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/scheduled-service:${{ env.SHORT_SHA }}|g" {} +
 
       - name: Validate manifests
-        uses: azure/k8s-actions/k8s-public-helm-schema-validation@v1.1
+        uses: instrumenta/kubeval-action@master
         with:
-          manifests: ${{ format('./kubernetes/{0}', join('./kubernetes/*.yaml', ',')) }}
+          files: './kubernetes/*.yaml'
+          strict: true
+          ignore_missing_schemas: true
 
       - name: Commit manifests
         run: |
@@ -89,7 +91,7 @@ jobs:
           git push
 
       - name: Deploy to cluster
-        uses: appleboy/ssh-action@v1.3.0
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
