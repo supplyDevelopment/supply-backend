@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduled-service
+  namespace: supply-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: scheduled-service
+  template:
+    metadata:
+      labels:
+        app: scheduled-service
+    spec:
+      containers:
+      - name: scheduled-service
+        image: "registry-placeholder/scheduled-service:image-tag-placeholder"
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://db:5432/supplydb"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "5432"
+        - name: SPRING_RABBITMQ_HOST
+          value: rabbitmq
+        - name: SPRING_RABBITMQ_PORT
+          value: "5672"
+        - name: SPRING_RABBITMQ_USERNAME
+          value: guest
+        - name: SPRING_RABBITMQ_PASSWORD
+          value: guest
+        ports:
+        - containerPort: 8082
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            memory: 256Mi
+            cpu: 200m

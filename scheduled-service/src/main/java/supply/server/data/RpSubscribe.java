@@ -22,20 +22,22 @@ public class RpSubscribe {
 
         return jdbcSession
                 .sql("""
-                        SELECT
-                            cs.company AS company_id,
-                            cs.expires_at,
-                            c.contact_emails
-                        FROM company_subscribe cs
-                        JOIN company c ON cs.company = c.id
+                        SElECT id, contact_emails, expires_at
+                        FROM company
                     """)
                 .select((rset, stmt) -> {
                     List<Subscribe> subscribes = new ArrayList<>();
 
                     while (rset.next()) {
+                        String emails = rset.getString("contact_emails");
+                        emails = emails.substring(1, emails.length() - 1);
+                        List<String> companyEmails = Arrays.stream(
+                                emails.split(",")
+                        ).filter(string -> !string.isEmpty()).toList();
+
                         subscribes.add(new Subscribe(
-                            UUID.fromString(rset.getString("company_id")),
-                            Arrays.stream(rset.getString("contact_emails").split(",")).toList(),
+                            UUID.fromString(rset.getString("id")),
+                            companyEmails,
                             rset.getDate("expires_at").toLocalDate()
                         ));
                     }
