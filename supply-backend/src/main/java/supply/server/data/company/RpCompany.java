@@ -86,7 +86,12 @@ public class RpCompany {
         if (expiresAt.isEmpty()) {
             return Optional.empty();
         }
-        LocalDate extendedExpiresAt = expiresAt.get().plusMonths(months);
+        LocalDate extendedExpiresAt;
+        if (expiresAt.get().isBefore(LocalDate.now())) {
+            extendedExpiresAt = LocalDate.now().plusMonths(months);
+        } else {
+            extendedExpiresAt = expiresAt.get().plusMonths(months);
+        }
         jdbcSession
                 .sql("""
                         UPDATE company
