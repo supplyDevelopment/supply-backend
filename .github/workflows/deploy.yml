@@ -78,7 +78,7 @@ jobs:
       - name: Validate manifests
         uses: instrumenta/kubeval-action@master
         with:
-          files: './kubernetes/*.yaml'
+          files: './kubernetes'
           strict: true
           ignore_missing_schemas: true
 
