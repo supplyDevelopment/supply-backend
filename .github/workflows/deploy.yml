@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         service:
-          - { name: 'app', path: './supply-backend', image: 'app' }
+          - { name: 'app', path: './supply-backend', image: 'supply-backend' }
           - { name: 'message-service', path: './email-service', image: 'email-service' }
           - { name: 'scheduled-service', path: './scheduled-service', image: 'scheduled-service' }
 
