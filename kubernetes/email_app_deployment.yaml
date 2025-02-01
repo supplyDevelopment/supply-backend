@@ -13,6 +13,8 @@ spec:
       labels:
         app: message-service
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: message-service
           image: "ghcr.io/supplydevelopment/email-service:latest"

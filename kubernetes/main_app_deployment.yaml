@@ -13,6 +13,8 @@ spec:
       labels:
         app: app
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: app
           image: "ghcr.io/supplydevelopment/supply-backend:latest"

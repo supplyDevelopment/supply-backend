@@ -13,6 +13,8 @@ spec:
       labels:
         app: scheduled-service
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
       - name: scheduled-service
         image: "ghcr.io/supplydevelopment/scheduled-service:latest"
