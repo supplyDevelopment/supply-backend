@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: "registry-placeholder/supply-backend:image-tag-placeholder"
+          image: "ghcr.io/supplydevelopment/supply-backend:latest"
           env:
             - name: SPRING_DATASOURCE_URL
               value: "jdbc:postgresql://db:5432/supplydb"

@@ -62,33 +62,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup variables
-        id: vars
-        run: |
-          echo "REGISTRY_PATH=${{ env.REGISTRY }}/${{ env.OWNER }}" >> $GITHUB_ENV
-          echo "SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-8)" >> $GITHUB_ENV
-
-      - name: Replace image placeholders
-        run: |
-          find kubernetes/ -type f -name "*.yaml" -exec sed -i \
-            -e "s|registry-placeholder/app:image-tag-placeholder|${{ env.REGISTRY_PATH }}/app:latest|g" \
-            -e "s|registry-placeholder/email-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/email-service:latest|g" \
-            -e "s|registry-placeholder/scheduled-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/scheduled-service:latest|g" {} +
-
       - name: Validate manifests
         uses: instrumenta/kubeval-action@master
         with:
           files: './kubernetes'
           strict: true
           ignore_missing_schemas: true
-
-      - name: Commit manifests
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add kubernetes/
-          git commit -m "CI: Update images to ${{ env.SHORT_SHA }}" || echo "No changes to commit"
-          git push
 
       - name: Deploy to cluster
         uses: appleboy/ssh-action@v1.2.0

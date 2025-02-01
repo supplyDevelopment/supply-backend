@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: message-service
-          image: "ghcr.io/supplydevelopment/email-service:b3b394dd"
+          image: "ghcr.io/supplydevelopment/email-service:latest"
           env:
             - name: SPRING_RABBITMQ_HOST
               value: rabbitmq
