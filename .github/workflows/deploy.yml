@@ -71,9 +71,9 @@ jobs:
       - name: Replace image placeholders
         run: |
           find kubernetes/ -type f -name "*.yaml" -exec sed -i \
-            -e "s|registry-placeholder/app:image-tag-placeholder|${{ env.REGISTRY_PATH }}/app:${{ env.SHORT_SHA }}|g" \
-            -e "s|registry-placeholder/email-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/email-service:${{ env.SHORT_SHA }}|g" \
-            -e "s|registry-placeholder/scheduled-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/scheduled-service:${{ env.SHORT_SHA }}|g" {} +
+            -e "s|registry-placeholder/app:image-tag-placeholder|${{ env.REGISTRY_PATH }}/app:latest|g" \
+            -e "s|registry-placeholder/email-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/email-service:latest|g" \
+            -e "s|registry-placeholder/scheduled-service:image-tag-placeholder|${{ env.REGISTRY_PATH }}/scheduled-service:latest|g" {} +
 
       - name: Validate manifests
         uses: instrumenta/kubeval-action@master
