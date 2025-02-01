@@ -41,18 +41,6 @@ spec:
               value: "5432"
           ports:
             - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 45
-            periodSeconds: 15
           resources:
             limits:
               memory: 1024Mi
