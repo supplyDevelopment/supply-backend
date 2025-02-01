@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: scheduled-service
-        image: "registry-placeholder/scheduled-service:image-tag-placeholder"
+        image: "ghcr.io/supplydevelopment/scheduled-service:b3b394dd"
         env:
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://db:5432/supplydb"
