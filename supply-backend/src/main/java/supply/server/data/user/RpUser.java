@@ -60,6 +60,7 @@ public class RpUser {
                 .set(companyId)
                 .insert(Outcome.VOID);
 
+        connection.close();
         return Optional.of(
                 new User(
                         userId,

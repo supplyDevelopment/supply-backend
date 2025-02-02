@@ -74,6 +74,7 @@ public class RpResource {
                 .set(createResource.userId())
                 .insert(Outcome.VOID);
 
+        connection.close();
         return Optional.of(new Resource(
                 resourceId,
                 createResource.images(),

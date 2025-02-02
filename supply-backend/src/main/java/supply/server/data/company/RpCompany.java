@@ -53,6 +53,7 @@ public class RpCompany {
                 .set(LocalDate.now())
                 .insert(new SingleOutcome<>(UUID.class));
 
+        connection.close();
         return Optional.of(new Company(
                 companyId,
                 createCompany.name(),
