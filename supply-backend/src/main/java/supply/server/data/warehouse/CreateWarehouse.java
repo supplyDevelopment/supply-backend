@@ -3,6 +3,7 @@ package supply.server.data.warehouse;
 import supply.server.data.utils.Address;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public record CreateWarehouse(
@@ -22,7 +23,7 @@ public record CreateWarehouse(
     ) {
         this(
                 name,
-                new Address(location),
+                Objects.isNull(location) ? null : new Address(location),
                 stockLevel,
                 capacity,
                 admins
