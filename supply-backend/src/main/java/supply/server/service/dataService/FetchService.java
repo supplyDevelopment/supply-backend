@@ -32,6 +32,10 @@ public class FetchService extends UserService {
         return repository.getUser().get(userId, user().companyId());
     }
 
+    public User getUser() {
+        return user();
+    }
+
     public Resource getResource(UUID resourceId) {
         return repository.getResource().get(resourceId, user().companyId());
     }

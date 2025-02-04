@@ -10,8 +10,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import supply.server.configuration.exception.PaymentException;
 import supply.server.data.company.Company;
 import supply.server.data.subscribe.CreateSubscribe;
-import supply.server.data.subscribe.Subscribe;
+import supply.server.data.subscribe.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -63,6 +64,18 @@ public class SubscribeService extends UserService {
             return repository.getCompany().extendSubscription(Integer.parseInt(subscribe.description()), user().companyId());
         }
         throw new PaymentException("Payment not completed");
+    }
+
+    public Optional<String> extractIdFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("payment".equals(cookie.getName())) {
+                    return Optional.of(cookie.getValue());
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     public void setPaymentCookie(HttpServletResponse response, String id) {

@@ -50,6 +50,13 @@ public class Redis<T> {
         }
     }
 
+    public void remove(UUID id) {
+        Optional<T> value = get(id);
+        if (value.isPresent()) {
+            redisTemplate.delete(getKey(id));
+        }
+    }
+
     private String acquireLock(UUID id) {
         String lockValue = getLockValue();
         if (Boolean.FALSE.equals(
