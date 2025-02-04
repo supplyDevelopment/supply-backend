@@ -55,36 +55,69 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/supplydb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 5432
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: guest
-      SPRING_RABBITMQ_PASSWORD: guest
-      SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_DATA_REDIS_PASSWORD: 5432
+      SPRING_DATASOURCE_URL: ${spring_datasource_url}
+      SPRING_DATASOURCE_USERNAME: ${spring_datasource_username}
+      SPRING_DATASOURCE_PASSWORD: ${spring_datasource_password}
+      SPRING_RABBITMQ_HOST: ${spring_rabbitmq_host}
+      SPRING_RABBITMQ_PORT: ${spring_rabbitmq_port}
+      SPRING_RABBITMQ_USERNAME: ${spring_rabbitmq_username}
+      SPRING_RABBITMQ_PASSWORD: ${spring_rabbitmq_password}
+      SPRING_DATA_REDIS_HOST: ${spring_data_redis_host}
+      SPRING_DATA_REDIS_PORT: ${spring_data_redis_port}
+      SPRING_DATA_REDIS_PASSWORD: ${spring_data_redis_password}
     ports:
       - "8080:8080"
     networks:
       - app-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
         
   message-service:
     build: ./email-service
     depends_on:
       rabbitmq:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: guest
-      SPRING_RABBITMQ_PASSWORD: guest
+      SPRING_RABBITMQ_HOST: ${spring_rabbitmq_host}
+      SPRING_RABBITMQ_PORT: ${spring_rabbitmq_port}
+      SPRING_RABBITMQ_USERNAME: ${spring_rabbitmq_username}
+      SPRING_RABBITMQ_PASSWORD: ${spring_rabbitmq_password}
     ports:
       - "8081:8081"
     networks:
       - app-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  scheduled-service:
+    build: ./scheduled-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: ${spring_datasource_url}
+      SPRING_DATASOURCE_USERNAME: ${spring_datasource_username}
+      SPRING_DATASOURCE_PASSWORD: ${spring_datasource_password}
+      SPRING_RABBITMQ_HOST: ${spring_rabbitmq_host}
+      SPRING_RABBITMQ_PORT: ${spring_rabbitmq_port}
+      SPRING_RABBITMQ_USERNAME: ${spring_rabbitmq_username}
+      SPRING_RABBITMQ_PASSWORD: ${spring_rabbitmq_password}
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 networks:
   app-network:
