@@ -76,6 +76,25 @@ public class RpUser {
         );
     }
 
+    public void remove(UUID userId, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        jdbcSession
+                .sql("""
+                    DELETE FROM company_users
+                    WHERE user_id = ? AND company_id = ?
+                    """)
+                .set(userId)
+                .set(companyId)
+                .update(Outcome.VOID);
+        jdbcSession
+                .sql("""
+                        DELETE FROM company_user
+                        WHERE id = ?
+                        """)
+                .set(userId)
+                .update(Outcome.VOID);
+    }
+
     public Optional<User> get(UUID userId, UUID companyId) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
@@ -133,6 +152,25 @@ public class RpUser {
                         return Optional.empty();
                     }
                 });
+    }
+
+    public Optional<User> update(UUID userId, Email email, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        jdbcSession
+                .sql("""
+                        UPDATE company_user
+                        SET email = ?::EMAIL
+                        WHERE id = (
+                            SELECT user_id
+                            FROM company_users
+                            WHERE user_id = ? AND company_id = ?
+                        )
+                        """)
+                .set(email.getEmail())
+                .set(userId)
+                .set(companyId)
+                .update(Outcome.VOID);
+        return get(userId, companyId);
     }
 
     public Optional<User> updatePassword(UUID userId, String password, UUID companyId) throws SQLException {

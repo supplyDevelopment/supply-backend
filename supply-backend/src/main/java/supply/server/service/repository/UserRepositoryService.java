@@ -9,6 +9,7 @@ import supply.server.data.Redis;
 import supply.server.data.user.CreateUser;
 import supply.server.data.user.RpUser;
 import supply.server.data.user.User;
+import supply.server.data.utils.Email;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -37,6 +38,15 @@ public class UserRepositoryService {
             throw new DbException(e.getMessage());
         }
         return user;
+    }
+
+    public void delete(UUID userId, UUID companyId) {
+        try {
+            rpUser.remove(userId, companyId);
+            inMemoryRpUser.remove(userId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
     }
 
     public User get(UUID userId, UUID companyId) {
@@ -75,6 +85,22 @@ public class UserRepositoryService {
             }
             user = userOpt.get();
 
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return user;
+    }
+
+    public User update(UUID userId, Email email, UUID companyId) {
+        User user;
+        try {
+            Optional<User> userOpt = rpUser.update(userId, email, companyId);
+            if (userOpt.isEmpty()) {
+                throw new DbException("Failed to update user");
+            } else {
+                user = userOpt.get();
+                inMemoryRpUser.set(user.id(), user);
+            }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }
