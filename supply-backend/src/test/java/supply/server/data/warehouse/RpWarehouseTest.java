@@ -68,8 +68,7 @@ public class RpWarehouseTest extends DataCreator {
                                 admins,
                                 UUID.fromString(rset.getString("company_id")),
                                 rset.getDate("created_at").toLocalDate(),
-                                rset.getDate("updated_at").toLocalDate(),
-                                dataSource
+                                rset.getDate("updated_at").toLocalDate()
                         ));
                     }
                     return Optional.<Warehouse>empty();

@@ -18,7 +18,6 @@ public record Warehouse (
     List<UUID> admins,
     UUID companyId,
     LocalDate createdAt,
-    LocalDate updatedAt,
-    DataSource dataSource
+    LocalDate updatedAt
 ) implements Serializable {
 }

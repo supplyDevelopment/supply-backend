@@ -69,8 +69,7 @@ public class RpWarehouse {
                 createWarehouse.admins(),
                 companyId,
                 LocalDate.now(),
-                LocalDate.now(),
-                dataSource
+                LocalDate.now()
         ));
 
     }
@@ -174,8 +173,7 @@ public class RpWarehouse {
                 admins,
                 UUID.fromString(rset.getString("company_id")),
                 rset.getDate("created_at").toLocalDate(),
-                rset.getDate("updated_at").toLocalDate(),
-                dataSource
+                rset.getDate("updated_at").toLocalDate()
         );
     }
 
