@@ -7,8 +7,10 @@ import supply.server.data.Redis;
 import supply.server.data.company.Company;
 import supply.server.data.company.CreateCompany;
 import supply.server.data.company.RpCompany;
+import supply.server.data.utils.Email;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,6 +68,24 @@ public class CompanyRepositoryService {
                 } else {
                     throw new DataNotFoundException("Company with id " + companyId + " not found");
                 }
+            }
+            company = companyOpt.get();
+
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return company;
+    }
+
+    public Company update(UUID companyId, List<Email> emails) {
+        Company company;
+        try {
+            Optional<Company> companyOpt = rpCompany.update(companyId, emails);
+
+            if (companyOpt.isPresent()) {
+                inMemoryRpCompany.set(companyId, companyOpt.get());
+            } else {
+                throw new DbException("Failed to update company");
             }
             company = companyOpt.get();
 

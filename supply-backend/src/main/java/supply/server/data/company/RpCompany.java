@@ -97,9 +97,11 @@ public class RpCompany {
                 .sql("""
                         UPDATE company
                         SET expires_at = ?
+                        SET updated_at = ?
                         WHERE id = ?
                         """)
                 .set(extendedExpiresAt)
+                .set(LocalDate.now())
                 .set(companyId)
                 .update(Outcome.VOID);
         return get(companyId);
@@ -122,6 +124,24 @@ public class RpCompany {
                     }
                     return Optional.empty();
                 });
+    }
+
+    public Optional<Company> update(UUID companyId, List<Email> emails) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Connection connection = dataSource.getConnection();
+
+        Array emailsArray = connection.createArrayOf("EMAIL",
+                emails.stream().map(Email::getEmail).toArray());
+        jdbcSession
+                .sql("""
+                        UPDATE company
+                        SET contact_emails = ?
+                        WHERE id = ?
+                        """)
+                .set(emailsArray)
+                .set(companyId)
+                .update(Outcome.VOID);
+        return get(companyId);
     }
 
     public boolean projectCheck(UUID projectId, UUID companyId) throws SQLException {
