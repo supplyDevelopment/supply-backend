@@ -48,8 +48,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers("/users/**", "/tasks/**").authenticated()
-                                .requestMatchers("/createTask").authenticated()
+                                .requestMatchers(
+                                        "/profile/**",
+                                        "/employee/**",
+                                        "/project/**",
+                                        "/warehouse/**"
+                                ).authenticated()
                                 .requestMatchers("/**").permitAll()
                 );
         http.authenticationProvider(authenticationProvider());
