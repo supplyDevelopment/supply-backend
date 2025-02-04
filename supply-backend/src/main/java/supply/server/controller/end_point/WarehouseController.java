@@ -33,7 +33,10 @@ public class WarehouseController {
     }
 
     @GetMapping("/warehouses")
-    public ResponseEntity<?> getWarehouses(@RequestParam @NotNull String prefix, @RequestParam @Valid @NotNull PaginationRequest paginationRequest) {
+    public ResponseEntity<?> getWarehouses(
+            @RequestParam @NotNull String prefix,
+            @Valid @NotNull PaginationRequest paginationRequest
+    ) {
         PaginatedList<Warehouse> warehouses = searchService.getWarehouses(prefix, paginationRequest.toPagination());
         return ResponseEntity.ok(warehouses);
     }
