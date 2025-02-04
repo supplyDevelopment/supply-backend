@@ -16,17 +16,20 @@ spec:
       containers:
         - name: redis
           image: redis:7
-          command: ["redis-server", "--requirepass", "5432"]
+          envFrom:
+            - secretRef:
+                name: app-secrets
+          command: ["redis-server", "--requirepass", "$(spring_data_redis_password)"]
           ports:
             - containerPort: 6379
           livenessProbe:
             exec:
-              command: ["redis-cli", "-a", "5432", "ping"]
+              command: ["redis-cli", "-a", "$(spring_data_redis_password)", "ping"]
             initialDelaySeconds: 5
             periodSeconds: 10
           readinessProbe:
             exec:
-              command: ["redis-cli", "-a", "5432", "ping"]
+              command: ["redis-cli", "-a", "$(spring_data_redis_password)", "ping"]
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:

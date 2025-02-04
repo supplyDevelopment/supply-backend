@@ -18,27 +18,60 @@ spec:
       containers:
         - name: app
           image: "ghcr.io/supplydevelopment/supply-backend:latest"
+          envFrom:
+            - secretRef:
+                name: app-secrets
           env:
             - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://db:5432/supplydb"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_datasource_url
             - name: SPRING_DATASOURCE_USERNAME
-              value: postgres
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_datasource_username
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "5432"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_datasource_password
             - name: SPRING_RABBITMQ_HOST
-              value: rabbitmq
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_rabbitmq_host
             - name: SPRING_RABBITMQ_PORT
-              value: "5672"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_rabbitmq_port
             - name: SPRING_RABBITMQ_USERNAME
-              value: guest
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_rabbitmq_username
             - name: SPRING_RABBITMQ_PASSWORD
-              value: guest
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_rabbitmq_password
             - name: SPRING_DATA_REDIS_HOST
-              value: redis
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_data_redis_host
             - name: SPRING_DATA_REDIS_PORT
-              value: "6379"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_data_redis_port
             - name: SPRING_DATA_REDIS_PASSWORD
-              value: "5432"
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_data_redis_password
           ports:
             - containerPort: 8080
           resources:

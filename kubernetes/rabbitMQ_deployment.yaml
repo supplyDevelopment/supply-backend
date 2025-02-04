@@ -16,11 +16,20 @@ spec:
       containers:
         - name: rabbitmq
           image: rabbitmq:3.11
+          envFrom:
+            - secretRef:
+                name: app-secrets
           env:
             - name: RABBITMQ_DEFAULT_USER
-              value: guest
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_rabbitmq_username
             - name: RABBITMQ_DEFAULT_PASS
-              value: guest
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: spring_rabbitmq_password
           ports:
             - containerPort: 5672
           livenessProbe:
