@@ -68,40 +68,6 @@ public class ResourceRepositoryService {
         return resource;
     }
 
-    public Resource edit(
-             UUID resourceId,
-             UUID companyId,
-             Optional<String> name,
-             Optional<Integer> count,
-             Optional<UUID> projectId,
-             Optional<ResourceStatus> status,
-             Optional<String> description
-    ) {
-        Resource resource;
-        try {
-            Optional<Resource> resourceOpt = rpResource.edit(
-                    resourceId,
-                    companyId,
-                    name,
-                    count,
-                    projectId,
-                    status,
-                    description
-            );
-
-            if (resourceOpt.isPresent()) {
-                resource = resourceOpt.get();
-                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
-            } else {
-                throw new DbException("Failed to edit resource with id " + resourceId);
-            }
-
-        } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        return resource;
-    }
-
     public PaginatedList<Resource> getAll(String prefix, UUID companyId, Pagination pagination) {
         PaginatedList<Resource> resources;
         try {

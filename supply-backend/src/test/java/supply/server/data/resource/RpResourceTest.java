@@ -7,9 +7,12 @@ import org.junit.jupiter.api.TestMethodOrder;
 import supply.server.configuration.DataCreator;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
+import supply.server.data.company.Company;
 import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
+import supply.server.data.user.User;
 import supply.server.data.utils.Unit;
+import supply.server.data.warehouse.RpWarehouse;
 import supply.server.data.warehouse.Warehouse;
 
 import javax.sql.DataSource;
@@ -110,7 +113,7 @@ public class RpResourceTest extends DataCreator {
     }
 
     @Test
-    void getTest() throws SQLException {
+    void getByIdTest() throws SQLException {
         RpResource rpResource = new RpResource(dataSource);
 
         Warehouse warehouse = getWarehouse(true);
@@ -139,6 +142,33 @@ public class RpResourceTest extends DataCreator {
         assertEquals(expected.updatedAt(), actual.updatedAt());
 
         assertTrue(rpResource.get(expected.id(), UUID.randomUUID()).isEmpty());
+    }
+
+    @Test
+    void getByAllPropertiesTest() throws SQLException {
+        RpResource rpResource = new RpResource(dataSource);
+        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+        UUID companyId = getCompany(false).id();
+        Warehouse warehouse = rpWarehouse.add(generateWarehouse(getUsers(2, false).stream().map(User::id).toList()), companyId).orElseThrow();
+
+        CreateResource createResource = generateResource(getUser(false).id(), warehouse.id(), getProject(false).id());
+        Resource expected = rpResource.add(createResource).orElseThrow();
+
+        Resource actual = rpResource.get(createResource, companyId).orElseThrow();
+
+        assertEquals(expected.id(), actual.id());
+        assertEquals(expected.images().get(0), actual.images().get(0));
+        assertEquals(expected.name(), actual.name());
+        assertEquals(expected.count(), actual.count());
+        assertEquals(expected.unit(), actual.unit());
+        assertEquals(expected.type(), actual.type());
+        assertEquals(expected.projectId(), actual.projectId());
+        assertEquals(expected.warehouseId(), actual.warehouseId());
+        assertEquals(expected.userId(), actual.userId());
+        assertEquals(expected.status(), actual.status());
+        assertEquals(expected.description(), actual.description());
+        assertEquals(expected.createdAt(), actual.createdAt());
+        assertEquals(expected.updatedAt(), actual.updatedAt());
     }
 
     @Test
@@ -217,77 +247,45 @@ public class RpResourceTest extends DataCreator {
     }
 
     @Test
-    void editNoParametersTest() throws SQLException {
-        Warehouse warehouse = getWarehouse(true);
-
+    void editTest() throws SQLException {
         RpResource rpResource = new RpResource(dataSource);
-        CreateResource createResource = generateResource(
-                getUser(false).id(),
-                warehouse.id(),
-                getProject(false).id()
-        );
+        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+        UUID companyId = getCompany(false).id();
+        Warehouse warehouse = rpWarehouse.add(generateWarehouse(getUsers(2, false).stream().map(User::id).toList()), companyId).orElseThrow();
 
+        CreateResource createResource = generateResource(getUser(false).id(), warehouse.id(), getProject(false).id());
         Resource resource = rpResource.add(createResource).orElseThrow();
 
-        Resource editedResource = rpResource.edit(
-                resource.id(),
-                warehouse.companyId(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty()).orElseThrow();
-
+        long count = 10;
+        Resource editedResource = rpResource.edit(resource.id(), companyId, count).orElseThrow();
         assertEquals(resource.id(), editedResource.id());
         assertEquals(resource.images().get(0), editedResource.images().get(0));
         assertEquals(resource.name(), editedResource.name());
-        assertEquals(resource.count(), editedResource.count());
+        assertEquals(count, editedResource.count());
         assertEquals(resource.unit(), editedResource.unit());
         assertEquals(resource.type(), editedResource.type());
         assertEquals(resource.projectId(), editedResource.projectId());
+        assertEquals(resource.warehouseId(), editedResource.warehouseId());
+        assertEquals(resource.userId(), editedResource.userId());
         assertEquals(resource.status(), editedResource.status());
         assertEquals(resource.description(), editedResource.description());
-
-        assertTrue(rpResource.edit(resource.id(),
-                UUID.randomUUID(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.empty()).isEmpty());
+        assertEquals(resource.createdAt(), editedResource.createdAt());
+        assertEquals(resource.updatedAt(), editedResource.updatedAt());
     }
 
     @Test
-    void editTest() throws SQLException {
-        Warehouse warehouse = getWarehouse(true);
-
+    void deleteTest() throws SQLException {
         RpResource rpResource = new RpResource(dataSource);
-        CreateResource createResource = generateResource(
-                getUser(false).id(),
-                warehouse.id(),
-                getProject(false).id()
-        );
+        RpWarehouse rpWarehouse = new RpWarehouse(dataSource);
+        UUID companyId = getCompany(false).id();
+        Warehouse warehouse = rpWarehouse.add(generateWarehouse(getUsers(2, false).stream().map(User::id).toList()), companyId).orElseThrow();
 
+        CreateResource createResource = generateResource(getUser(false).id(), warehouse.id(), getProject(false).id());
         Resource resource = rpResource.add(createResource).orElseThrow();
 
-        Resource editedResource = rpResource.edit(
-                resource.id(),
-                warehouse.companyId(),
-                Optional.of("editedName"),
-                Optional.of(2),
-                Optional.empty(),
-                Optional.empty(),
-                Optional.of("editedDescription")).orElseThrow();
+        rpResource.delete(resource.id(), companyId);
 
-        assertEquals(resource.id(), editedResource.id());
-        assertEquals(resource.images().get(0), editedResource.images().get(0));
-        assertEquals("editedName", editedResource.name());
-        assertEquals(2, editedResource.count());
-        assertEquals(resource.unit(), editedResource.unit());
-        assertEquals(resource.type(), editedResource.type());
-        assertEquals(resource.projectId(), editedResource.projectId());
-        assertEquals(resource.status(), editedResource.status());
-        assertEquals("editedDescription", editedResource.description());
+        Optional<Resource> deletedResource = rpResource.get(resource.id(), companyId);
+        assertTrue(deletedResource.isEmpty());
     }
-
 }
