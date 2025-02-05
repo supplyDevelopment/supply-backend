@@ -12,7 +12,6 @@ import java.util.UUID;
 public record EditResource(
         int quantity,
         Optional<String> name,
-        Optional<Integer> count,
         Optional<ResourceType> type,
         Optional<UUID> projectId,
         Optional<ResourceStatus> status,
@@ -24,7 +23,7 @@ public record EditResource(
         return new CreateResource(
                 resource.images(),
                 name.orElse(resource.name()),
-                count.orElse(resource.count()),
+                quantity,
                 resource.unit(),
                 type.orElse(resource.type()),
                 userId.orElse(resource.userId()),
