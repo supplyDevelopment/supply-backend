@@ -1,0 +1,22 @@
+CREATE TABLE resource_history(
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    company_id UUID NOT NULL REFERENCES company(id),
+    prev_id UUID,
+    goal_id UUID,
+    quantity INT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    name VARCHAR(1024),
+    count       INTEGER,
+    projectId   UUID REFERENCES project(id),
+    status      INVENTORY_ITEM_STATUS,
+    description VARCHAR(1024),
+    warehouseId UUID REFERENCES warehouse(id),
+    userId UUID REFERENCES company_user(id),
+    goal_name VARCHAR(1024),
+    goal_count       INTEGER,
+    goal_projectId   UUID REFERENCES project(id),
+    goal_status      INVENTORY_ITEM_STATUS,
+    goal_description VARCHAR(1024),
+    goal_warehouseId UUID REFERENCES warehouse(id),
+    goal_userId UUID REFERENCES company_user(id)
+);
