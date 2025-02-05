@@ -10,7 +10,6 @@ import supply.server.data.Redis;
 import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
-import supply.server.data.resource.types.ResourceStatus;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -68,6 +67,17 @@ public class ResourceRepositoryService {
         return resource;
     }
 
+    public Optional<Resource> get(CreateResource createResource, UUID companyId) {
+        Optional<Resource> resource;
+        try {
+            resource = rpResource.get(createResource, companyId);
+            resource.ifPresent(value -> inMemoryRpResource.set(value.id(), Pair.of(companyId, value)));
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return resource;
+    }
+
     public PaginatedList<Resource> getAll(String prefix, UUID companyId, Pagination pagination) {
         PaginatedList<Resource> resources;
         try {
@@ -76,6 +86,32 @@ public class ResourceRepositoryService {
             throw new DbException(e.getMessage());
         }
         return resources;
+    }
+
+    public Resource edit(UUID id, UUID companyId, int count) {
+        Resource resource;
+        try {
+            Optional<Resource> resourceOpt = rpResource.edit(id, companyId, count);
+
+            if (resourceOpt.isPresent()) {
+                resource = resourceOpt.get();
+                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+            } else {
+                throw new DataNotFoundException("Resource with id " + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return resource;
+    }
+
+    public void delete(UUID resourceId, UUID companyId) {
+        try {
+            rpResource.delete(resourceId, companyId);
+            inMemoryRpResource.remove(resourceId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
     }
 
 }

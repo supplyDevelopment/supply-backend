@@ -162,4 +162,125 @@ public class RpResourceHistory {
                 });
     }
 
+    public Optional<ResourceHistory> get(UUID historyId, UUID companyId) throws SQLException {
+        String SQL = """
+            SELECT *
+            FROM resource_history
+                WHERE id = ?
+                  AND company_id = ?
+            """;
+
+        return new JdbcSession(dataSource)
+                .sql(SQL)
+                .set(historyId)
+                .set(companyId)
+                .select((rset, stmt) -> {
+                    if (!rset.next()) {
+
+                        String prev_id = rset.getString("prev_id");
+                        String goal_id = rset.getString("goal_id");
+                        String projectId = rset.getString("projectId");
+                        String goal_projectId = rset.getString("goal_projectId");
+                        String warehouseId = rset.getString("warehouseId");
+                        String goal_warehouseId = rset.getString("goal_warehouseId");
+                        String userId = rset.getString("userId");
+                        String goal_userId = rset.getString("goal_userId");
+                        String goal_status = rset.getString("goal_status");
+                        String prev_status = rset.getString("status");
+                        String count = rset.getString("count");
+                        String goal_count = rset.getString("goal_count");
+
+                        return Optional.of(new ResourceHistory(
+                                rset.getObject("id", UUID.class),
+                                rset.getInt("quantity"),
+                                Objects.isNull(prev_id) ? null : UUID.fromString(prev_id),
+                                Objects.isNull(goal_id) ? null : UUID.fromString(goal_id),
+                                rset.getString("name"),
+                                rset.getString("goal_name"),
+                                Objects.isNull(prev_status) ? null : ResourceStatus.valueOf(prev_status),
+                                Objects.isNull(goal_status) ? null : ResourceStatus.valueOf(goal_status),
+                                Objects.isNull(count) ? null : Integer.parseInt(count),
+                                Objects.isNull(goal_count) ? null : Integer.parseInt(goal_count),
+                                Objects.isNull(projectId) ? null : UUID.fromString(projectId),
+                                Objects.isNull(goal_projectId) ? null : UUID.fromString(goal_projectId),
+                                rset.getString("description"),
+                                rset.getString("goal_description"),
+                                Objects.isNull(warehouseId) ? null : UUID.fromString(warehouseId),
+                                Objects.isNull(goal_warehouseId) ? null : UUID.fromString(goal_warehouseId),
+                                Objects.isNull(userId) ? null : UUID.fromString(userId),
+                                Objects.isNull(goal_userId) ? null : UUID.fromString(goal_userId),
+                                rset.getDate("created_at").toLocalDate()
+                        ));
+                    }
+                    return Optional.empty();
+                });
+    }
+
+    public PaginatedList<ResourceHistory> get(UUID companyId, Pagination pagination) throws SQLException {
+        String SQL = """
+            WITH history_table AS (
+                SELECT *
+                FROM resource_history
+                WHERE company_id = ?
+            )
+            SELECT *,
+                   (SELECT COUNT(*) FROM history_table) AS total_count
+            FROM history_table
+            ORDER BY created_at DESC
+            LIMIT ? OFFSET ?
+            """;
+
+        return new JdbcSession(dataSource)
+                .sql(SQL)
+                .set(companyId)
+                .set(pagination.limit())
+                .set(pagination.offset())
+                .select((rset, stmt) -> {
+                    List<ResourceHistory> histories = new ArrayList<>();
+                    long total = 0;
+
+                    while (rset.next()) {
+                        if (total == 0) {
+                            total = rset.getLong("total_count");
+                        }
+
+                        String prev_id = rset.getString("prev_id");
+                        String goal_id = rset.getString("goal_id");
+                        String projectId = rset.getString("projectId");
+                        String goal_projectId = rset.getString("goal_projectId");
+                        String warehouseId = rset.getString("warehouseId");
+                        String goal_warehouseId = rset.getString("goal_warehouseId");
+                        String userId = rset.getString("userId");
+                        String goal_userId = rset.getString("goal_userId");
+                        String goal_status = rset.getString("goal_status");
+                        String prev_status = rset.getString("status");
+                        String count = rset.getString("count");
+                        String goal_count = rset.getString("goal_count");
+
+                        histories.add(new ResourceHistory(
+                                rset.getObject("id", UUID.class),
+                                rset.getInt("quantity"),
+                                Objects.isNull(prev_id) ? null : UUID.fromString(prev_id),
+                                Objects.isNull(goal_id) ? null : UUID.fromString(goal_id),
+                                rset.getString("name"),
+                                rset.getString("goal_name"),
+                                Objects.isNull(prev_status) ? null : ResourceStatus.valueOf(prev_status),
+                                Objects.isNull(goal_status) ? null : ResourceStatus.valueOf(goal_status),
+                                Objects.isNull(count) ? null : Integer.parseInt(count),
+                                Objects.isNull(goal_count) ? null : Integer.parseInt(goal_count),
+                                Objects.isNull(projectId) ? null : UUID.fromString(projectId),
+                                Objects.isNull(goal_projectId) ? null : UUID.fromString(goal_projectId),
+                                rset.getString("description"),
+                                rset.getString("goal_description"),
+                                Objects.isNull(warehouseId) ? null : UUID.fromString(warehouseId),
+                                Objects.isNull(goal_warehouseId) ? null : UUID.fromString(goal_warehouseId),
+                                Objects.isNull(userId) ? null : UUID.fromString(userId),
+                                Objects.isNull(goal_userId) ? null : UUID.fromString(goal_userId),
+                                rset.getDate("created_at").toLocalDate()
+                        ));
+                    }
+                    return new PaginatedList<>(total, histories);
+                });
+    }
+
 }

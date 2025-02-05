@@ -141,7 +141,6 @@ public class RpResource {
                     WHERE cw.company = ?
                       AND r.images = p.images
                       AND r.name = ?
-                      AND r.count = ?
                       AND r.unit = ?::UNIT
                       AND r.type = ?::RESOURCE_TYPE
                       AND r.projectId = ?
@@ -156,7 +155,6 @@ public class RpResource {
                 .set(imagesArray)
                 .set(companyId)
                 .set(createResource.name())
-                .set(createResource.count())
                 .set(createResource.unit().toString())
                 .set(createResource.type().toString())
                 .set(createResource.projectId())
@@ -236,7 +234,7 @@ public class RpResource {
                 });
     }
 
-    public Optional<Resource> edit(UUID resourceId, UUID companyId, long count) throws SQLException {
+    public Optional<Resource> edit(UUID resourceId, UUID companyId, int count) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
 
         jdbcSession

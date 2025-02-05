@@ -22,6 +22,8 @@ public class RepositoryService {
     private final WarehouseRepositoryService warehouse;
     @Getter
     private final ResourceRepositoryService resource;
+    @Getter
+    private final HistoryRepositoryService history;
 
     public RepositoryService(PgRepository pgRepository, InMemoryRepository inMemoryRepository) {
         this.pgRepository = pgRepository;
@@ -46,6 +48,9 @@ public class RepositoryService {
         resource = new ResourceRepositoryService(
                 pgRepository.rpResource(),
                 inMemoryRepository.inMemoryRpResource()
+        );
+        history = new HistoryRepositoryService(
+                pgRepository.rpResourceHistory()
         );
     }
 }
