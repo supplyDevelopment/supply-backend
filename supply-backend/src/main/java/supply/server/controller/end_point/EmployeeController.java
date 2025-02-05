@@ -67,8 +67,8 @@ public class EmployeeController {
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<?> removeEmployee(@RequestBody String id) {
-        updateService.removeUser(UUID.fromString(id));
+    public ResponseEntity<?> removeEmployee(@RequestBody @Valid @NotNull UUID id) {
+        updateService.removeUser(id);
         return ResponseEntity.ok().build();
     }
 
