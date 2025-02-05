@@ -34,7 +34,7 @@ public class EmployeeController {
     @GetMapping("/employees")
     public ResponseEntity<?> getEmployees(
             @RequestParam @Valid @NotNull String prefix,
-            @RequestParam @Valid @NotNull PaginationRequest paginationRequest
+            @Valid @NotNull PaginationRequest paginationRequest
     ) {
         PaginatedList<User> users = searchService.getUsers(prefix, paginationRequest.toPagination());
 

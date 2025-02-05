@@ -96,7 +96,7 @@ public class RpCompany {
         jdbcSession
                 .sql("""
                         UPDATE company
-                        SET expires_at = ?
+                        SET expires_at = ?,
                         SET updated_at = ?
                         WHERE id = ?
                         """)

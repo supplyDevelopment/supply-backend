@@ -10,6 +10,6 @@ public record PaginationRequest(
         int size
 ) {
     public Pagination toPagination() {
-        return new Pagination(page, size);
+        return new Pagination(size, page);
     }
 }

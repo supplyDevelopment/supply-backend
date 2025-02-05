@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import supply.server.controller.entity.request.CreateProjectRequest;
 import supply.server.controller.entity.request.PaginationRequest;
 import supply.server.data.PaginatedList;
 import supply.server.data.project.Project;
@@ -26,18 +27,15 @@ public class ProjectController {
     private final FetchService fetchService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addProject(
-            @RequestBody @Valid @NotNull String name,
-            @RequestBody @Valid @NotNull String description
-    ) {
-        creationService.createProject(name, description);
+    public ResponseEntity<?> addProject(@RequestBody @Valid @NotNull CreateProjectRequest createProject) {
+        creationService.createProject(createProject.name(), createProject.description());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/projects")
     public ResponseEntity<?> getProjects(
             @RequestParam @NotNull String prefix,
-            @RequestParam @Valid @NotNull PaginationRequest paginationRequest
+            @Valid @NotNull PaginationRequest paginationRequest
     ) {
         PaginatedList<Project> projects = searchService.getProjects(prefix, paginationRequest.toPagination());
 
