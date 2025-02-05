@@ -256,7 +256,7 @@ public class RpResourceTest extends DataCreator {
         CreateResource createResource = generateResource(getUser(false).id(), warehouse.id(), getProject(false).id());
         Resource resource = rpResource.add(createResource).orElseThrow();
 
-        long count = 10;
+        int count = 10;
         Resource editedResource = rpResource.edit(resource.id(), companyId, count).orElseThrow();
         assertEquals(resource.id(), editedResource.id());
         assertEquals(resource.images().get(0), editedResource.images().get(0));
