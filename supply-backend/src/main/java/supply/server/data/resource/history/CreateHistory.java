@@ -34,8 +34,8 @@ public record CreateHistory(
                 editResource.name().isEmpty() ? null : goalResource.name(),
                 editResource.status().isEmpty() ? null : resource.status(),
                 editResource.status().isEmpty() ? null : goalResource.status(),
-                editResource.count().isEmpty() ? null : resource.count(),
-                editResource.count().isEmpty() ? null : goalResource.count(),
+                resource.count(),
+                goalResource.count(),
                 editResource.projectId().isEmpty() ? null : resource.projectId(),
                 editResource.projectId().isEmpty() ? null : goalResource.projectId(),
                 editResource.description().isEmpty() ? null : resource.description(),
@@ -46,4 +46,27 @@ public record CreateHistory(
                 editResource.userId().isEmpty() ? null : goalResource.userId()
         );
     }
+
+    public static CreateHistory expend(Resource resource, int quantity) {
+        return new CreateHistory(
+                quantity,
+                resource.id(),
+                resource.id(),
+                null,
+                null,
+                null,
+                null,
+                resource.count(),
+                resource.count() - quantity,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
 }
