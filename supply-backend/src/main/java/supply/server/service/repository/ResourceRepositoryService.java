@@ -25,15 +25,27 @@ public class ResourceRepositoryService {
     public Resource add(CreateResource createResource, UUID companyId) {
         Resource resource;
         try {
-            Optional<Resource> resourceOpt = rpResource.add(createResource);
+            Optional<Resource> existingResource = rpResource.get(createResource, companyId);
+            Optional<Resource> resourceOpt;
+            if (existingResource.isPresent()) {
+                resourceOpt = rpResource.edit(existingResource.get().id(), companyId, existingResource.get().count() + createResource.count());
 
-            if (resourceOpt.isPresent()) {
-                resource = resourceOpt.get();
-                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+                if (resourceOpt.isPresent()) {
+                    resource = resourceOpt.get();
+                    inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+                } else {
+                    throw new DbException("Failed to update existing resource");
+                }
             } else {
-                throw new DbException("Failed to add resource");
-            }
+                resourceOpt = rpResource.add(createResource);
 
+                if (resourceOpt.isPresent()) {
+                    resource = resourceOpt.get();
+                    inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+                } else {
+                    throw new DbException("Failed to add resource");
+                }
+            }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }

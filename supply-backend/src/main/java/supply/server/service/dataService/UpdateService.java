@@ -31,8 +31,16 @@ public class UpdateService extends UserService {
         return repository.getUser().update(user().id(), email, user().companyId());
     }
 
+    public User updateUser(Email email, UUID id) {
+        return repository.getUser().update(id, email, user().companyId());
+    }
+
     public User updateUser(String password) {
         return repository.getUser().updatePassword(user().id(), password, user().companyId());
+    }
+
+    public User updateUser(String password, UUID id) {
+        return repository.getUser().updatePassword(id, password, user().companyId());
     }
 
     public Pair<Resource, Resource> updateResource(UUID resourceId, EditResource editResource) {
