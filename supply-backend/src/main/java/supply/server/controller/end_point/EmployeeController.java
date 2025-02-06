@@ -56,12 +56,12 @@ public class EmployeeController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateEmployee(@RequestBody @Valid @NotNull EmailPasswordRequest emailPassword) {
+    public ResponseEntity<?> updateEmployee(@RequestBody @Valid @NotNull EmailPasswordRequest emailPassword, @Valid @NotNull String id) {
         if (emailPassword.password() != null) {
-            updateService.updateUser(emailPassword.password());
+            updateService.updateUser(emailPassword.password(), UUID.fromString(id));
         }
         if (emailPassword.email() != null) {
-            updateService.updateUser(emailPassword.toEmail());
+            updateService.updateUser(emailPassword.toEmail(), UUID.fromString(id));
         }
         return ResponseEntity.ok().build();
     }

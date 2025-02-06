@@ -8,15 +8,19 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Component;
 import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
+import supply.server.data.resource.history.CreateHistory;
+import supply.server.data.resource.history.ResourceHistory;
 import supply.server.data.resource.types.ResourceStatus;
 import supply.server.data.resource.types.ResourceType;
 import supply.server.data.utils.Unit;
 
+import javax.crypto.spec.OAEPParameterSpec;
 import javax.sql.DataSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
@@ -96,51 +100,77 @@ public class RpResource {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
         return jdbcSession
                 .sql("""
+                        SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
+                               r.status, r.description, r.warehouseId, r.created_at, r.updated_at,
+                               ru.user_id AS user_id
+                        FROM resource r
+                        LEFT JOIN resource_users ru ON r.id = ru.resource_id
+                        JOIN company_warehouses cw ON r.warehouseId = cw.warehouse
+                        WHERE r.id = ? AND cw.company = ?
+                    """)
+                .set(resourceId)
+                .set(companyId)
+                .select((rset, stmt) -> {
+                    if (rset.next()) {
+                        return Optional.of(compactFromRset(rset));
+                    }
+                    return Optional.empty();
+                });
+    }
+
+    public Optional<Resource> get(CreateResource createResource, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+        Connection connection = dataSource.getConnection();
+
+        Array imagesArray = connection.createArrayOf(
+                "VARCHAR",
+                createResource.images().stream().map(URL::toString).toArray(String[]::new)
+        );
+
+        String SQL = """
+                    WITH params AS (
+                        SELECT ?::VARCHAR[] AS images
+                    )
                     SELECT r.id, r.images, r.name, r.count, r.unit, r.type, r.projectId,
                            r.status, r.description, r.warehouseId, r.created_at, r.updated_at,
                            ru.user_id AS user_id
                     FROM resource r
                     LEFT JOIN resource_users ru ON r.id = ru.resource_id
                     JOIN company_warehouses cw ON r.warehouseId = cw.warehouse
-                    WHERE r.id = ? AND cw.company = ?
-            """)
-                .set(resourceId)
+                    JOIN params p ON true
+                    WHERE cw.company = ?
+                      AND r.images = p.images
+                      AND r.name = ?
+                      AND r.unit = ?::UNIT
+                      AND r.type = ?::RESOURCE_TYPE
+                      AND r.projectId = ?
+                      AND r.status = ?::INVENTORY_ITEM_STATUS
+                      AND r.description = ?
+                      AND r.warehouseId = ?
+                      AND ru.user_id = ?
+                """;
+
+        Optional<Resource> result = jdbcSession
+                .sql(SQL)
+                .set(imagesArray)
                 .set(companyId)
+                .set(createResource.name())
+                .set(createResource.unit().toString())
+                .set(createResource.type().toString())
+                .set(createResource.projectId())
+                .set(createResource.status().toString())
+                .set(createResource.description())
+                .set(createResource.warehouseId())
+                .set(createResource.userId())
                 .select((rset, stmt) -> {
                     if (rset.next()) {
-                        Array imagesArray = rset.getArray("images");
-                        List<URL> images = null;
-
-                        if (imagesArray != null) {
-                            images = Arrays.stream((String[]) imagesArray.getArray())
-                                    .map(url -> {
-                                        try {
-                                            return new URL(url);
-                                        } catch (MalformedURLException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    })
-                                    .toList();
-                        }
-
-                        return Optional.of(new Resource(
-                                rset.getObject("id", UUID.class),
-                                images,
-                                rset.getString("name"),
-                                rset.getInt("count"),
-                                Unit.valueOf(rset.getString("unit")),
-                                ResourceType.valueOf(rset.getString("type")),
-                                rset.getObject("projectId", UUID.class),
-                                ResourceStatus.valueOf(rset.getString("status")),
-                                rset.getString("description"),
-                                rset.getObject("warehouseId", UUID.class),
-                                rset.getObject("user_id", UUID.class),
-                                rset.getDate("created_at").toLocalDate(),
-                                rset.getDate("updated_at").toLocalDate()
-                        ));
+                        return Optional.of(compactFromRset(rset));
                     }
                     return Optional.empty();
                 });
+
+        connection.close();
+        return result;
     }
 
     // TODO: implement filters
@@ -198,94 +228,23 @@ public class RpResource {
                             total = rset.getLong("total_count");
                         }
 
-                        List<URL> images = null;
-                        Array imagesArray = rset.getArray("images");
-                        if (imagesArray != null) {
-                            images = Arrays.stream((String[]) imagesArray.getArray())
-                                    .map(url -> {
-                                        try {
-                                            return new URL(url);
-                                        } catch (MalformedURLException e) {
-                                            throw new RuntimeException(e);
-                                        }
-                                    })
-                                    .toList();
-                        }
-
-                        resources.add(new Resource(
-                                rset.getObject("id", UUID.class),
-                                images,
-                                rset.getString("name"),
-                                rset.getInt("count"),
-                                Unit.valueOf(rset.getString("unit")),
-                                ResourceType.valueOf(rset.getString("type")),
-                                rset.getObject("projectId", UUID.class),
-                                ResourceStatus.valueOf(rset.getString("status")),
-                                rset.getString("description"),
-                                rset.getObject("warehouseId", UUID.class),
-                                rset.getObject("user_id", UUID.class),
-                                rset.getDate("created_at").toLocalDate(),
-                                rset.getDate("updated_at").toLocalDate()
-                        ));
+                        resources.add(compactFromRset(rset));
                     }
-
                     return new PaginatedList<>(total, resources);
                 });
     }
 
-
-    public List changeLogs(UUID resourceId, Pagination pagination) {
-        throw new NotImplementedException();
-    }
-
-    public List moveLogs(UUID resourceId, Pagination pagination) {
-        throw new NotImplementedException();
-    }
-
-    public Resource moveToUser(UUID resourceId, UUID userId) {
-        throw new NotImplementedException();
-    }
-
-    public Resource moveToWarehouse(UUID resourceId, UUID warehouseId) {
-        throw new NotImplementedException();
-    }
-
-    public Resource applyMove(UUID resourceId, UUID userId) {
-        throw new NotImplementedException();
-    }
-
-    public Optional<Resource> edit(
-            UUID resourceId,
-            UUID companyId,
-            Optional<String> name,
-            Optional<Integer> count,
-            Optional<UUID> projectId,
-            Optional<ResourceStatus> status,
-            Optional<String> description
-    ) throws SQLException {
+    public Optional<Resource> edit(UUID resourceId, UUID companyId, int count) throws SQLException {
         JdbcSession jdbcSession = new JdbcSession(dataSource);
 
         jdbcSession
                 .sql("""
-                    UPDATE resource SET
-                    name = coalesce(?, name),
-                    count = coalesce(?, count),
-                    projectId = coalesce(?, projectId),
-                    status = coalesce(?::INVENTORY_ITEM_STATUS, status),
-                    description = coalesce(?, description)
-                    WHERE id = ?
-                    AND EXISTS (
-                        SELECT 1
-                        FROM company_warehouses cw
-                        WHERE cw.company = ?
-                        AND cw.warehouse = resource.warehouseId
-                    )
+                    UPDATE resource
+                    SET count = ?
+                    WHERE id = ? and warehouseId in
+                    (SELECT warehouse FROM company_warehouses WHERE company = ?)
                     """)
-                .set(name.orElse(null))
-                .set(count.orElse(null))
-                .set(projectId.orElse(null))
-                .set(status.map(ResourceStatus::toString).orElse(null))
-                .set(description.orElse(null))
+                .set(count)
                 .set(resourceId)
                 .set(companyId)
                 .update(Outcome.VOID);
@@ -293,5 +252,75 @@ public class RpResource {
         return get(resourceId, companyId);
     }
 
+    public void delete(UUID resourceId, UUID companyId) throws SQLException {
+        JdbcSession jdbcSession = new JdbcSession(dataSource);
+
+        jdbcSession
+                .sql("""
+                    DELETE FROM resource_users
+                    WHERE resource_id = ?
+                    """)
+                .set(resourceId)
+                .update(Outcome.VOID);
+
+        jdbcSession
+                .sql("""
+                    DELETE FROM resource
+                    WHERE id = ? AND warehouseId in
+                    (SELECT warehouse FROM company_warehouses WHERE company = ?)
+                    """)
+                .set(resourceId)
+                .set(companyId)
+                .update(Outcome.VOID);
+
+        jdbcSession
+                .sql("""
+                    UPDATE resource_history
+                    SET prev_id = null
+                    WHERE prev_id = ?
+                    """)
+                .set(resourceId)
+                .update(Outcome.VOID);
+
+        jdbcSession
+                .sql("""                    
+                    UPDATE resource_history
+                    SET goal_id = null
+                    WHERE goal_id = ?;
+                    """)
+                .set(resourceId)
+                .update(Outcome.VOID);
+    }
+
+    private Resource compactFromRset(ResultSet rset) throws SQLException {
+        Array dbImagesArray = rset.getArray("images");
+        List<URL> images = null;
+        if (dbImagesArray != null) {
+            images = Arrays.stream((String[]) dbImagesArray.getArray())
+                    .map(url -> {
+                        try {
+                            return new URL(url);
+                        } catch (MalformedURLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        }
+        return new Resource(
+                rset.getObject("id", UUID.class),
+                images,
+                rset.getString("name"),
+                rset.getInt("count"),
+                Unit.valueOf(rset.getString("unit")),
+                ResourceType.valueOf(rset.getString("type")),
+                rset.getObject("projectId", UUID.class),
+                ResourceStatus.valueOf(rset.getString("status")),
+                rset.getString("description"),
+                rset.getObject("warehouseId", UUID.class),
+                rset.getObject("user_id", UUID.class),
+                rset.getDate("created_at").toLocalDate(),
+                rset.getDate("updated_at").toLocalDate()
+        );
+    }
 
 }
