@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import supply.server.controller.entity.request.EmailPasswordRequest;
 import supply.server.controller.entity.request.EmailRequest;
 import supply.server.controller.entity.response.UserInfoResponse;
 import supply.server.controller.entity.response.UserProfileResponse;
@@ -16,6 +17,7 @@ import supply.server.service.dataService.FetchService;
 import supply.server.service.dataService.UpdateService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/profile")
@@ -52,9 +54,15 @@ public class ProfileController {
     }
 
     @PostMapping("/user/update")
-    public ResponseEntity<?> updateUser(@RequestBody @Valid @NotNull EmailRequest email) {
-        updateService.updateUser(email.toEmail());
+    public ResponseEntity<?> updateUser(@RequestBody @Valid @NotNull EmailPasswordRequest emailPassword) {
+        if (emailPassword.password() != null) {
+            updateService.updateUser(emailPassword.password());
+        }
+        if (emailPassword.email() != null) {
+            updateService.updateUser(emailPassword.toEmail());
+        }
         return ResponseEntity.ok().build();
     }
+
 
 }

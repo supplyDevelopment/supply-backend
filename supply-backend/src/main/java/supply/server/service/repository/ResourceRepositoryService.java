@@ -10,7 +10,6 @@ import supply.server.data.Redis;
 import supply.server.data.resource.CreateResource;
 import supply.server.data.resource.Resource;
 import supply.server.data.resource.RpResource;
-import supply.server.data.resource.types.ResourceStatus;
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -26,15 +25,27 @@ public class ResourceRepositoryService {
     public Resource add(CreateResource createResource, UUID companyId) {
         Resource resource;
         try {
-            Optional<Resource> resourceOpt = rpResource.add(createResource);
+            Optional<Resource> existingResource = rpResource.get(createResource, companyId);
+            Optional<Resource> resourceOpt;
+            if (existingResource.isPresent()) {
+                resourceOpt = rpResource.edit(existingResource.get().id(), companyId, existingResource.get().count() + createResource.count());
 
-            if (resourceOpt.isPresent()) {
-                resource = resourceOpt.get();
-                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+                if (resourceOpt.isPresent()) {
+                    resource = resourceOpt.get();
+                    inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+                } else {
+                    throw new DbException("Failed to update existing resource");
+                }
             } else {
-                throw new DbException("Failed to add resource");
-            }
+                resourceOpt = rpResource.add(createResource);
 
+                if (resourceOpt.isPresent()) {
+                    resource = resourceOpt.get();
+                    inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+                } else {
+                    throw new DbException("Failed to add resource");
+                }
+            }
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }
@@ -68,34 +79,11 @@ public class ResourceRepositoryService {
         return resource;
     }
 
-    public Resource edit(
-             UUID resourceId,
-             UUID companyId,
-             Optional<String> name,
-             Optional<Integer> count,
-             Optional<UUID> projectId,
-             Optional<ResourceStatus> status,
-             Optional<String> description
-    ) {
-        Resource resource;
+    public Optional<Resource> get(CreateResource createResource, UUID companyId) {
+        Optional<Resource> resource;
         try {
-            Optional<Resource> resourceOpt = rpResource.edit(
-                    resourceId,
-                    companyId,
-                    name,
-                    count,
-                    projectId,
-                    status,
-                    description
-            );
-
-            if (resourceOpt.isPresent()) {
-                resource = resourceOpt.get();
-                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
-            } else {
-                throw new DbException("Failed to edit resource with id " + resourceId);
-            }
-
+            resource = rpResource.get(createResource, companyId);
+            resource.ifPresent(value -> inMemoryRpResource.set(value.id(), Pair.of(companyId, value)));
         } catch (SQLException e) {
             throw new DbException(e.getMessage());
         }
@@ -110,6 +98,32 @@ public class ResourceRepositoryService {
             throw new DbException(e.getMessage());
         }
         return resources;
+    }
+
+    public Resource edit(UUID id, UUID companyId, int count) {
+        Resource resource;
+        try {
+            Optional<Resource> resourceOpt = rpResource.edit(id, companyId, count);
+
+            if (resourceOpt.isPresent()) {
+                resource = resourceOpt.get();
+                inMemoryRpResource.set(resource.id(), Pair.of(companyId, resource));
+            } else {
+                throw new DataNotFoundException("Resource with id " + id + " not found");
+            }
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
+        return resource;
+    }
+
+    public void delete(UUID resourceId, UUID companyId) {
+        try {
+            rpResource.delete(resourceId, companyId);
+            inMemoryRpResource.remove(resourceId);
+        } catch (SQLException e) {
+            throw new DbException(e.getMessage());
+        }
     }
 
 }

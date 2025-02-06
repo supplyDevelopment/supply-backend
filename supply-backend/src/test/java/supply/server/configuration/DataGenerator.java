@@ -77,7 +77,7 @@ public class DataGenerator extends RedisAndDBConnection {
         return new CreateResource(
                 List.of(url),
                 stringGenerator.generate(10, true, true),
-                1,
+                5,
                 Unit.KG,
                 ResourceType.PRODUCT,
                 userId,

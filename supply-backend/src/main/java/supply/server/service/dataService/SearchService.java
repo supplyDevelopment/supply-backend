@@ -6,11 +6,13 @@ import supply.server.data.PaginatedList;
 import supply.server.data.Pagination;
 import supply.server.data.project.Project;
 import supply.server.data.resource.Resource;
+import supply.server.data.resource.history.ResourceHistory;
 import supply.server.data.supplier.Supplier;
 import supply.server.data.user.User;
 import supply.server.data.warehouse.Warehouse;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SearchService extends UserService {
@@ -33,6 +35,10 @@ public class SearchService extends UserService {
 
     public PaginatedList<Resource> getResources(String prefix, Pagination pagination) {
         return repository.getResource().getAll(prefix, user().companyId(), pagination);
+    }
+
+    public PaginatedList<ResourceHistory> getResourceHistory(UUID companyId, Pagination pagination) {
+        return repository.getHistory().get(companyId, pagination);
     }
 
     public List<Supplier> getSuppliers() {

@@ -1,9 +1,12 @@
 package supply.server.service.dataService;
 
 import org.springframework.stereotype.Service;
+import supply.server.data.PaginatedList;
+import supply.server.data.Pagination;
 import supply.server.data.company.Company;
 import supply.server.data.project.Project;
 import supply.server.data.resource.Resource;
+import supply.server.data.resource.history.ResourceHistory;
 import supply.server.data.user.User;
 import supply.server.data.warehouse.Warehouse;
 
@@ -38,6 +41,10 @@ public class FetchService extends UserService {
 
     public Resource getResource(UUID resourceId) {
         return repository.getResource().get(resourceId, user().companyId());
+    }
+
+    public PaginatedList<ResourceHistory> getResourceHistory(UUID resourceId, Pagination pagination) {
+        return repository.getHistory().get(resourceId, user().companyId(), pagination);
     }
 
 }
