@@ -20,8 +20,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RpHistoryTest extends DataCreator {
 
@@ -33,7 +32,6 @@ public class RpHistoryTest extends DataCreator {
         EditResource editResource = new EditResource(
                 2,
                 Optional.of("test"),
-                Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
                 Optional.empty(),
@@ -61,8 +59,8 @@ public class RpHistoryTest extends DataCreator {
         assertEquals(resourceHistory.goal_id(), actual.id());
         assertEquals(resourceHistory.prev_name(), expected.name());
         assertEquals(resourceHistory.goal_name(), actual.name());
-        assertNull(resourceHistory.prev_count());
-        assertNull(resourceHistory.goal_count());
+        assertEquals(5, resourceHistory.prev_count());
+        assertEquals(2, resourceHistory.goal_count());
         assertNull(resourceHistory.prev_status());
         assertNull(resourceHistory.goal_status());
         assertNull(resourceHistory.prev_projectId());
