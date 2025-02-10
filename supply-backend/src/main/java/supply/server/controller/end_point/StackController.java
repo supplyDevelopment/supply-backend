@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import supply.server.controller.entity.request.CreateResourceRequest;
 import supply.server.controller.entity.request.EditResourceRequest;
+import supply.server.controller.entity.request.ExpandResourceRequest;
 import supply.server.controller.entity.request.PaginationRequest;
 import supply.server.data.PaginatedList;
 import supply.server.data.resource.Resource;
@@ -49,8 +50,8 @@ public class StackController {
     }
 
     @PostMapping("/expand")
-    public ResponseEntity<?> expandStack(@RequestBody @Valid @NotNull String id, @Valid @NotNull Integer quantity) {
-        updateService.expendResource(UUID.fromString(id), quantity);
+    public ResponseEntity<?> expandStack(@RequestBody @Valid @NotNull ExpandResourceRequest expandResourceRequest) {
+        updateService.expendResource(UUID.fromString(expandResourceRequest.id()), expandResourceRequest.quantity());
         return ResponseEntity.ok().build();
     }
 
