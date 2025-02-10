@@ -53,7 +53,8 @@ public class SecurityConfig {
                                         "/employee/**",
                                         "/project/**",
                                         "/warehouse/**",
-                                        "/stack/**"
+                                        "/stack/**",
+                                        "/history/**"
                                 ).authenticated()
                                 .requestMatchers("/**").permitAll()
                 );

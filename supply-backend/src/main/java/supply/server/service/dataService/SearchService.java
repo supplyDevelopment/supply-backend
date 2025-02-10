@@ -37,8 +37,8 @@ public class SearchService extends UserService {
         return repository.getResource().getAll(prefix, user().companyId(), pagination);
     }
 
-    public PaginatedList<ResourceHistory> getResourceHistory(UUID companyId, Pagination pagination) {
-        return repository.getHistory().get(companyId, pagination);
+    public PaginatedList<ResourceHistory> getResourceHistory(Pagination pagination) {
+        return repository.getHistory().get(user().companyId(), pagination);
     }
 
     public List<Supplier> getSuppliers() {
