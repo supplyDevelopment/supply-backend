@@ -55,8 +55,8 @@ public class StackController {
     }
 
     @PostMapping("/edit")
-    public ResponseEntity<?> editStack(@RequestBody @Valid @NotNull EditResourceRequest editResourceRequest, @Valid @NotNull String id) {
-        updateService.updateResource(UUID.fromString(id), editResourceRequest.toEditResource());
+    public ResponseEntity<?> editStack(@RequestBody @Valid @NotNull EditResourceRequest editResourceRequest) {
+        updateService.updateResource(UUID.fromString(editResourceRequest.id()), editResourceRequest.toEditResource());
         return ResponseEntity.ok().build();
     }
 
