@@ -61,13 +61,16 @@ public class UpdateService extends UserService {
             updatedResource = repository.getResource().edit(updatedResource.id(), user().companyId(), updatedResource.count() + createUpdatedResource.count());
         }
 
-        updatableResource = repository.getResource().edit(resourceId, user().companyId(), updatableResource.count() - editResource.quantity());
-
         repository.getHistory().add(
                 new CreateHistory(editResource, updatableResource, updatedResource),
                 user().companyId()
         );
 
+        if (updatableResource.count() == editResource.quantity()) {
+            repository.getResource().delete(resourceId, user().companyId());
+        } else {
+            updatableResource = repository.getResource().edit(resourceId, user().companyId(), updatableResource.count() - editResource.quantity());
+        }
 
         return Pair.of(updatableResource, updatedResource);
     }
