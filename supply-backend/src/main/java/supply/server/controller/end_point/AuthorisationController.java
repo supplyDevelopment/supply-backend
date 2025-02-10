@@ -1,6 +1,9 @@
 package supply.server.controller.end_point;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -26,6 +29,11 @@ public class AuthorisationController {
     private final AuthenticationService authenticationService;
 
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success, cookie set"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/register_company")
     public ResponseEntity<?> registerCompany(@RequestBody @Valid @NotNull EmailRequest email, HttpServletResponse response) {
         String jwt = companyService.createCompany(email.toEmail());
@@ -34,6 +42,11 @@ public class AuthorisationController {
         return ResponseEntity.ok().build();
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success, cookie set"),
+            @ApiResponse(responseCode = "400", description = "Bad request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/authorize")
     public ResponseEntity<?> authorize(@RequestBody @Valid @NotNull EmailPasswordRequest emailPassword, HttpServletResponse response) {
         Optional<String> jwtOptional = authenticationService.authenticate(emailPassword.toEmail(), emailPassword.password());
@@ -44,6 +57,10 @@ public class AuthorisationController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success, cookie deleted"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         authenticationService.resetAuthenticationCookie(request, response);
