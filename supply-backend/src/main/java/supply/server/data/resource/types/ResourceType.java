@@ -1,6 +1,6 @@
 package supply.server.data.resource.types;
 
-import supply.server.configuration.exception.IncorrectParameterException;
+import supply.server.configuration.exception.IncorrectInputException;
 
 import java.io.Serializable;
 
@@ -14,7 +14,7 @@ public enum ResourceType implements Serializable {
                 return type;
             }
         }
-        throw new IncorrectParameterException("Unknown resource type: " + name);
+        throw new IncorrectInputException("Unknown resource type: " + name);
     }
 }
 

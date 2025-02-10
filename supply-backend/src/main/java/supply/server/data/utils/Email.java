@@ -2,7 +2,6 @@ package supply.server.data.utils;
 
 import lombok.Getter;
 import supply.server.configuration.exception.IncorrectInputException;
-import supply.server.configuration.exception.IncorrectParameterException;
 
 import java.io.Serializable;
 
@@ -10,9 +9,9 @@ import java.io.Serializable;
 public class Email implements Serializable {
     private final String email;
 
-    public Email(String email) throws IncorrectInputException {
+    public Email(String email) {
         if (!isValidEmail(email)) {
-            throw new IncorrectParameterException("Email is invalid " + email);
+            throw new IncorrectInputException("Email is invalid " + email);
         }
         this.email = email;
     }
