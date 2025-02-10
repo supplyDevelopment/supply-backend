@@ -3,12 +3,12 @@ package supply.server.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import supply.server.configuration.exception.*;
 
 @Slf4j
-@Service
+@ControllerAdvice
 public class ExceptionHandlerService {
 
     @ExceptionHandler({RedisLockException.class, DbException.class})
