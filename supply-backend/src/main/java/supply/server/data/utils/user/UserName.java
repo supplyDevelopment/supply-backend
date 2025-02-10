@@ -1,7 +1,7 @@
 package supply.server.data.utils.user;
 
 import lombok.Getter;
-import supply.server.configuration.exception.IncorrectParameterException;
+import supply.server.configuration.exception.IncorrectInputException;
 
 import java.io.Serializable;
 
@@ -24,7 +24,7 @@ public class UserName implements Serializable {
 
     private void checkName(String name) {
         if (name != null &&!name.chars().allMatch(Character::isLetter)) {
-            throw new IncorrectParameterException("Not allowed to use non-letter chars in name: " + name);
+            throw new IncorrectInputException("Not allowed to use non-letter chars in name: " + name);
         }
     }
 }

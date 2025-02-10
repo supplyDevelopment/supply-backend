@@ -1,6 +1,6 @@
 package supply.server.data.utils;
 
-import supply.server.configuration.exception.IncorrectParameterException;
+import supply.server.configuration.exception.IncorrectInputException;
 
 import java.io.Serializable;
 
@@ -38,6 +38,6 @@ public enum Unit implements Serializable {
                 return unit;
             }
         }
-        throw new IncorrectParameterException("Unknown unit: " + shortName);
+        throw new IncorrectInputException("Unknown unit: " + shortName);
     }
 }

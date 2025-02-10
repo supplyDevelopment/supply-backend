@@ -1,7 +1,6 @@
 package supply.server.data.resource.types;
 
-import supply.server.configuration.exception.IncorrectParameterException;
-
+import supply.server.configuration.exception.IncorrectInputException;
 import java.io.Serializable;
 
 public enum ResourceStatus implements Serializable {
@@ -17,7 +16,7 @@ public enum ResourceStatus implements Serializable {
                 return status;
             }
         }
-        throw new IncorrectParameterException("Unknown resource status: " + name);
+        throw new IncorrectInputException("Unknown resource status: " + name);
     }
 }
 
