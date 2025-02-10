@@ -1,5 +1,6 @@
 package supply.server.controller.entity.request;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import supply.server.data.resource.EditResource;
 import supply.server.data.resource.types.ResourceStatus;
@@ -10,6 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public record EditResourceRequest(
+        @NotNull
+        String id,
         @NotNull
         int quantity,
         String name,
