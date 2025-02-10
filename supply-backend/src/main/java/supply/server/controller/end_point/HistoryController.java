@@ -24,7 +24,7 @@ public class HistoryController {
 
     @GetMapping("/get")
     public ResponseEntity<?> getHistory(
-            @RequestParam @Valid @NotNull PaginationRequest paginationRequest
+            @Valid @NotNull PaginationRequest paginationRequest
     ) {
         PaginatedList<ResourceHistory> resources = searchService.getResourceHistory(paginationRequest.toPagination());
 
