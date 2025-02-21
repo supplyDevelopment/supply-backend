@@ -36,7 +36,7 @@ public class ExceptionHandlerService {
     public ResponseEntity<?> handleExceptionBadRequest(IncorrectParameterException e) {
         log.warn("Incorrect parameter: {}", e.getMessage());
 
-        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)
