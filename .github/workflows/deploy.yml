@@ -87,3 +87,4 @@ jobs:
             kubectl rollout status deployment/app -n supply-app --timeout=3m
             kubectl rollout status deployment/message-service -n supply-app --timeout=2m
             kubectl rollout status deployment/scheduled-service -n supply-app --timeout=2m
+            crictl rmi --prune
