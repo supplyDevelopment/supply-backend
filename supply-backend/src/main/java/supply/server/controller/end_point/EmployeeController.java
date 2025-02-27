@@ -48,7 +48,7 @@ public class EmployeeController {
         return ResponseEntity.ok(
                 new PaginatedList<>(
                         users.total(),
-                        users.items().stream().map(UserPartialInfoResponse::new).toList()
+                        users.items().stream().map(user -> new UserPartialInfoResponse(user, fetchService.getCompany().subscriptionExpiresAt())).toList()
                 )
         );
     }

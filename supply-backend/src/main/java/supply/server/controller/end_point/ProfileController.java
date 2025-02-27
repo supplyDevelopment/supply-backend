@@ -47,7 +47,7 @@ public class ProfileController {
     public ResponseEntity<UserPartialInfoResponse> getUserInfo() {
         User user = fetchService.getUser();
 
-        return ResponseEntity.ok(new UserPartialInfoResponse(user));
+        return ResponseEntity.ok(new UserPartialInfoResponse(user, fetchService.getCompany().subscriptionExpiresAt()));
     }
 
     @ApiResponses(value = {
