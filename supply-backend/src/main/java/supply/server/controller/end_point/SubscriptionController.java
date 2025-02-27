@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import supply.server.controller.entity.request.CreateSubscribeRequest;
+import supply.server.data.subscribe.PaymentLink;
 import supply.server.data.subscribe.Subscribe;
 import supply.server.service.dataService.SubscribeService;
 
@@ -31,7 +32,7 @@ public class SubscriptionController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @PostMapping("/payment")
-    public ResponseEntity<String> payment(
+    public ResponseEntity<PaymentLink> payment(
             @RequestBody @Valid @NotNull CreateSubscribeRequest createSubscribeRequest,
             HttpServletResponse response
     ) {
@@ -39,7 +40,7 @@ public class SubscriptionController {
                 .createSubscribePayment(createSubscribeRequest.toCreateSubscribe());
         subscribeService.setPaymentCookie(response, subscribe.id());
 
-        return ResponseEntity.ok(subscribe.confirmation().confirmation_url());
+        return ResponseEntity.ok(new PaymentLink(subscribe.confirmation().confirmation_url()));
     }
 
     @ApiResponses(value = {
