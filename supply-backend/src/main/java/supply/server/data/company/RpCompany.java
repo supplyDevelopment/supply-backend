@@ -97,7 +97,7 @@ public class RpCompany {
                 .sql("""
                         UPDATE company
                         SET expires_at = ?,
-                        SET updated_at = ?
+                        updated_at = ?
                         WHERE id = ?
                         """)
                 .set(extendedExpiresAt)
