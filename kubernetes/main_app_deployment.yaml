@@ -22,6 +22,8 @@ spec:
             - secretRef:
                 name: app-secrets
           env:
+            - name: YOO_KASSA_REDIRECT_URL
+              value: "https://supply-test.ecosystema.space/registr/handler"
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 secretKeyRef:
