@@ -4,6 +4,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,13 +44,14 @@ public class AuthenticationService {
     }
 
     public void setAuthenticationCookie(HttpServletResponse response, String jwt) {
-        Cookie cookie = new Cookie("token", jwt);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(86400);
-
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from("token", jwt)
+                .sameSite("None")
+                .secure(true)
+                .path("/")
+                .maxAge(86400)
+                .httpOnly(true)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void resetAuthenticationCookie(HttpServletRequest request, HttpServletResponse response) {
@@ -56,12 +59,14 @@ public class AuthenticationService {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("token".equals(cookie.getName())) {
-                    Cookie deleteCookie = new Cookie("token", null);
-                    deleteCookie.setMaxAge(0);
-                    deleteCookie.setPath(cookie.getPath() != null ? cookie.getPath() : "/");
-                    deleteCookie.setSecure(true);
-                    deleteCookie.setHttpOnly(true);
-                    response.addCookie(deleteCookie);
+                    ResponseCookie deleteCookie = ResponseCookie.from("token", null)
+                            .sameSite("None")
+                            .secure(true)
+                            .path("/")
+                            .maxAge(0)
+                            .httpOnly(true)
+                            .build();
+                    response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
                     break;
                 }
             }

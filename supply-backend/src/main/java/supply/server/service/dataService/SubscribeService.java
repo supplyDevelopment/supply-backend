@@ -4,7 +4,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import supply.server.configuration.exception.PaymentException;
@@ -79,12 +81,14 @@ public class SubscribeService extends UserService {
     }
 
     public void setPaymentCookie(HttpServletResponse response, String id) {
-        Cookie cookie = new Cookie("payment", id);
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(86400);
-
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from("payment", id)
+                .sameSite("None")
+                .secure(true)
+                .path("/")
+                .maxAge(86400)
+                .httpOnly(true)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     public void deletePaymentCookie(HttpServletResponse response, HttpServletRequest request) {
@@ -92,12 +96,14 @@ public class SubscribeService extends UserService {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("payment".equals(cookie.getName())) {
-                    Cookie deleteCookie = new Cookie("payment", null);
-                    deleteCookie.setMaxAge(0);
-                    deleteCookie.setPath(cookie.getPath() != null ? cookie.getPath() : "/");
-                    deleteCookie.setSecure(true);
-                    deleteCookie.setHttpOnly(true);
-                    response.addCookie(deleteCookie);
+                    ResponseCookie deleteCookie = ResponseCookie.from("payment", null)
+                            .sameSite("None")
+                            .secure(true)
+                            .path("/")
+                            .maxAge(0)
+                            .httpOnly(true)
+                            .build();
+                    response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
                     break;
                 }
             }
