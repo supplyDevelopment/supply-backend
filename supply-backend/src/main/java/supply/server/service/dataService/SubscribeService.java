@@ -23,6 +23,8 @@ public class SubscribeService extends UserService {
     @Value("${yoo.kassa.redirect.url}")
     private String redirectURL;
     private final WebClient yooKassaClient;
+    @Value("${cookie.domain}")
+    private String cookieDomain;
 
     public SubscribeService(RepositoryService repository, WebClient yooKassaClient) {
         super(repository);
@@ -85,6 +87,7 @@ public class SubscribeService extends UserService {
                 .sameSite("None")
                 .secure(true)
                 .path("/")
+                .domain(cookieDomain)
                 .maxAge(86400)
                 .httpOnly(true)
                 .build();
@@ -100,6 +103,7 @@ public class SubscribeService extends UserService {
                             .sameSite("None")
                             .secure(true)
                             .path("/")
+                            .domain(cookieDomain)
                             .maxAge(0)
                             .httpOnly(true)
                             .build();

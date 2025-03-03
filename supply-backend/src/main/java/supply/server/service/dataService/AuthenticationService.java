@@ -4,6 +4,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,12 +21,15 @@ import supply.server.data.utils.Email;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final UserEntityDetailsService entityDetailsService;
+
+    @Value("${cookie.domain}")
+    private String cookieDomain;
 
     public Optional<String> authenticate(Email email, String password) {
         UserDetails userDetails = entityDetailsService.loadUserByUsername(email.getEmail());
@@ -48,6 +53,7 @@ public class AuthenticationService {
                 .sameSite("None")
                 .secure(true)
                 .path("/")
+                .domain(cookieDomain)
                 .maxAge(86400)
                 .httpOnly(true)
                 .build();
@@ -63,6 +69,7 @@ public class AuthenticationService {
                             .sameSite("None")
                             .secure(true)
                             .path("/")
+                            .domain(cookieDomain)
                             .maxAge(0)
                             .httpOnly(true)
                             .build();
