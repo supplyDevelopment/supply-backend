@@ -55,7 +55,6 @@ public class AuthenticationService {
                 .path("/")
                 .domain(cookieDomain)
                 .maxAge(86400)
-                .httpOnly(true)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
@@ -71,7 +70,6 @@ public class AuthenticationService {
                             .path("/")
                             .domain(cookieDomain)
                             .maxAge(0)
-                            .httpOnly(true)
                             .build();
                     response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
                     break;
